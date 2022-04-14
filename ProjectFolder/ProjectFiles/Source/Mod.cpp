@@ -2,7 +2,7 @@
 #include "Classes.h"
 
 // Custom variables
-
+std::vector<ExcavatorBlock> excavatorBlocks;
 
 /************************************************************
 	Config Variables (Set these to whatever you need. They are automatically read by the game.)
@@ -20,14 +20,22 @@ float TickRate = 1;							 // Set how many times per second Event_Tick() is call
 // Run every time a block is placed
 void Event_BlockPlaced(CoordinateInBlocks At, UniqueID CustomBlockID)
 {
-	
+	if (CustomBlockID == 1473066952) {
+		excavatorBlocks.push_back(ExcavatorBlock(At));
+	}
 }
 
 
 // Run every time a block is destroyed
 void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID)
 {
-	
+	for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
+		if (it->getPosition() == At) {
+			it->removeCorners();
+			excavatorBlocks.erase(it);
+			break;
+		}
+	}
 }
 
 
@@ -36,7 +44,12 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 {
 
 	if (ToolName == L"T_Stick") {
-		
+		for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
+			if (it->getPosition() == At) {
+				it->incrementSize();
+				break;
+			}
+		}
 	}
 	else if (ToolName == L"T_Pickaxe_Stone") {
 
