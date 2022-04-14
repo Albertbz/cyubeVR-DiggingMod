@@ -21,7 +21,8 @@ float TickRate = 1;							 // Set how many times per second Event_Tick() is call
 void Event_BlockPlaced(CoordinateInBlocks At, UniqueID CustomBlockID)
 {
 	if (CustomBlockID == 1473066952) {
-		excavatorBlocks.push_back(ExcavatorBlock(At));
+		// Adds the newly placed excavator block to the list of excavator blocks
+		excavatorBlocks.push_back(ExcavatorBlock(At)); 
 	}
 }
 
@@ -29,11 +30,14 @@ void Event_BlockPlaced(CoordinateInBlocks At, UniqueID CustomBlockID)
 // Run every time a block is destroyed
 void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID)
 {
-	for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
-		if (it->getPosition() == At) {
-			it->removeCorners();
-			excavatorBlocks.erase(it);
-			break;
+	if (CustomBlockID == 1473066952) {
+		// Goes through all excavator blocks, deletes the one that was destroyed
+		for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
+			if (it->getPosition() == At) {
+				it->removeCorners();
+				excavatorBlocks.erase(it);
+				break;
+			}
 		}
 	}
 }
@@ -44,10 +48,13 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 {
 
 	if (ToolName == L"T_Stick") {
-		for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
-			if (it->getPosition() == At) {
-				it->incrementSize();
-				break;
+		if (CustomBlockID == 1473066952) {
+			// Increments the size of the area to be dug out (when hitting excavator block with a stick)
+			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
+				if (it->getPosition() == At) {
+					it->incrementSize();
+					break;
+				}
 			}
 		}
 	}
