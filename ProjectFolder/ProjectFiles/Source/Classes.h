@@ -1,55 +1,57 @@
 #pragma once
 #include "GameAPI.h"
 class ExcavatorBlock {
+private:
+	int size;								// Used to define the size of the area (area is size*2+1 x size*2+1).
+	CoordinateInBlocks blockPosition;		// The position of the block.
+	EBlockType cornerBlockType;				// The type of block to be used as corners.
+	bool isDigging;							// Boolean to tell whether digging is in progress.
+	int currentDigLayer;					// The current layer that the digging is at relative to blockPosition.
+	int currentDigBlock[2];					// The current block that is being dug out relative to blockPosition.
+	
 public:
-	int size; // The size of the area (area is size*2+1 x size*2+1)
-	CoordinateInBlocks position; // The position of the block
-	EBlockType cornerBlockType; // The type of block to be used as corners
-	ExcavatorBlock(CoordinateInBlocks position) {
-		this->position = position;
-		this->size = 2;
-		this->cornerBlockType = EBlockType::Wallstone;
-		addCorners();
-	}
+	// Constructor for ExcavatorBlock.
+	ExcavatorBlock(CoordinateInBlocks);
 
-	/*
-	Accessor method for the position field.
+	/**
+	 * Accessor method for the blockPosition field.
+	 * 
+	 * @return the position of the excavator block.
 	*/
-	CoordinateInBlocks getPosition() {
-		return this->position;
-	}
+	CoordinateInBlocks getBlockPosition();
 
-	/*
-	Adds the corners of the area that is to be dug out.
-	*/
-	void addCorners() {
-		SetBlock(position + CoordinateInBlocks(size, size, 0), cornerBlockType);
-		SetBlock(position + CoordinateInBlocks(size, -size, 0), cornerBlockType);
-		SetBlock(position + CoordinateInBlocks(-size, size, 0), cornerBlockType);
-		SetBlock(position + CoordinateInBlocks(-size, -size, 0), cornerBlockType);
-	}
+	/**
+	 * Adds the corners of the area that is to be dug out.
+	 */
+	void addCorners();
 
-	/*
-	Removes the corners of the area that is to be dug out.
-	*/
-	void removeCorners() {
-		SetBlock(position + CoordinateInBlocks(size, size, 0), EBlockType::Air);
-		SetBlock(position + CoordinateInBlocks(size, -size, 0), EBlockType::Air);
-		SetBlock(position + CoordinateInBlocks(-size, size, 0), EBlockType::Air);
-		SetBlock(position + CoordinateInBlocks(-size, -size, 0), EBlockType::Air);
-	}
+	/**
+	 * Removes the corners of the area that is to be dug out.
+	 */
+	void removeCorners();
 
-	/*
-	Increments the size of the area that is to be dug out.
-	*/
-	void incrementSize() {
-		removeCorners();
-		if (size >= 10) {
-			size = 2;
-		}
-		else {
-			size += 1;
-		}
-		addCorners();
-	}
+	/**
+	 * Increments the size of the area that is to be dug out.
+	 */
+	void incrementSize();
+
+	/**
+	 * Digs/mines a single block if the block is digging at that moment.
+	 */
+	void dig();
+
+	/**
+	 * Starts digging (sets isDigging to true).
+	 */
+	void startDig();
+
+	/**
+	 * Updates the currentDigBlock to fit with size.
+	 */
+	void updateDigBlock();
+
+	/**
+	 * Removes all foliage that is on the top layer of Grass blocks.
+	 */
+	void removeFoliage();
 };

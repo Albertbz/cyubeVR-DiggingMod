@@ -1,8 +1,6 @@
-﻿  GameFunctions.cpp
+﻿  Classes.cpp
   Internals.cpp
   Generating Code...
-  LINK : C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\x64\Debug\Code.dll not found or not built by the last incremental link; performing full link
-     Creating library C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\x64\Debug\Code.lib and object C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\x64\Debug\Code.exp
   Code.vcxproj -> C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\x64\Debug\Code.dll
           1 file(s) copied.
   Press any key to continue . . . 
