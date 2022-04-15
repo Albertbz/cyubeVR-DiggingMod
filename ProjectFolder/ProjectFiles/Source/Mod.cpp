@@ -10,7 +10,7 @@ std::vector<ExcavatorBlock*> excavatorBlocks;
 	Config Variables (Set these to whatever you need. They are automatically read by the game.)
 *************************************************************/
 
-UniqueID ThisModUniqueIDs[] = { 1473066952 }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
+UniqueID ThisModUniqueIDs[] = { 1473066952, 1473066953 }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
 float TickRate = 0.2;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
 

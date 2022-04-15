@@ -4,7 +4,7 @@ class ExcavatorBlock {
 private:
 	int size;								// Used to define the size of the area (area is size*2+1 x size*2+1).
 	CoordinateInBlocks blockPosition;		// The position of the block.
-	EBlockType cornerBlockType;				// The type of block to be used as corners.
+	UniqueID cornerBlockType;				// The type of block to be used as corners.
 	bool isDigging;							// Boolean to tell whether digging is in progress.
 	int currentDigLayer;					// The current layer that the digging is at relative to blockPosition.
 	int currentDigBlock[2];					// The current block that is being dug out relative to blockPosition.

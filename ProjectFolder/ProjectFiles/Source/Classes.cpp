@@ -7,7 +7,7 @@
 ExcavatorBlock::ExcavatorBlock(CoordinateInBlocks blockPosition) {
 	this->size = 2;
 	this->blockPosition = blockPosition;
-	this->cornerBlockType = EBlockType::Wallstone;
+	this->cornerBlockType = 1473066953;
 	this->isDigging = false;
 	this->currentDigLayer = -1;
 	this->updateDigBlock();
@@ -17,7 +17,7 @@ ExcavatorBlock::ExcavatorBlock(CoordinateInBlocks blockPosition) {
 ExcavatorBlock::ExcavatorBlock(int size, CoordinateInBlocks blockPosition, bool isDigging, int currentDigLayer, int currentDigBlockX, int currentDigBlockY) {
 	this->size = size;
 	this->blockPosition = blockPosition;
-	this->cornerBlockType = EBlockType::Wallstone;
+	this->cornerBlockType = 1473066953;
 	this->isDigging = isDigging;
 	this->currentDigLayer = currentDigLayer;
 	this->currentDigBlock[0] = currentDigBlockX;
@@ -126,7 +126,6 @@ void ExcavatorBlock::writeExcavatorBlocks(std::ostream&& file, const std::vector
 }
 
 auto ExcavatorBlock::readExcavatorBlocks(std::istream& file)->std::vector<ExcavatorBlock*> {
-	//auto excavatorBlocks = std::vector<ExcavatorBlock*>();
 	std::vector<ExcavatorBlock*> excavatorBlocks;
 	auto line = std::string{};
 
@@ -138,7 +137,6 @@ auto ExcavatorBlock::readExcavatorBlocks(std::istream& file)->std::vector<Excava
 		auto pos5 = line.find_first_of(';', pos4 + 1);
 		auto pos6 = line.find_first_of(';', pos5 + 1);
 		auto pos7 = line.find_first_of(';', pos6 + 1);
-		//int size = std::stoi(std::string{ line, 0, pos });
 		excavatorBlocks.push_back(new ExcavatorBlock{std::stoi(std::string{line, 0, pos1}), 
 													 CoordinateInBlocks(std::stoi(std::string{line, pos1 + 1}), std::stoi(std::string{line, pos2 + 1}), std::stoi(std::string{line, pos3 + 1})),
 													 stob(std::string{line, pos4 + 1}, false),
