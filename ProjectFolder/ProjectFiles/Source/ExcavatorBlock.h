@@ -6,8 +6,7 @@ private:
 	CoordinateInBlocks blockPosition;		// The position of the block.
 	UniqueID cornerBlockType;				// The type of block to be used as corners.
 	bool isDigging;							// Boolean to tell whether digging is in progress.
-	int currentDigLayer;					// The current layer that the digging is at relative to blockPosition.
-	int currentDigBlock[2];					// The current block that is being dug out relative to blockPosition.
+	int currentDigBlock[3];					// The current block that is being dug out, relative to blockPosition.
 	
 public:
 	// Constructor for ExcavatorBlock.

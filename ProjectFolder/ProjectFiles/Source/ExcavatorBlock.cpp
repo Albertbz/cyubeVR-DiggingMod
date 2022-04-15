@@ -1,4 +1,4 @@
-#include "Classes.h"
+#include "ExcavatorBlock.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -9,19 +9,19 @@ ExcavatorBlock::ExcavatorBlock(CoordinateInBlocks blockPosition) {
 	this->blockPosition = blockPosition;
 	this->cornerBlockType = 1473066953;
 	this->isDigging = false;
-	this->currentDigLayer = -1;
 	this->updateDigBlock();
+	this->currentDigBlock[2] = -1;
 	this->addCorners();
 }
 
-ExcavatorBlock::ExcavatorBlock(int size, CoordinateInBlocks blockPosition, bool isDigging, int currentDigLayer, int currentDigBlockX, int currentDigBlockY) {
+ExcavatorBlock::ExcavatorBlock(int size, CoordinateInBlocks blockPosition, bool isDigging, int currentDigBlockX, int currentDigBlockY, int currentDigBlockZ) {
 	this->size = size;
 	this->blockPosition = blockPosition;
 	this->cornerBlockType = 1473066953;
 	this->isDigging = isDigging;
-	this->currentDigLayer = currentDigLayer;
 	this->currentDigBlock[0] = currentDigBlockX;
 	this->currentDigBlock[1] = currentDigBlockY;
+	this->currentDigBlock[2] = currentDigBlockZ;
 }
 
 
@@ -59,9 +59,9 @@ void ExcavatorBlock::incrementSize() {
 
 bool ExcavatorBlock::dig() {
 	if (isDigging) {
-		EBlockType currentBlockType = GetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigLayer)).Type;
+		EBlockType currentBlockType = GetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2])).Type;
 		if (currentBlockType == EBlockType::Stone || currentBlockType == EBlockType::Dirt || currentBlockType == EBlockType::Grass) {
-			SetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigLayer), EBlockType::Air);
+			SetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2]), EBlockType::Air);
 		}
 		currentDigBlock[0]--;
 		if (currentDigBlock[0] < -size) {
@@ -69,9 +69,9 @@ bool ExcavatorBlock::dig() {
 			currentDigBlock[1]--;
 			if (currentDigBlock[1] < -size) {
 				currentDigBlock[1] = size;
-				currentDigLayer--;
-				if (currentDigLayer < -5) {
-					currentDigLayer = -1;
+				currentDigBlock[2]--;
+				if (currentDigBlock[2] < -5) {
+					currentDigBlock[2] = -1;
 					isDigging = false;
 				}
 			}
@@ -86,7 +86,7 @@ bool ExcavatorBlock::dig() {
 void ExcavatorBlock::toggleDig() {
 	if (!isDigging) {
 		removeCorners();
-		if (currentDigLayer == -1) {
+		if (currentDigBlock[2] == -1) {
 			removeFoliage();
 		}
 		isDigging = true;
@@ -117,7 +117,7 @@ void ExcavatorBlock::removeFoliage() {
 void ExcavatorBlock::writeExcavatorBlocks(std::ostream& file, const std::vector<ExcavatorBlock*>& excavatorBlocks) {
 	for (auto b : excavatorBlocks) {
 		file << b->size << ';' << b->blockPosition.X << ';' << b->blockPosition.Y << ';' << b->blockPosition.Z << ';' 
-			 << b->isDigging << ';' << b->currentDigLayer << ';' << b->currentDigBlock[0] << ';' << b->currentDigBlock[1] << '\n';
+			 << b->isDigging << ';' << b->currentDigBlock[0] << ';' << b->currentDigBlock[1] << ';' << b->currentDigBlock[2] << '\n';
 	}
 }
 
