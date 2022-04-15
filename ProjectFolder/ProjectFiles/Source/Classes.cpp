@@ -53,6 +53,7 @@ void ExcavatorBlock::incrementSize() {
 			size += 1;
 		}
 		addCorners();
+		updateDigBlock();
 	}
 }
 
@@ -82,11 +83,18 @@ bool ExcavatorBlock::dig() {
 	}
 }
 
-void ExcavatorBlock::startDig() {
-	removeCorners();
-	removeFoliage();
-	updateDigBlock();
-	isDigging = true;
+void ExcavatorBlock::toggleDig() {
+	if (!isDigging) {
+		removeCorners();
+		if (currentDigLayer == -1) {
+			removeFoliage();
+		}
+		isDigging = true;
+	}
+	else {
+		addCorners();
+		isDigging = false;
+	}
 }
 
 void ExcavatorBlock::updateDigBlock() {

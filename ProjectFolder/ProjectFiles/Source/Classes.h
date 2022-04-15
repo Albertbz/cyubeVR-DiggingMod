@@ -42,9 +42,9 @@ public:
 	bool dig();
 
 	/**
-	 * Starts digging (sets isDigging to true).
+	 * Toggles digging.
 	 */
-	void startDig();
+	void toggleDig();
 
 	/**
 	 * Updates the currentDigBlock to fit with size.
