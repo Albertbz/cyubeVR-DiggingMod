@@ -70,7 +70,7 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 		if (CustomBlockID == 1473066952) {
 			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
 				if ((*it)->getBlockPosition() == At) {
-					(*it)->startDig();
+					(*it)->toggleDig();
 					ExcavatorBlock::writeExcavatorBlocks(std::ofstream{ "ExcavatorBlocks.txt" }, excavatorBlocks);
 					break;
 				}
