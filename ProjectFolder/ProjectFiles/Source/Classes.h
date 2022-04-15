@@ -12,6 +12,7 @@ private:
 public:
 	// Constructor for ExcavatorBlock.
 	ExcavatorBlock(CoordinateInBlocks);
+	ExcavatorBlock(int, CoordinateInBlocks, bool, int, int, int);
 
 	/**
 	 * Accessor method for the blockPosition field.
@@ -38,7 +39,7 @@ public:
 	/**
 	 * Digs/mines a single block if the block is digging at that moment.
 	 */
-	void dig();
+	bool dig();
 
 	/**
 	 * Starts digging (sets isDigging to true).
@@ -54,4 +55,15 @@ public:
 	 * Removes all foliage that is on the top layer of Grass blocks.
 	 */
 	void removeFoliage();
+
+	/**
+	 * Writes a vector/list of ExcavatorBlock instances to a file.
+	 */
+	static void writeExcavatorBlocks(std::ostream&, const std::vector<ExcavatorBlock*>&);
+	static void writeExcavatorBlocks(std::ostream&&, const std::vector<ExcavatorBlock*>&);
+
+	static auto readExcavatorBlocks(std::istream& i)->std::vector<ExcavatorBlock*>;
+	static auto readExcavatorBlocks(std::istream&& i)->std::vector<ExcavatorBlock*>;
+private:
+	static bool stob(std::string, bool);
 };
