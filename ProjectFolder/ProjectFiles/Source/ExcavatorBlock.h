@@ -6,7 +6,7 @@ private:
 	int depth;								// How deep the hole will be.
 	CoordinateInBlocks blockPosition;		// The position of the block.
 	UniqueID cornerBlockType;				// The type of block to be used as corners.
-	int currentMode;						// The current mode the excavator block is in. 1 = normal, 2 = settings, 3 = digging, 4 = destroyed.
+	int currentMode;						// The current mode the excavator block is in. 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
 	int currentDigBlock[3];					// The current block that is being dug out, relative to blockPosition.
 	
 public:
@@ -66,7 +66,7 @@ public:
 	bool dig();
 
 	// Toggles digging mode.
-	void toggleDig();
+	void toggleDigging();
 
 	// Toggles settings mode.
 	void toggleSettings();
@@ -84,6 +84,20 @@ public:
 	 * @param show Whether to show the blocks.
 	 */
 	void showNormal(bool show);
+
+	/**
+	 * Sets or removes all of the blocks needed for the finished mode.
+	 *
+	 * @param show Whether to show the blocks.
+	 */
+	void showFinished(bool show);
+
+	/**
+	 * Sets or removes all of the blocks needed for the digging mode.
+	 *
+	 * @param show Whether to show the blocks.
+	 */
+	void showDigging(bool show);
 
 	// Removes and stops everything.
 	void destroy();

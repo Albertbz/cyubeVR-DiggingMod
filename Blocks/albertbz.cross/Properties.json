@@ -1,0 +1,18 @@
+{    
+    "Name": "Cross Mark",
+    "CreatorName": "Albertbz",
+    "UniqueID": 1473066961,
+    "Recipe": {
+      "Array" : [2,2,2,2,2,2,2,2,2,2,2],
+      "SizeX": 1,
+      "SizeY": 11,
+      "SizeZ": 1
+    },
+    "Yield": 1,
+    "SimilarTo": 2,
+    "Textures": {
+        "Mode": 2,
+        "WithNormals" : false,
+		"WithGlowMap" : true
+      }
+  }

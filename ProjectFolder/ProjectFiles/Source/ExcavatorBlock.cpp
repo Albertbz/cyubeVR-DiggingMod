@@ -90,7 +90,9 @@ bool ExcavatorBlock::dig() {
 				currentDigBlock[2]--;
 				if (currentDigBlock[2] < -depth) {
 					currentDigBlock[2] = -1;
-					currentMode = 1;
+					showDigging(false);
+					showFinished(true);
+					currentMode = 4;
 				}
 			}
 		}
@@ -101,15 +103,17 @@ bool ExcavatorBlock::dig() {
 	}
 }
 
-void ExcavatorBlock::toggleDig() {
+void ExcavatorBlock::toggleDigging() {
 	if (currentMode == 1) {
 		showNormal(false);
 		if (currentDigBlock[2] == -1) {
 			removeFoliage();
 		}
+		showDigging(true);
 		currentMode = 3;
 	}
 	else if (currentMode == 3) {
+		showDigging(false);
 		showNormal(true);
 		currentMode = 1;
 	}
@@ -151,22 +155,55 @@ void ExcavatorBlock::showNormal(bool show) {
 	if (show) {
 		addCorners();
 		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), 1473066958); // Set Settings block
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), 1473066960); // Set Check Mark block
 	}
 	else {
 		removeCorners();
 		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), EBlockType::Air);
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), EBlockType::Air);
+	}
+}
+
+void ExcavatorBlock::showFinished(bool show) {
+	if (show) {
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), 1473066959); // Set Exclamation Mark block
+	}
+	else {
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), EBlockType::Air);
+	}
+}
+
+void ExcavatorBlock::showDigging(bool show) {
+	if (show) {
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), 1473066961); // Set Cross Mark block
+	}
+	else {
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), EBlockType::Air);
 	}
 }
 
 void ExcavatorBlock::destroy() {
-	showNormal(false);
-	showSettings(false);
-	currentMode = 4;
+	switch (currentMode) {
+	case 1:
+		showNormal(false);
+		break;
+	case 2:
+		showSettings(false);
+		break;
+	case 3:
+		showDigging(false);
+		break;
+	case 4:
+		showFinished(false);
+		break;
+	};
+	currentMode = 0;
 }
 
 void ExcavatorBlock::updateDigBlock() {
 	currentDigBlock[0] = size;
 	currentDigBlock[1] = size;
+	currentDigBlock[2] = -1;
 }
 
 void ExcavatorBlock::removeFoliage() {
