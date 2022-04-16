@@ -161,6 +161,7 @@ void ExcavatorBlock::showNormal(bool show) {
 void ExcavatorBlock::destroy() {
 	showNormal(false);
 	showSettings(false);
+	currentMode = 4;
 }
 
 void ExcavatorBlock::updateDigBlock() {
