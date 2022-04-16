@@ -1,1 +1,1 @@
-This is the GitHub page for my Excavater Block mod! You can see all of the blocks used in the Block folder, and the most recent version of the mod itself can be found in the ProjectFolder as the "Code.dll" file :D
+This is the GitHub page for my Excavater Block mod! You can see all of the blocks used in the Blocks folder, and the most recent version of the mod itself can be found in the ProjectFolder as the "Code.dll" file :D
