@@ -67,7 +67,7 @@ void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID)
 void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::wstring ToolName)
 {
 	if (CustomBlockID == excBlockID) {
-		if (ToolName == L"T_Stick") {
+		if (ToolName == L"T_Arrow") {
 			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
 				if ((*it)->getBlockPosition() == At) {
 					(*it)->toggleDig();
