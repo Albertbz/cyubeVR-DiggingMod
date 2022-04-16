@@ -1,9 +1,0 @@
-﻿  ExcavatorBlock.cpp
-C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\ProjectFiles\Source\ExcavatorBlock.cpp(122,15): warning C4553: '==': result of expression not used; did you intend '='?
-C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\ProjectFiles\Source\ExcavatorBlock.cpp(127,15): warning C4553: '==': result of expression not used; did you intend '='?
-  Internals.cpp
-C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\ProjectFiles\Source\Mod.cpp(22,21): warning C4305: 'initializing': truncation from 'double' to 'float'
-  Generating Code...
-  Code.vcxproj -> C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\x64\Debug\Code.dll
-          1 file(s) copied.
-  Press any key to continue . . . 
