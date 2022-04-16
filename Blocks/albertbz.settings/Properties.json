@@ -1,0 +1,18 @@
+{    
+    "Name": "Settings",
+    "CreatorName": "Albertbz",
+    "UniqueID": 1473066958,
+    "Recipe": {
+      "Array" : [2,2,2,2,2,2,2,2],
+      "SizeX": 1,
+      "SizeY": 8,
+      "SizeZ": 1
+    },
+    "Yield": 1,
+    "SimilarTo": 2,
+    "Textures": {
+        "Mode": 1,
+        "WithNormals" : false,
+		"WithGlowMap" : true
+      }
+  }

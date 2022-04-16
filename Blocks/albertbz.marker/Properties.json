@@ -1,0 +1,18 @@
+{    
+    "Name": "Marker",
+    "CreatorName": "Albertbz",
+    "UniqueID": 1473066953,
+    "Recipe": {
+      "Array" : [2,2,2],
+      "SizeX": 1,
+      "SizeY": 3,
+      "SizeZ": 1
+    },
+    "Yield": 1,
+    "SimilarTo": 3,
+    "Textures": {
+        "Mode": 1,
+        "WithNormals" : false,
+		"WithGlowMap" : true
+      }
+  }
