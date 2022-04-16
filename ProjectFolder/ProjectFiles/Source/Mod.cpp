@@ -5,12 +5,19 @@
 
 // Custom variables
 std::vector<ExcavatorBlock*> excavatorBlocks;
+const int excBlockID = 1473066952;
+const int markBlockID = 1473066953;
+const int outBlockID = 1473066954;
+const int downBlockID = 1473066955;
+const int upBlockID = 1473066956;
+const int inBlockID = 1473066957;
+const int setBlockID = 1473066958;
 
 /************************************************************
 	Config Variables (Set these to whatever you need. They are automatically read by the game.)
 *************************************************************/
 
-UniqueID ThisModUniqueIDs[] = { 1473066952, 1473066953 }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
+UniqueID ThisModUniqueIDs[] = { excBlockID, markBlockID, outBlockID, downBlockID, upBlockID, inBlockID, setBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
 float TickRate = 0.2;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
 
@@ -22,10 +29,19 @@ float TickRate = 0.2;							 // Set how many times per second Event_Tick() is ca
 // Run every time a block is placed
 void Event_BlockPlaced(CoordinateInBlocks At, UniqueID CustomBlockID)
 {
-	if (CustomBlockID == 1473066952) {
+	if (CustomBlockID == excBlockID) {
 		// Adds the newly placed excavator block to the list of excavator blocks
-		excavatorBlocks.push_back(new ExcavatorBlock(At)); 
-		ExcavatorBlock::writeExcavatorBlocks(std::ofstream{ "ExcavatorBlocks.txt" }, excavatorBlocks);
+		bool newBlock = true;
+		for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
+			if ((*it)->getBlockPosition() == At) {
+				newBlock = false;
+				break;
+			}
+		}
+		if (newBlock) {
+			excavatorBlocks.push_back(new ExcavatorBlock(At));
+			ExcavatorBlock::writeExcavatorBlocks(std::ofstream{ "ExcavatorBlocks.txt" }, excavatorBlocks);
+		}
 	}
 }
 
@@ -33,11 +49,11 @@ void Event_BlockPlaced(CoordinateInBlocks At, UniqueID CustomBlockID)
 // Run every time a block is destroyed
 void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID)
 {
-	if (CustomBlockID == 1473066952) {
+	if (CustomBlockID == excBlockID) {
 		// Goes through all excavator blocks, deletes the one that was destroyed
 		for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
 			if ((*it)->getBlockPosition() == At) {
-				(*it)->removeCorners();
+				(*it)->destroy();
 				excavatorBlocks.erase(it);
 				ExcavatorBlock::writeExcavatorBlocks(std::ofstream{ "ExcavatorBlocks.txt" }, excavatorBlocks);
 				break;
@@ -50,24 +66,8 @@ void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID)
 // Run every time a block is hit by a tool
 void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::wstring ToolName)
 {
-
-	if (ToolName == L"T_Stick") {
-		if (CustomBlockID == 1473066952) {
-			// Increments the size of the area to be dug out (when hitting excavator block with a stick)
-			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
-				if ((*it)->getBlockPosition() == At) {
-					(*it)->incrementSize();
-					ExcavatorBlock::writeExcavatorBlocks(std::ofstream{ "ExcavatorBlocks.txt" }, excavatorBlocks);
-					break;
-				}
-			}
-		}
-	}
-	else if (ToolName == L"T_Pickaxe_Stone") {
-
-	}
-	else if (ToolName == L"T_Arrow") {
-		if (CustomBlockID == 1473066952) {
+	if (CustomBlockID == excBlockID) {
+		if (ToolName == L"T_Stick") {
 			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
 				if ((*it)->getBlockPosition() == At) {
 					(*it)->toggleDig();
@@ -77,8 +77,60 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 			}
 		}
 	}
-	else {
-
+	else if (CustomBlockID == setBlockID) {
+		if (ToolName == L"T_Stick") {
+			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
+				if ((*it)->getBlockPosition() == (At + CoordinateInBlocks(0, 0, -4))) {
+					(*it)->toggleSettings();
+					ExcavatorBlock::writeExcavatorBlocks(std::ofstream{ "ExcavatorBlocks.txt" }, excavatorBlocks);
+					break;
+				}
+			}
+		}
+	}
+	else if (CustomBlockID == outBlockID) {
+		if (ToolName == L"T_Stick") {
+			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
+				if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(-1, 0, 0))) {
+					(*it)->incrementSize();
+					ExcavatorBlock::writeExcavatorBlocks(std::ofstream{ "ExcavatorBlocks.txt" }, excavatorBlocks);
+					break;
+				}
+			}
+		}
+	}
+	else if (CustomBlockID == inBlockID) {
+		if (ToolName == L"T_Stick") {
+			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
+				if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(1, 0, 0))) {
+					(*it)->decrementSize();
+					ExcavatorBlock::writeExcavatorBlocks(std::ofstream{ "ExcavatorBlocks.txt" }, excavatorBlocks);
+					break;
+				}
+			}
+		}
+	}
+	else if (CustomBlockID == upBlockID) {
+		if (ToolName == L"T_Stick") {
+			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
+				if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(0, 0, 2))) {
+					(*it)->decrementDepth();
+					ExcavatorBlock::writeExcavatorBlocks(std::ofstream{ "ExcavatorBlocks.txt" }, excavatorBlocks);
+					break;
+				}
+			}
+		}
+	}
+	else if (CustomBlockID == downBlockID) {
+		if (ToolName == L"T_Stick") {
+			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
+				if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(0, 0, 1))) {
+					(*it)->incrementDepth();
+					ExcavatorBlock::writeExcavatorBlocks(std::ofstream{ "ExcavatorBlocks.txt" }, excavatorBlocks);
+					break;
+				}
+			}
+		}
 	}
 }
 

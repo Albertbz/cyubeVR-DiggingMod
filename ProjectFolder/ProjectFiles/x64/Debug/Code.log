@@ -1,8 +1,5 @@
-﻿  ExcavatorBlock.cpp
-  Internals.cpp
-C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\ProjectFiles\Source\Mod.cpp(15,21): warning C4305: 'initializing': truncation from 'double' to 'float'
-  Generating Code...
-     Creating library C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\x64\Debug\Code.lib and object C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\x64\Debug\Code.exp
+﻿  Internals.cpp
+C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\ProjectFiles\Source\Mod.cpp(22,21): warning C4305: 'initializing': truncation from 'double' to 'float'
   Code.vcxproj -> C:\Users\alber\OneDrive\Dokumenter\GitHub\cyubeVRModding\ProjectFolder\x64\Debug\Code.dll
           1 file(s) copied.
   Press any key to continue . . . 

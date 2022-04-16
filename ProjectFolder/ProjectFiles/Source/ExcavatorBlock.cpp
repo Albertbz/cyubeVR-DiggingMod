@@ -6,19 +6,21 @@
 
 ExcavatorBlock::ExcavatorBlock(CoordinateInBlocks blockPosition) {
 	this->size = 2;
+	this->depth = 5;
 	this->blockPosition = blockPosition;
-	this->cornerBlockType = 1473066953;
-	this->isDigging = false;
+	this->cornerBlockType = 1473066953; // markBlockID
+	this->currentMode = 1;
 	this->updateDigBlock();
 	this->currentDigBlock[2] = -1;
-	this->addCorners();
+	this->showNormal(true);
 }
 
-ExcavatorBlock::ExcavatorBlock(int size, CoordinateInBlocks blockPosition, bool isDigging, int currentDigBlockX, int currentDigBlockY, int currentDigBlockZ) {
+ExcavatorBlock::ExcavatorBlock(int size, int depth, CoordinateInBlocks blockPosition, int currentMode, int currentDigBlockX, int currentDigBlockY, int currentDigBlockZ) {
 	this->size = size;
+	this->depth = depth;
 	this->blockPosition = blockPosition;
-	this->cornerBlockType = 1473066953;
-	this->isDigging = isDigging;
+	this->cornerBlockType = 1473066953; // markBlockID
+	this->currentMode = currentMode;
 	this->currentDigBlock[0] = currentDigBlockX;
 	this->currentDigBlock[1] = currentDigBlockY;
 	this->currentDigBlock[2] = currentDigBlockZ;
@@ -44,21 +46,37 @@ void ExcavatorBlock::removeCorners() {
 }
 
 void ExcavatorBlock::incrementSize() {
-	if (!isDigging) {
+	if (currentMode == 2) {
 		removeCorners();
-		if (size >= 10) {
-			size = 2;
-		}
-		else {
-			size += 1;
-		}
+		size++;
 		addCorners();
 		updateDigBlock();
 	}
 }
 
+void ExcavatorBlock::decrementSize() {
+	if (currentMode == 2 && size > 2) {
+		removeCorners();
+		size--;
+		addCorners();
+		updateDigBlock();
+	}
+}
+
+void ExcavatorBlock::incrementDepth() {
+	if (currentMode == 2) {
+		depth++;
+	}
+}
+
+void ExcavatorBlock::decrementDepth() {
+	if (currentMode == 2 && depth > 3) {
+		depth--;
+	}
+}
+
 bool ExcavatorBlock::dig() {
-	if (isDigging) {
+	if (currentMode == 3) {
 		EBlockType currentBlockType = GetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2])).Type;
 		if (currentBlockType == EBlockType::Stone || currentBlockType == EBlockType::Dirt || currentBlockType == EBlockType::Grass) {
 			SetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2]), EBlockType::Air);
@@ -70,9 +88,9 @@ bool ExcavatorBlock::dig() {
 			if (currentDigBlock[1] < -size) {
 				currentDigBlock[1] = size;
 				currentDigBlock[2]--;
-				if (currentDigBlock[2] < -5) {
+				if (currentDigBlock[2] < -depth) {
 					currentDigBlock[2] = -1;
-					isDigging = false;
+					currentMode = 1;
 				}
 			}
 		}
@@ -84,17 +102,65 @@ bool ExcavatorBlock::dig() {
 }
 
 void ExcavatorBlock::toggleDig() {
-	if (!isDigging) {
-		removeCorners();
+	if (currentMode == 1) {
+		showNormal(false);
 		if (currentDigBlock[2] == -1) {
 			removeFoliage();
 		}
-		isDigging = true;
+		currentMode = 3;
+	}
+	else if (currentMode == 3) {
+		showNormal(true);
+		currentMode = 1;
+	}
+}
+
+void ExcavatorBlock::toggleSettings() {
+	if (currentMode == 1) {
+		showNormal(false);
+		showSettings(true);
+		currentMode == 2;
+	}
+	else if (currentMode == 2) {
+		showSettings(false);
+		showNormal(true);
+		currentMode == 1;
+	}
+}
+
+void ExcavatorBlock::showSettings(bool show) {
+	if (show) {
+		addCorners();
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), 1473066958); // Set Settings block
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 2), 1473066956); // Set Up block
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 1), 1473066955); // Set Down block
+		SetBlock(blockPosition + CoordinateInBlocks(1, 0, 0), 1473066957); // Set In block
+		SetBlock(blockPosition + CoordinateInBlocks(-1, 0, 0), 1473066954); // Set Out block
 	}
 	else {
-		addCorners();
-		isDigging = false;
+		removeCorners();
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), EBlockType::Air);
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 2), EBlockType::Air);
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 1), EBlockType::Air); 
+		SetBlock(blockPosition + CoordinateInBlocks(1, 0, 0), EBlockType::Air); 
+		SetBlock(blockPosition + CoordinateInBlocks(-1, 0, 0), EBlockType::Air);
 	}
+}
+
+void ExcavatorBlock::showNormal(bool show) {
+	if (show) {
+		addCorners();
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), 1473066958); // Set Settings block
+	}
+	else {
+		removeCorners();
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), EBlockType::Air);
+	}
+}
+
+void ExcavatorBlock::destroy() {
+	showNormal(false);
+	showSettings(false);
 }
 
 void ExcavatorBlock::updateDigBlock() {
@@ -105,6 +171,7 @@ void ExcavatorBlock::updateDigBlock() {
 void ExcavatorBlock::removeFoliage() {
 	for (int i = size; i >= -size; i--) { 
 		for (int j = size; j >= -size; j--) {
+			// Possibly add for height as well
 			EBlockType currentBlockType = GetBlock(blockPosition + CoordinateInBlocks(i, j, 0)).Type;
 			if (currentBlockType == EBlockType::Flower1 || currentBlockType == EBlockType::Flower2 || currentBlockType == EBlockType::Flower3 ||
 				currentBlockType == EBlockType::Flower4 || currentBlockType == EBlockType::FlowerRainbow || currentBlockType == EBlockType::GrassFoliage) {
@@ -116,8 +183,8 @@ void ExcavatorBlock::removeFoliage() {
 
 void ExcavatorBlock::writeExcavatorBlocks(std::ostream& file, const std::vector<ExcavatorBlock*>& excavatorBlocks) {
 	for (auto b : excavatorBlocks) {
-		file << b->size << ';' << b->blockPosition.X << ';' << b->blockPosition.Y << ';' << b->blockPosition.Z << ';' 
-			 << b->isDigging << ';' << b->currentDigBlock[0] << ';' << b->currentDigBlock[1] << ';' << b->currentDigBlock[2] << '\n';
+		file << b->size << ';' << b->depth << ';' << b->blockPosition.X << ';' << b->blockPosition.Y << ';' << b->blockPosition.Z << ';'
+			 << b->currentMode << ';' << b->currentDigBlock[0] << ';' << b->currentDigBlock[1] << ';' << b->currentDigBlock[2] << '\n';
 	}
 }
 
@@ -137,12 +204,14 @@ auto ExcavatorBlock::readExcavatorBlocks(std::istream& file)->std::vector<Excava
 		auto pos5 = line.find_first_of(';', pos4 + 1);
 		auto pos6 = line.find_first_of(';', pos5 + 1);
 		auto pos7 = line.find_first_of(';', pos6 + 1);
-		excavatorBlocks.push_back(new ExcavatorBlock{std::stoi(std::string{line, 0, pos1}), 
-													 CoordinateInBlocks(std::stoi(std::string{line, pos1 + 1}), std::stoi(std::string{line, pos2 + 1}), std::stoi(std::string{line, pos3 + 1})),
-													 stob(std::string{line, pos4 + 1}, false),
+		auto pos8 = line.find_first_of(';', pos7 + 1);
+		excavatorBlocks.push_back(new ExcavatorBlock{std::stoi(std::string{line, 0, pos1}),
+													 std::stoi(std::string{line, pos1 + 1}),
+													 CoordinateInBlocks(std::stoi(std::string{line, pos2 + 1}), std::stoi(std::string{line, pos3 + 1}), std::stoi(std::string{line, pos4 + 1})),
 													 std::stoi(std::string{line, pos5 + 1}),
 													 std::stoi(std::string{line, pos6 + 1}),
-													 std::stoi(std::string{line, pos7 + 1})});
+													 std::stoi(std::string{line, pos7 + 1}),
+													 std::stoi(std::string{line, pos8 + 1})});
 	}
 
 	return excavatorBlocks;
@@ -150,14 +219,4 @@ auto ExcavatorBlock::readExcavatorBlocks(std::istream& file)->std::vector<Excava
 
 auto ExcavatorBlock::readExcavatorBlocks(std::istream&& file) -> std::vector<ExcavatorBlock*> {
 	return readExcavatorBlocks(file);
-}
-
-bool ExcavatorBlock::stob(std::string s, bool throw_on_error = true)
-{
-	auto result = false;    // failure to assert is false
-
-	std::istringstream is(s);
-	// first try simple integer conversion
-	is >> result;
-	return result;
 }
