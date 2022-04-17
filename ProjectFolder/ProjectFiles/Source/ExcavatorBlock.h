@@ -5,9 +5,21 @@ private:
 	int size;								// Used to define the size of the area (area is size*2+1 x size*2+1).
 	int depth;								// How deep the hole will be.
 	CoordinateInBlocks blockPosition;		// The position of the block.
-	UniqueID cornerBlockType;				// The type of block to be used as corners.
 	int currentMode;						// The current mode the excavator block is in. 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
 	int currentDigBlock[3];					// The current block that is being dug out, relative to blockPosition.
+	enum {mark1BlockID = 430459851,			// Enum with all of the blocks used for methods.
+		  mark2BlockID = 430459852,
+		  mark3BlockID = 430459853,
+		  mark4BlockID = 430459854,
+		  setBlockID = 1473066958,
+		  upBlockID = 1473066956,
+		  downBlockID = 1473066955,
+		  inBlockID = 1473066957,
+		  outBlockID = 1473066954,
+		  checkBlockID = 1473066960,
+		  exclBlockID = 1473066959,
+		  crossBlockID = 1473066961
+	};
 	
 public:
 	// Constructor for ExcavatorBlock.

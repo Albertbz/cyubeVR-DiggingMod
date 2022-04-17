@@ -8,7 +8,6 @@ ExcavatorBlock::ExcavatorBlock(CoordinateInBlocks blockPosition) {
 	this->size = 2;
 	this->depth = 5;
 	this->blockPosition = blockPosition;
-	this->cornerBlockType = 1473066953; // markBlockID
 	this->currentMode = 1;
 	this->updateDigBlock();
 	this->currentDigBlock[2] = -1;
@@ -19,7 +18,6 @@ ExcavatorBlock::ExcavatorBlock(int size, int depth, CoordinateInBlocks blockPosi
 	this->size = size;
 	this->depth = depth;
 	this->blockPosition = blockPosition;
-	this->cornerBlockType = 1473066953; // markBlockID
 	this->currentMode = currentMode;
 	this->currentDigBlock[0] = currentDigBlockX;
 	this->currentDigBlock[1] = currentDigBlockY;
@@ -32,10 +30,10 @@ CoordinateInBlocks ExcavatorBlock::getBlockPosition() {
 }
 
 void ExcavatorBlock::addCorners() {
-	SetBlock(blockPosition + CoordinateInBlocks(size, size, 0), cornerBlockType);
-	SetBlock(blockPosition + CoordinateInBlocks(size, -size, 0), cornerBlockType);
-	SetBlock(blockPosition + CoordinateInBlocks(-size, size, 0), cornerBlockType);
-	SetBlock(blockPosition + CoordinateInBlocks(-size, -size, 0), cornerBlockType);
+	SetBlock(blockPosition + CoordinateInBlocks(size, size, 0), mark2BlockID);
+	SetBlock(blockPosition + CoordinateInBlocks(size, -size, 0), mark1BlockID);
+	SetBlock(blockPosition + CoordinateInBlocks(-size, size, 0), mark4BlockID);
+	SetBlock(blockPosition + CoordinateInBlocks(-size, -size, 0), mark3BlockID);
 }
 
 void ExcavatorBlock::removeCorners() {
@@ -80,15 +78,16 @@ void ExcavatorBlock::decrementDepth() {
 void ExcavatorBlock::printDepth() {
 	std::wstring message = L"Depth: ";
 	message.append(std::to_wstring(depth));
-	SpawnHintText(blockPosition + CoordinateInBlocks(0, 0, 3) - CoordinateInCentimeters(0, 0, 30), message, 1, 1.2);
+	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0,  110), message, 1, 1.2f);
 }
 
 void ExcavatorBlock::printSize() {
 	std::wstring message = L"Size: ";
-	message.append(std::to_wstring(size * 2 + 1));
+	int length = size * 2 + 1;
+	message.append(std::to_wstring(length));
 	message.append(L" x ");
-	message.append(std::to_wstring(size * 2 + 1));
-	SpawnHintText(blockPosition + CoordinateInBlocks(0, 0, 3) - CoordinateInCentimeters(0, 0, 30), message, 1, 1.2);
+	message.append(std::to_wstring(length));
+	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 120), message, 1, 1.2f);
 }
 
 bool ExcavatorBlock::dig() {
@@ -149,7 +148,7 @@ void ExcavatorBlock::toggleSettings() {
 	}
 	else if (currentMode == 2) {
 		showSettings(false);
-		SpawnHintText(blockPosition + CoordinateInBlocks(0, 0, 3), L"Settings saved!", 1, 1.2);
+		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 130), L"Settings saved!", 1, 1.2f);
 		showNormal(true);
 		currentMode = 1;
 	}
@@ -158,11 +157,11 @@ void ExcavatorBlock::toggleSettings() {
 void ExcavatorBlock::showSettings(bool show) {
 	if (show) {
 		addCorners();
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), 1473066958); // Set Settings block
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 2), 1473066956); // Set Up block
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 1), 1473066955); // Set Down block
-		SetBlock(blockPosition + CoordinateInBlocks(1, 0, 0), 1473066957); // Set In block
-		SetBlock(blockPosition + CoordinateInBlocks(-1, 0, 0), 1473066954); // Set Out block
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), setBlockID); // Set Settings block
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 2), upBlockID); // Set Up block
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 1), downBlockID); // Set Down block
+		SetBlock(blockPosition + CoordinateInBlocks(1, 0, 0), inBlockID); // Set In block
+		SetBlock(blockPosition + CoordinateInBlocks(-1, 0, 0), outBlockID); // Set Out block
 	}
 	else {
 		removeCorners();
@@ -177,8 +176,8 @@ void ExcavatorBlock::showSettings(bool show) {
 void ExcavatorBlock::showNormal(bool show) {
 	if (show) {
 		addCorners();
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), 1473066958); // Set Settings block
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), 1473066960); // Set Check Mark block
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), setBlockID); // Set Settings block
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), checkBlockID); // Set Check Mark block
 	}
 	else {
 		removeCorners();
@@ -189,7 +188,7 @@ void ExcavatorBlock::showNormal(bool show) {
 
 void ExcavatorBlock::showFinished(bool show) {
 	if (show) {
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), 1473066959); // Set Exclamation Mark block
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), exclBlockID); // Set Exclamation Mark block
 	}
 	else {
 		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), EBlockType::Air);
@@ -198,7 +197,7 @@ void ExcavatorBlock::showFinished(bool show) {
 
 void ExcavatorBlock::showDigging(bool show) {
 	if (show) {
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), 1473066961); // Set Cross Mark block
+		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), crossBlockID); // Set Cross Mark block
 	}
 	else {
 		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), EBlockType::Air);

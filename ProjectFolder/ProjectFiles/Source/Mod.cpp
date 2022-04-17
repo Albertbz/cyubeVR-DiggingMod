@@ -93,7 +93,7 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 	}
 	else if (CustomBlockID == setBlockID) {
 		if (ToolName == L"T_Stick") {
-			SpawnHintText(At - CoordinateInBlocks(0, 1, 0), L"Message", 5);
+
 			// Goes through all Excavator blocks, toggles the settings of the one the Settings block belongs to.
 			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
 				if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(0, 0, 4))) {
