@@ -29,7 +29,7 @@ const int crossBlockID = 1473066961;
 
 UniqueID ThisModUniqueIDs[] = { excBlockID, outBlockID, downBlockID, upBlockID, inBlockID, setBlockID, checkBlockID, crossBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
-float TickRate = 0.2;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
+float TickRate = 5;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
 
 /************************************************************* 
 	Functions (Run automatically by the game, you can put any code you want into them)
@@ -93,7 +93,7 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 	}
 	else if (CustomBlockID == setBlockID) {
 		if (ToolName == L"T_Stick") {
-
+			SpawnHintText(At - CoordinateInBlocks(0, 1, 0), L"Message", 5);
 			// Goes through all Excavator blocks, toggles the settings of the one the Settings block belongs to.
 			for (auto it = excavatorBlocks.begin(); it != excavatorBlocks.end(); it++) {
 				if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(0, 0, 4))) {

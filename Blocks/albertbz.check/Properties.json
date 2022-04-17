@@ -1,5 +1,5 @@
 {    
-    "Name": "Exclamation Mark",
+    "Name": "Check Mark",
     "CreatorName": "Albertbz",
     "UniqueID": 1473066960,
     "Recipe": {
@@ -9,7 +9,7 @@
       "SizeZ": 1
     },
     "Yield": 1,
-    "SimilarTo": 2,
+    "SimilarTo": 4,
     "Textures": {
         "Mode": 2,
         "WithNormals" : false,

@@ -123,12 +123,12 @@ void ExcavatorBlock::toggleSettings() {
 	if (currentMode == 1) {
 		showNormal(false);
 		showSettings(true);
-		currentMode == 2;
+		currentMode = 2;
 	}
 	else if (currentMode == 2) {
 		showSettings(false);
 		showNormal(true);
-		currentMode == 1;
+		currentMode = 1;
 	}
 }
 
