@@ -50,15 +50,15 @@ CoordinateInCentimeters GetPlayerLocation()
 std::vector<CoordinateInBlocks> GetAllCoordinatesInBox(CoordinateInBlocks At, CoordinateInBlocks BoxExtent)
 {
 	std::vector<CoordinateInBlocks> ReturnCoordinates;
-
+	
 	for (int64_t x = -BoxExtent.X; x < BoxExtent.X; x++) {
 		for (int64_t y = -BoxExtent.Y; y < BoxExtent.Y; y++) {
 			for (int16_t z = -BoxExtent.Z; z < BoxExtent.Z; z++) {
 
 				CoordinateInBlocks Offset = CoordinateInBlocks(x, y, z);
 
-				if (((int32_t(At.Z) + int32_t(Offset.Z)) >= 0) && ((int32_t(At.Z) + int32_t(Offset.Z)) <= 800)) {
-					ReturnCoordinates.push_back(At + Offset);
+				if ( ((int32_t(At.Z) + int32_t(Offset.Z)) >= 0) && ((int32_t(At.Z) + int32_t(Offset.Z)) <= 800)) {
+					ReturnCoordinates.push_back(At + Offset);				
 				}
 			}
 		}
@@ -122,18 +122,18 @@ bool GetRandomBool()
 	return xoroshiro128p() > AboveThisTrue;
 }
 
-
 template<int32_t Min, int32_t Max>
 int32_t GetRandomInt()
 {
-	static constexpr uint32_t TotalSpan = Max - Min;
+	static constexpr uint32_t TotalSpan = int64_t(Max) - int64_t(Min);
 	static constexpr uint32_t DivideBy = UINT32_MAX / (TotalSpan + 1);
+
+	if constexpr (TotalSpan == UINT32_MAX) return xoroshiro128p();
 
 	return int32_t(uint32_t(xoroshiro128p()) / DivideBy) + Min;
 }
 
-int main()
+int main() 
 {
-
-
+	
 }

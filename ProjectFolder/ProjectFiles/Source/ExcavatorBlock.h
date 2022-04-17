@@ -62,7 +62,11 @@ public:
 	// Decrements the depth of the hole to be dug out.
 	void decrementDepth();
 
-	// Digs/mines a single block if the excavator block is digging at that moment.
+	/**
+	 * Digs/mines a single block if the excavator block is digging at that moment.
+	 * 
+	 * @return A Boolean telling whether a block was dug.
+	 */
 	bool dig();
 
 	// Toggles digging mode.

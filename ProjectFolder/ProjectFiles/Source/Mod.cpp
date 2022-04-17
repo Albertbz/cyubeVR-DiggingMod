@@ -12,13 +12,13 @@ std::vector<ExcavatorBlock*> excavatorBlocks;
 
 // All blocks with possible interactions
 const int excBlockID = 1473066952;
-//const int markBlockID = 1473066953;
+//const int markBlockID = 1473066953; // Purely for decoration
 const int outBlockID = 1473066954;
 const int downBlockID = 1473066955;
 const int upBlockID = 1473066956;
 const int inBlockID = 1473066957;
 const int setBlockID = 1473066958;
-//const int exclBlockID = 1473066959;
+//const int exclBlockID = 1473066959; // Purely for decoration
 const int checkBlockID = 1473066960;
 const int crossBlockID = 1473066961;
 
@@ -37,7 +37,7 @@ float TickRate = 0.2;							 // Set how many times per second Event_Tick() is ca
 
 
 // Run every time a block is placed
-void Event_BlockPlaced(CoordinateInBlocks At, UniqueID CustomBlockID)
+void Event_BlockPlaced(CoordinateInBlocks At, UniqueID CustomBlockID, bool Moved)
 {
 	if (CustomBlockID == excBlockID) { 
 
@@ -58,7 +58,7 @@ void Event_BlockPlaced(CoordinateInBlocks At, UniqueID CustomBlockID)
 
 
 // Run every time a block is destroyed
-void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID)
+void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID, bool Moved)
 {
 	if (CustomBlockID == excBlockID) {
 
@@ -181,6 +181,11 @@ void Event_OnLoad()
 	excavatorBlocks = ExcavatorBlock::readExcavatorBlocks(std::ifstream{ "ExcavatorBlocks.txt" });
 }
 
+// Run once when the world is exited
+void Event_OnExit()
+{
+
+}
 
 /*******************************************************
 
