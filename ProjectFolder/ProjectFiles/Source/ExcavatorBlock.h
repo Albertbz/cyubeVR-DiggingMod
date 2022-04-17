@@ -62,6 +62,12 @@ public:
 	// Decrements the depth of the hole to be dug out.
 	void decrementDepth();
 
+	// Spawns a Text with the current depth.
+	void printDepth();
+
+	// Spawns a Text with the current size as the corresponding area.
+	void printSize();
+
 	/**
 	 * Digs/mines a single block if the excavator block is digging at that moment.
 	 * 
@@ -108,9 +114,6 @@ public:
 
 	// Updates the currentDigBlock to fit with size.
 	void updateDigBlock();
-
-	// Removes all foliage that is on the top layer of Grass blocks.
-	void removeFoliage();
 
 	/**
 	 * Writes a vector/list of ExcavatorBlock instances to a file.

@@ -66,13 +66,29 @@ void ExcavatorBlock::decrementSize() {
 void ExcavatorBlock::incrementDepth() {
 	if (currentMode == 2) {
 		depth++;
+		printDepth();
 	}
 }
 
 void ExcavatorBlock::decrementDepth() {
 	if (currentMode == 2 && depth > 3) {
 		depth--;
+		printDepth();
 	}
+}
+
+void ExcavatorBlock::printDepth() {
+	std::wstring message = L"Depth: ";
+	message.append(std::to_wstring(depth));
+	SpawnHintText(blockPosition + CoordinateInBlocks(0, 0, 3) - CoordinateInCentimeters(0, 0, 30), message, 1, 1.2);
+}
+
+void ExcavatorBlock::printSize() {
+	std::wstring message = L"Size: ";
+	message.append(std::to_wstring(size * 2 + 1));
+	message.append(L" x ");
+	message.append(std::to_wstring(size * 2 + 1));
+	SpawnHintText(blockPosition + CoordinateInBlocks(0, 0, 3) - CoordinateInCentimeters(0, 0, 30), message, 1, 1.2);
 }
 
 bool ExcavatorBlock::dig() {
@@ -80,6 +96,15 @@ bool ExcavatorBlock::dig() {
 		EBlockType currentBlockType = GetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2])).Type;
 		if (currentBlockType == EBlockType::Stone || currentBlockType == EBlockType::Dirt || currentBlockType == EBlockType::Grass) {
 			SetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2]), EBlockType::Air);
+
+			// If block was Grass, remove possible flower/foliage on top.
+			if (currentBlockType == EBlockType::Grass) {
+				EBlockType blockAboveType = GetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2] + 1)).Type;
+				if (blockAboveType == EBlockType::Flower1 || blockAboveType == EBlockType::Flower2 || blockAboveType == EBlockType::Flower3 ||
+					blockAboveType == EBlockType::Flower4 || blockAboveType == EBlockType::FlowerRainbow || blockAboveType == EBlockType::GrassFoliage) {
+					SetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2] + 1), EBlockType::Air);
+				}
+			}
 		}
 		currentDigBlock[0]--;
 		if (currentDigBlock[0] < -size) {
@@ -106,9 +131,6 @@ bool ExcavatorBlock::dig() {
 void ExcavatorBlock::toggleDigging() {
 	if (currentMode == 1) {
 		showNormal(false);
-		if (currentDigBlock[2] == -1) {
-			removeFoliage();
-		}
 		showDigging(true);
 		currentMode = 3;
 	}
@@ -127,6 +149,7 @@ void ExcavatorBlock::toggleSettings() {
 	}
 	else if (currentMode == 2) {
 		showSettings(false);
+		SpawnHintText(blockPosition + CoordinateInBlocks(0, 0, 3), L"Settings saved!", 1, 1.2);
 		showNormal(true);
 		currentMode = 1;
 	}
@@ -204,19 +227,6 @@ void ExcavatorBlock::updateDigBlock() {
 	currentDigBlock[0] = size;
 	currentDigBlock[1] = size;
 	currentDigBlock[2] = -1;
-}
-
-void ExcavatorBlock::removeFoliage() {
-	for (int i = size; i >= -size; i--) { 
-		for (int j = size; j >= -size; j--) {
-			// Possibly add for height as well
-			EBlockType currentBlockType = GetBlock(blockPosition + CoordinateInBlocks(i, j, 0)).Type;
-			if (currentBlockType == EBlockType::Flower1 || currentBlockType == EBlockType::Flower2 || currentBlockType == EBlockType::Flower3 ||
-				currentBlockType == EBlockType::Flower4 || currentBlockType == EBlockType::FlowerRainbow || currentBlockType == EBlockType::GrassFoliage) {
-				SetBlock(blockPosition + CoordinateInBlocks(i, j, 0), EBlockType::Air);
-			}
-		}
-	}
 }
 
 void ExcavatorBlock::writeExcavatorBlocks(std::ostream& file, const std::vector<ExcavatorBlock*>& excavatorBlocks) {
