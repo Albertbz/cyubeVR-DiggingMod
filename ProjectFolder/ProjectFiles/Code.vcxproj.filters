@@ -24,7 +24,7 @@
     <ClCompile Include="Source\GameFunctions.cpp">
       <Filter>Source Files\InternalFiles</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ExcavatorBlock.cpp">
+    <ClCompile Include="Source\QuarryBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,7 +44,7 @@
     <ClInclude Include="Source\GameAPI.cpp">
       <Filter>Source Files\InternalFiles</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ExcavatorBlock.h">
+    <ClInclude Include="Source\QuarryBlock.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
