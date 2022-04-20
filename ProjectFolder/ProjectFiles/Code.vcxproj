@@ -19,8 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\DiggingBlock.h" />
     <ClInclude Include="Source\QuarryBlock.h" />
     <ClInclude Include="Source\GameAPI.cpp" />
+    <ClCompile Include="Source\DiggingBlock.cpp" />
     <ClCompile Include="Source\QuarryBlock.cpp" />
     <ClCompile Include="Source\GameFunctions.cpp" />
     <ClInclude Include="Source\Mod.cpp" />
