@@ -6,22 +6,23 @@
 #include <algorithm>
 
 DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition) {
-	this->size = 2;
+	this->length = 5;
+	this->width = 5;
 	this->depth = 5;
 	this->blockPosition = blockPosition;
 	this->currentMode = 1;
-	this->updateDigBlock();
-	this->currentDigBlock[2] = -1;
+	this->resetDigBlock();
 	this->showNormal(true);
 }
 
-DiggingBlock::DiggingBlock(int size, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<int, 4> cornerBlockTypes) {
-	this->size = size;
+DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<std::pair<CoordinateInBlocks, EBlockType>, 4> cornerBlocks) {
+	this->length = length;
+	this->width = width;
 	this->depth = depth;
 	this->blockPosition = blockPosition;
 	this->currentMode = currentMode;
 	this->currentDigBlock = currentDigBlock;
-	this->cornerBlockTypes = cornerBlockTypes;
+	this->cornerBlocks = cornerBlocks;
 }
 
 
@@ -30,54 +31,124 @@ CoordinateInBlocks DiggingBlock::getBlockPosition() {
 }
 
 void DiggingBlock::addCorners() {
-	cornerBlockTypes[0] = (uint8_t)GetBlock(blockPosition + CoordinateInBlocks(size, -size, 0)).Type;
-	cornerBlockTypes[1] = (uint8_t)GetBlock(blockPosition + CoordinateInBlocks(size, size, 0)).Type;
-	cornerBlockTypes[2] = (uint8_t)GetBlock(blockPosition + CoordinateInBlocks(-size, -size, 0)).Type;
-	cornerBlockTypes[3] = (uint8_t)GetBlock(blockPosition + CoordinateInBlocks(-size, size, 0)).Type;
-	SetBlock(blockPosition + CoordinateInBlocks(size, -size, 0), mark1BlockID);
-	SetBlock(blockPosition + CoordinateInBlocks(size, size, 0), mark2BlockID);
-	SetBlock(blockPosition + CoordinateInBlocks(-size, -size, 0), mark3BlockID);
-	SetBlock(blockPosition + CoordinateInBlocks(-size, size, 0), mark4BlockID);
+	cornerBlocks[0].second = GetBlock(blockPosition + cornerBlocks[0].first).Type;
+	cornerBlocks[1].second = GetBlock(blockPosition + cornerBlocks[1].first).Type;
+	cornerBlocks[2].second = GetBlock(blockPosition + cornerBlocks[2].first).Type;
+	cornerBlocks[3].second = GetBlock(blockPosition + cornerBlocks[3].first).Type;
+	SetBlock(blockPosition + cornerBlocks[0].first, mark1BlockID);
+	SetBlock(blockPosition + cornerBlocks[1].first, mark2BlockID);
+	SetBlock(blockPosition + cornerBlocks[2].first, mark3BlockID);
+	SetBlock(blockPosition + cornerBlocks[3].first, mark4BlockID);
 }
 
 void DiggingBlock::removeCorners() {
-	SetBlock(blockPosition + CoordinateInBlocks(size, -size, 0), (EBlockType)cornerBlockTypes[0]);
-	SetBlock(blockPosition + CoordinateInBlocks(size, size, 0), (EBlockType)cornerBlockTypes[1]);
-	SetBlock(blockPosition + CoordinateInBlocks(-size, -size, 0), (EBlockType)cornerBlockTypes[2]);
-	SetBlock(blockPosition + CoordinateInBlocks(-size, size, 0), (EBlockType)cornerBlockTypes[3]);
+	SetBlock(blockPosition + cornerBlocks[0].first, cornerBlocks[0].second);
+	SetBlock(blockPosition + cornerBlocks[1].first, cornerBlocks[1].second);
+	SetBlock(blockPosition + cornerBlocks[2].first, cornerBlocks[2].second);
+	SetBlock(blockPosition + cornerBlocks[3].first, cornerBlocks[3].second);
+}
+
+void DiggingBlock::incrementLength(char side) {
+	if (currentMode == 2) {
+		removeCorners();
+		length++;
+		if (side == 'l') {
+			cornerBlocks[0].first.X++;
+			cornerBlocks[1].first.X++;
+		}
+		else if (side == 'r') {
+			cornerBlocks[2].first.X--;
+			cornerBlocks[3].first.X--;
+		}
+		addCorners();
+		resetDigBlock();
+	}
+}
+
+void DiggingBlock::decrementLength(char side) {
+	if (currentMode == 2 && length > 5) {
+		removeCorners();
+		length--;
+		if (side == 'l' && cornerBlocks[0].first.X > 2) {
+			cornerBlocks[0].first.X--;
+			cornerBlocks[1].first.X--;
+		}
+		else if (side == 'r' && cornerBlocks[2].first.X < -2) {
+			cornerBlocks[2].first.X++;
+			cornerBlocks[3].first.X++;
+		}
+		else {
+			length++;
+		}
+		addCorners();
+		resetDigBlock();
+	}
+}
+
+void DiggingBlock::incrementWidth(char side) {
+	if (currentMode == 2) {
+		removeCorners();
+		width++;
+		if (side == 'f') {
+			cornerBlocks[1].first.Y++;
+			cornerBlocks[3].first.Y++;
+		}
+		else if (side == 'b') {
+			cornerBlocks[0].first.Y--;
+			cornerBlocks[2].first.Y--;
+		}
+		addCorners();
+		resetDigBlock();
+	}
+}
+
+void DiggingBlock::decrementWidth(char side) {
+	if (currentMode == 2 && width > 5) {
+		removeCorners();
+		width--;
+		if (side == 'f' && cornerBlocks[1].first.Y > 2) {
+			cornerBlocks[1].first.X--;
+			cornerBlocks[3].first.X--;
+		}
+		else if (side == 'b' && cornerBlocks[0].first.Y < -2) {
+			cornerBlocks[0].first.X++;
+			cornerBlocks[2].first.X++;
+		}
+		else {
+			width++;
+		}
+		addCorners();
+		resetDigBlock();
+	}
 }
 
 void DiggingBlock::incrementSize() {
 	if (currentMode == 2) {
-		removeCorners();
-		size++;
-		printSize();
-		addCorners();
-		updateDigBlock();
+		incrementLength('l');
+		incrementLength('r');
+		incrementWidth('f');
+		incrementWidth('b');
 	}
 }
 
 void DiggingBlock::decrementSize() {
-	if (currentMode == 2 && size > 2) {
-		removeCorners();
-		size--;
-		printSize();
-		addCorners();
-		updateDigBlock();
+	if (currentMode == 2) {
+		decrementLength('l');
+		decrementLength('r');
+		decrementWidth('f');
+		decrementWidth('b');
 	}
 }
 
 void DiggingBlock::incrementDepth() {
 	if (currentMode == 2) {
 		depth++;
-		printDepth();
 	}
 }
 
 void DiggingBlock::decrementDepth() {
 	if (currentMode == 2 && depth > 1) {
 		depth--;
-		printDepth();
 	}
 }
 
@@ -89,44 +160,14 @@ void DiggingBlock::printDepth() {
 
 void DiggingBlock::printSize() {
 	std::wstring message = L"Size: ";
-	int length = size * 2 + 1;
 	message.append(std::to_wstring(length));
 	message.append(L" x ");
-	message.append(std::to_wstring(length));
+	message.append(std::to_wstring(width));
 	SpawnHintText(CoordinateInCentimeters(blockPosition) + CoordinateInCentimeters(0, 0, 125), message, 1, 1.2f);
 }
 
 void DiggingBlock::dig() {
-	if (currentMode == 3) {
-		EBlockType currentBlockType = GetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2])).Type;
-		if (currentBlockType == EBlockType::Stone || currentBlockType == EBlockType::Dirt || currentBlockType == EBlockType::Grass) {
-			SetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2]), EBlockType::Air);
-
-			// If block was Grass, remove possible flower/foliage on top.
-			if (currentBlockType == EBlockType::Grass) {
-				EBlockType blockAboveType = GetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2] + 1)).Type;
-				if (blockAboveType == EBlockType::Flower1 || blockAboveType == EBlockType::Flower2 || blockAboveType == EBlockType::Flower3 ||
-					blockAboveType == EBlockType::Flower4 || blockAboveType == EBlockType::FlowerRainbow || blockAboveType == EBlockType::GrassFoliage) {
-					SetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2] + 1), EBlockType::Air);
-				}
-			}
-		}
-		currentDigBlock[0]--;
-		if (currentDigBlock[0] < -size) {
-			currentDigBlock[0] = size;
-			currentDigBlock[1]--;
-			if (currentDigBlock[1] < -size) {
-				currentDigBlock[1] = size;
-				currentDigBlock[2]--;
-				if (currentDigBlock[2] < -depth) {
-					currentDigBlock[2] = -1;
-					showDigging(false);
-					showFinished(true);
-					currentMode = 4;
-				}
-			}
-		}
-	}
+	
 }
 
 void DiggingBlock::toggleDigging() {
@@ -156,54 +197,28 @@ void DiggingBlock::toggleSettings() {
 	}
 }
 
+void DiggingBlock::finishedDigging() {
+	if (currentMode == 3) {
+		showDigging(false);
+		showFinished(true);
+		currentMode = 4;
+	}
+}
+
 void DiggingBlock::showSettings(bool show) {
-	if (show) {
-		addCorners();
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), setBlockID); // Set Settings block
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 2), upBlockID); // Set Up block
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 1), downBlockID); // Set Down block
-		SetBlock(blockPosition + CoordinateInBlocks(1, 0, 0), inBlockID); // Set In block
-		SetBlock(blockPosition + CoordinateInBlocks(-1, 0, 0), outBlockID); // Set Out block
-	}
-	else {
-		removeCorners();
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), EBlockType::Air);
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 2), EBlockType::Air);
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 1), EBlockType::Air);
-		SetBlock(blockPosition + CoordinateInBlocks(1, 0, 0), EBlockType::Air);
-		SetBlock(blockPosition + CoordinateInBlocks(-1, 0, 0), EBlockType::Air);
-	}
+	
 }
 
 void DiggingBlock::showNormal(bool show) {
-	if (show) {
-		addCorners();
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), setBlockID); // Set Settings block
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), checkBlockID); // Set Check Mark block
-	}
-	else {
-		removeCorners();
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 4), EBlockType::Air);
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), EBlockType::Air);
-	}
+	
 }
 
 void DiggingBlock::showFinished(bool show) {
-	if (show) {
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), exclBlockID); // Set Exclamation Mark block
-	}
-	else {
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), EBlockType::Air);
-	}
+	
 }
 
 void DiggingBlock::showDigging(bool show) {
-	if (show) {
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), crossBlockID); // Set Cross Mark block
-	}
-	else {
-		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), EBlockType::Air);
-	}
+	
 }
 
 void DiggingBlock::destroy() {
@@ -224,17 +239,17 @@ void DiggingBlock::destroy() {
 	currentMode = 0;
 }
 
-void DiggingBlock::updateDigBlock() {
-	currentDigBlock[0] = size;
-	currentDigBlock[1] = size;
+void DiggingBlock::resetDigBlock() {
+	currentDigBlock[0] = cornerBlocks[0].first.X;
+	currentDigBlock[1] = cornerBlocks[1].first.X;
 	currentDigBlock[2] = -1;
 }
 
 void DiggingBlock::writeBlocks(std::ostream& file, const std::vector<DiggingBlock*>& diggingBlocks) {
 	for (auto b : diggingBlocks) {
-		file << b->size << ';' << b->depth << ';' << b->blockPosition.X << ';' << b->blockPosition.Y << ';' << b->blockPosition.Z << ';'
+		file << b->length << ';' << b->width << ';' << b->depth << ';' << b->blockPosition.X << ';' << b->blockPosition.Y << ';' << b->blockPosition.Z << ';'
 			<< b->currentMode << ';' << b->currentDigBlock[0] << ';' << b->currentDigBlock[1] << ';' << b->currentDigBlock[2] << ';'
-			<< b->cornerBlockTypes[0] << ';' << b->cornerBlockTypes[1] << ';' << b->cornerBlockTypes[2] << ';' << b->cornerBlockTypes[3] << '\n';
+			<< (int)b->cornerBlocks[0].second << ';' << (int)b->cornerBlocks[1].second << ';' << (int)b->cornerBlocks[2].second << ';' << (int)b->cornerBlocks[3].second << '\n';
 	}
 }
 
@@ -248,8 +263,11 @@ auto DiggingBlock::readBlocks(std::istream& file)->std::vector<DiggingBlock*> {
 
 	while (std::getline(file, line)) {
 		size_t pos = line.find_first_of(';');
-		int size = std::stoi(std::string{ line, 0, pos });
+		int length = std::stoi(std::string{ line, 0, pos });
 
+		int width = std::stoi(std::string{ line, pos + 1 });
+
+		pos = line.find_first_of(';', pos + 1);
 		int depth = std::stoi(std::string{ line, pos + 1 });
 
 		CoordinateInBlocks blockPosition;
@@ -271,18 +289,18 @@ auto DiggingBlock::readBlocks(std::istream& file)->std::vector<DiggingBlock*> {
 		pos = line.find_first_of(';', pos + 1);
 		currentDigBlock[2] = std::stoi(std::string{ line, pos + 1 });
 
-		std::array<int, 4> cornerBlockTypes{};
+		std::array<std::pair<CoordinateInBlocks, EBlockType>, 4> cornerBlocks;
 		pos = line.find_first_of(';', pos + 1);
-		cornerBlockTypes[0] = std::stoi(std::string{ line, pos + 1 });
+		cornerBlocks[0].second = (EBlockType)std::stoi(std::string{ line, pos + 1 });
 		pos = line.find_first_of(';', pos + 1);
-		cornerBlockTypes[1] = std::stoi(std::string{ line, pos + 1 });
+		cornerBlocks[1].second = (EBlockType)std::stoi(std::string{ line, pos + 1 });
 		pos = line.find_first_of(';', pos + 1);
-		cornerBlockTypes[2] = std::stoi(std::string{ line, pos + 1 });
+		cornerBlocks[2].second = (EBlockType)std::stoi(std::string{ line, pos + 1 });
 		pos = line.find_first_of(';', pos + 1);
-		cornerBlockTypes[3] = std::stoi(std::string{ line, pos + 1 });
+		cornerBlocks[3].second = (EBlockType)std::stoi(std::string{ line, pos + 1 });
 
 
-		diggingBlocks.push_back(new DiggingBlock{ size, depth, blockPosition, currentMode, currentDigBlock, cornerBlockTypes });
+		diggingBlocks.push_back(new DiggingBlock{ length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks });
 	}
 
 	return diggingBlocks;

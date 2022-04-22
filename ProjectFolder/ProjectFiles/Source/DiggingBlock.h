@@ -4,14 +4,15 @@
 
 class DiggingBlock {
 protected:
-	int size;									// Used to define the size of the area (area is size*2+1 x size*2+1).
-	int depth;									// How deep the hole will be.
-	CoordinateInBlocks blockPosition;			// The position of the block.
-	int currentMode;							// The current mode the Quarry block is in. 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
-	std::array<int, 3> currentDigBlock;			// The current block that is being dug out, relative to blockPosition.
-	std::array<int, 4> cornerBlockTypes;		// The types of the four cornor blocks before they were changed.
+	int length;															// The length of the hole.
+	int width;															// The width of the hole.
+	int depth;															// The depth of the hole.
+	CoordinateInBlocks blockPosition;									// The position of the block.
+	int currentMode;													// The current mode the Quarry block is in. 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
+	std::array<int, 3> currentDigBlock;									// The current block that is being dug out, relative to blockPosition.
+	std::array<std::pair<CoordinateInBlocks, EBlockType>, 4> cornerBlocks;		// The position of the corner blocks as well as original block type.
 	enum {
-		mark1BlockID = 430459851,				// Enum with all of the blocks used for methods.
+		mark1BlockID = 430459851,										// Enum with all of the blocks used for methods.
 		mark2BlockID = 430459852,
 		mark3BlockID = 430459853,
 		mark4BlockID = 430459854,
@@ -26,7 +27,7 @@ protected:
 	};
 public:
 	/**
-	* Constructor for DiggingBlock for when a new block is
+	* Constructor for when a new block is
 	* placed down.
 	* 
 	* @param blockPosition The position of the block.
@@ -34,17 +35,17 @@ public:
 	DiggingBlock(CoordinateInBlocks blockPosition);
 
 	/**
-	* Constructor for DiggingBlock for when loading in 
-	* the file containing all currently placed DiggingBlocks.
+	* Constructor for when loading in the file containing 
+	* all currently placed blocks.
 	* 
 	* @param size The size of the area to be dug out.
 	* @param depth How deep the hole will be.
-	* @param blockPosition The position of the DiggingBlock.
-	* @param currentMode The current mode of the DiggingBlock.
+	* @param blockPosition The position of the block.
+	* @param currentMode The current mode of the block.
 	* @param currentDigBlock The coordinates for the block currently being dug out.
 	* @param cornerBlockTypes The types of the corner blocks.
 	*/
-	DiggingBlock(int size, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<int, 4> cornerBlockTypes);
+	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<std::pair<CoordinateInBlocks, EBlockType>, 4> cornerBlocks);
 	
 	/**
 	* Accessor method for the blockPosition field.
@@ -58,6 +59,34 @@ public:
 
 	// Removes the corners of the area that is to be dug out.
 	void removeCorners();
+
+	/**
+	* Increments the length of the area that is to be dug out.
+	* 
+	* @param side The side (l/r) that is to be incremented.
+	*/
+	void incrementLength(char side);
+
+	/**
+	* Decrements the length of the area that is to be dug out.
+	*
+	* @param side The side (l/r) that is to be decremented.
+	*/
+	void decrementLength(char side);
+
+	/**
+	* Increments the width of the area that is to be dug out.
+	*
+	* @param side The side (b/f) that is to be incremented.
+	*/
+	void incrementWidth(char side);
+
+	/**
+	* Decrements the width of the area that is to be dug out.
+	*
+	* @param side The side (b/f) that is to be decremented.
+	*/
+	void decrementWidth(char side);
 
 	// Increments the size of the area that is to be dug out.
 	void incrementSize();
@@ -85,6 +114,9 @@ public:
 
 	// Toggles settings mode.
 	void toggleSettings();
+
+	// Goes to the finished mode.
+	void finishedDigging();
 
 	/**
 	* Sets or removes all of the blocks needed for the settings mode.
@@ -117,8 +149,8 @@ public:
 	// Removes and stops everything.
 	void destroy();
 
-	// Updates the currentDigBlock to fit with size.
-	void updateDigBlock();
+	// Resets the currentDigBlock to fit with length & width.
+	void resetDigBlock();
 
 	/**
 	* Writes a vector/list of DiggingBlock instances to a file.

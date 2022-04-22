@@ -102,6 +102,7 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(-1, 0, 0))) {
 				(*it)->incrementSize();
+				(*it)->printSize();
 				break;
 			}
 		}
@@ -112,6 +113,7 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(1, 0, 0))) {
 				(*it)->decrementSize();
+				(*it)->printSize();
 				break;
 			}
 		}
@@ -122,6 +124,7 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(0, 0, 2))) {
 				(*it)->decrementDepth();
+				(*it)->printDepth();
 				break;
 			}
 		}
@@ -132,6 +135,7 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(0, 0, 1))) {
 				(*it)->incrementDepth();
+				(*it)->printDepth();
 				break;
 			}
 		}
