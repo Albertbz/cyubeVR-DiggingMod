@@ -7,10 +7,19 @@
 
 QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition) 
 	: DiggingBlock(blockPosition) {
-
+	this->cornerBlocks[0].position = CoordinateInBlocks(2, -2, 0);
+	this->cornerBlocks[1].position = CoordinateInBlocks(2, 2, 0);
+	this->cornerBlocks[2].position = CoordinateInBlocks(-2, -2, 0);
+	this->cornerBlocks[3].position = CoordinateInBlocks(-2, 2, 0);
+	this->cornerBlocks[0].infoBlock = mark1BlockID;
+	this->cornerBlocks[1].infoBlock = mark2BlockID;
+	this->cornerBlocks[2].infoBlock = mark3BlockID;
+	this->cornerBlocks[3].infoBlock = mark4BlockID;
+	this->resetDigBlock();
+	showNormal(true);
 }
 
-QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<std::pair<CoordinateInBlocks, EBlockType>, 4> cornerBlocks)
+QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<Block, 4> cornerBlocks)
 	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks) {
 	
 }
@@ -18,7 +27,7 @@ QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks bl
 void QuarryBlock::dig() {
 	if (currentMode == 3) {
 		EBlockType currentBlockType = GetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2])).Type;
-		if (currentBlockType == EBlockType::Stone || currentBlockType == EBlockType::Dirt || currentBlockType == EBlockType::Grass) {
+		if (currentBlockType == EBlockType::Stone || currentBlockType == EBlockType::Dirt || currentBlockType == EBlockType::Grass || currentBlockType == EBlockType::Sand) {
 			SetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2]), EBlockType::Air);
 
 			// If block was Grass, remove possible flower/foliage on top.
@@ -31,11 +40,11 @@ void QuarryBlock::dig() {
 			}
 		}
 		currentDigBlock[0]--;
-		if (currentDigBlock[0] < cornerBlocks[2].first.X) {
-			currentDigBlock[0] = cornerBlocks[0].first.X;
+		if (currentDigBlock[0] < cornerBlocks[2].position.X) {
+			currentDigBlock[0] = cornerBlocks[0].position.X;
 			currentDigBlock[1]--;
-			if (currentDigBlock[1] < cornerBlocks[0].first.Y) {
-				currentDigBlock[1] = cornerBlocks[1].first.Y;
+			if (currentDigBlock[1] < cornerBlocks[0].position.Y) {
+				currentDigBlock[1] = cornerBlocks[1].position.Y;
 				currentDigBlock[2]--;
 				if (currentDigBlock[2] < -depth) {
 					currentDigBlock[2] = -1;
@@ -43,6 +52,80 @@ void QuarryBlock::dig() {
 				}
 			}
 		}
+	}
+}
+
+void QuarryBlock::incrementLength(char side) {
+	if (currentMode == 2) {
+		removeCorners();
+		length++;
+		if (side == 'l') {
+			cornerBlocks[0].position.X++;
+			cornerBlocks[1].position.X++;
+		}
+		else if (side == 'r') {
+			cornerBlocks[2].position.X--;
+			cornerBlocks[3].position.X--;
+		}
+		addCorners();
+		resetDigBlock();
+	}
+}
+
+void QuarryBlock::decrementLength(char side) {
+	if (currentMode == 2 && length > 5) {
+		removeCorners();
+		length--;
+		if (side == 'l' && cornerBlocks[0].position.X > 2) {
+			cornerBlocks[0].position.X--;
+			cornerBlocks[1].position.X--;
+		}
+		else if (side == 'r' && cornerBlocks[2].position.X < -2) {
+			cornerBlocks[2].position.X++;
+			cornerBlocks[3].position.X++;
+		}
+		else {
+			length++;
+		}
+		addCorners();
+		resetDigBlock();
+	}
+}
+
+void QuarryBlock::incrementWidth(char side) {
+	if (currentMode == 2) {
+		removeCorners();
+		width++;
+		if (side == 'f') {
+			cornerBlocks[1].position.Y++;
+			cornerBlocks[3].position.Y++;
+		}
+		else if (side == 'b') {
+			cornerBlocks[0].position.Y--;
+			cornerBlocks[2].position.Y--;
+		}
+		addCorners();
+		resetDigBlock();
+	}
+}
+
+void QuarryBlock::decrementWidth(char side) {
+	if (currentMode == 2 && width > 5) {
+		removeCorners();
+		width--;
+		if (side == 'f' && cornerBlocks[1].position.Y > 2) {
+			cornerBlocks[1].position.Y--;
+			cornerBlocks[3].position.Y--;
+		}
+		else if (side == 'b' && cornerBlocks[0].position.Y < -2) {
+			cornerBlocks[0].position.Y++;
+			cornerBlocks[2].position.Y++;
+		}
+		else {
+			width++;
+		}
+		addCorners();
+		resetDigBlock();
 	}
 }
 
@@ -94,4 +177,10 @@ void QuarryBlock::showDigging(bool show) {
 	else {
 		SetBlock(blockPosition + CoordinateInBlocks(0, 0, 6), EBlockType::Air);
 	}
+}
+
+void QuarryBlock::resetDigBlock() {
+	currentDigBlock[0] = cornerBlocks[0].position.X;
+	currentDigBlock[1] = cornerBlocks[1].position.Y;
+	currentDigBlock[2] = -1;
 }

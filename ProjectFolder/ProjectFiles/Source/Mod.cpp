@@ -8,7 +8,10 @@
 *************************************************************/
 
 // Stores all Quarry blocks currently in the world
-std::vector<QuarryBlock*> quarryBlocks;
+std::vector<QuarryBlock> quarryBlocks;
+
+// The name of the world
+std::wstring worldName;
 
 // All blocks with possible interactions
 const int quarryBlockID = 1473066952;
@@ -21,13 +24,17 @@ const int setBlockID = 1473066958;
 //const int exclBlockID = 1473066959; // Purely for decoration
 const int checkBlockID = 1473066960;
 const int crossBlockID = 1473066961;
+const int leftBlockID = 577305854;
+const int rightBlockID = 577305855;
+const int backBlockID = 577305856;
+const int frontBlockID = 577305857;
 
 
 /************************************************************
 	Config Variables (Set these to whatever you need. They are automatically read by the game.)
 *************************************************************/
 
-UniqueID ThisModUniqueIDs[] = { quarryBlockID, outBlockID, downBlockID, upBlockID, inBlockID, setBlockID, checkBlockID, crossBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
+UniqueID ThisModUniqueIDs[] = { quarryBlockID, outBlockID, downBlockID, upBlockID, inBlockID, setBlockID, checkBlockID, crossBlockID, leftBlockID, rightBlockID, backBlockID, frontBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
 float TickRate = 5;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
 
@@ -40,17 +47,16 @@ float TickRate = 5;							 // Set how many times per second Event_Tick() is call
 void Event_BlockPlaced(CoordinateInBlocks At, UniqueID CustomBlockID, bool Moved)
 {
 	if (CustomBlockID == quarryBlockID) {
-
 		// Adds the newly placed Quarry block to the list of Quarry blocks (if it doesn't already exist).
 		bool newBlock = true;
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if ((*it)->getBlockPosition() == At) {
+			if (it->blockPosition == At) {
 				newBlock = false;
 				break;
 			}
 		}
 		if (newBlock) {
-			quarryBlocks.push_back(new QuarryBlock(At));
+			quarryBlocks.push_back(QuarryBlock(At));
 		}
 	}
 }
@@ -63,8 +69,8 @@ void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID, bool Mo
 
 		// Goes through all Quarry blocks, deletes the one that was destroyed.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if ((*it)->getBlockPosition() == At) {
-				(*it)->destroy();
+			if (it->blockPosition == At) {
+				it->destroy();
 				quarryBlocks.erase(it);
 				break;
 			}
@@ -80,8 +86,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 
 		// Goes through all Quarry blocks, toggles the digging of the one the Check/Cross Mark block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(0, 0, 6))) {
-				(*it)->toggleDigging();
+			if (it->blockPosition == (At - CoordinateInBlocks(0, 0, 6))) {
+				it->toggleDigging();
 				break;
 			}
 		}
@@ -90,8 +96,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 
 		// Goes through all Quarry blocks, toggles the settings of the one the Settings block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(0, 0, 4))) {
-				(*it)->toggleSettings();
+			if (it->blockPosition == (At - CoordinateInBlocks(0, 0, 4))) {
+				it->toggleSettings();
 				break;
 			}
 		}
@@ -100,9 +106,9 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 		
 		// Goes through all Quarry blocks, increments the size of the one the Outwards block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(-1, 0, 0))) {
-				(*it)->incrementSize();
-				(*it)->printSize();
+			if (it->blockPosition == (At - CoordinateInBlocks(-1, 0, 0))) {
+				it->incrementSize();
+				it->printSize();
 				break;
 			}
 		}
@@ -111,9 +117,9 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 
 		// Goes through all Quarry blocks, decrements the size of the one the Inwards block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(1, 0, 0))) {
-				(*it)->decrementSize();
-				(*it)->printSize();
+			if (it->blockPosition == (At - CoordinateInBlocks(1, 0, 0))) {
+				it->decrementSize();
+				it->printSize();
 				break;
 			}
 		}
@@ -122,9 +128,9 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 
 		// Goes through all Quarry blocks, decrements the depth of the one the Up block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(0, 0, 2))) {
-				(*it)->decrementDepth();
-				(*it)->printDepth();
+			if (it->blockPosition == (At - CoordinateInBlocks(0, 0, 2))) {
+				it->decrementDepth();
+				it->printDepth();
 				break;
 			}
 		}
@@ -133,9 +139,9 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 
 		// Goes through all Quarry blocks, increments the depth of the one the Down block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if ((*it)->getBlockPosition() == (At - CoordinateInBlocks(0, 0, 1))) {
-				(*it)->incrementDepth();
-				(*it)->printDepth();
+			if (it->blockPosition == (At - CoordinateInBlocks(0, 0, 1))) {
+				it->incrementDepth();
+				it->printDepth();
 				break;
 			}
 		}
@@ -149,7 +155,7 @@ void Event_Tick()
 
 	// Goes through all Quarry blocks and runs the dig method.
 	for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-		(*it)->dig();
+		it->dig();
 	}
 }
 
@@ -157,9 +163,10 @@ void Event_Tick()
 // Run once when the world is loaded
 void Event_OnLoad()
 {
-
+	worldName = GetWorldName();
+	
 	// Loads all Quarry blocks previously placed in the world into the quarryBlocks vector.
-	quarryBlocks = QuarryBlock::readQuarryBlocks(std::ifstream{ "QuarryBlocks.txt" });
+	quarryBlocks = readBlocks<QuarryBlock>(std::ifstream{worldName + L"-QuarryBlocks.txt"});
 }
 
 // Run once when the world is exited
@@ -167,7 +174,7 @@ void Event_OnExit()
 {
 
 	// Saves all Quarry blocks to a file for later loading.
-	QuarryBlock::writeQuarryBlocks(std::ofstream{ "QuarryBlocks.txt" }, quarryBlocks);
+	writeBlocks<QuarryBlock>(std::ofstream{worldName + L"-QuarryBlocks.txt"}, quarryBlocks);
 }
 
 /*******************************************************

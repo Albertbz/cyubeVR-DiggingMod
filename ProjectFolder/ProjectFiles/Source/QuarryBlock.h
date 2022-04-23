@@ -3,29 +3,6 @@
 #include "DiggingBlock.h"
 #include <array>
 class QuarryBlock : public DiggingBlock {
-	/*
-	private:
-		int size;									// Used to define the size of the area (area is size*2+1 x size*2+1).
-		int depth;									// How deep the hole will be.
-		CoordinateInBlocks blockPosition;			// The position of the block.
-		int currentMode;							// The current mode the Quarry block is in. 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
-		std::array<int, 3> currentDigBlock;			// The current block that is being dug out, relative to blockPosition.
-		std::array<int, 4> cornerBlockTypes;		// The types of the four cornor blocks before they were changed.
-		enum {mark1BlockID = 430459851,				// Enum with all of the blocks used for methods.
-			  mark2BlockID = 430459852,
-			  mark3BlockID = 430459853,
-			  mark4BlockID = 430459854,
-			  setBlockID = 1473066958,
-			  upBlockID = 1473066956,
-			  downBlockID = 1473066955,
-			  inBlockID = 1473066957,
-			  outBlockID = 1473066954,
-			  checkBlockID = 1473066960,
-			  exclBlockID = 1473066959,
-			  crossBlockID = 1473066961
-		};
-		*/
-
 public:
 	/**
 	* Constructor for QuarryBlock used when a new Quarry
@@ -45,12 +22,40 @@ public:
 	* @param blockPosition The position of the Quarry block.
 	* @param currentMode The current mode of the Quarry block.
 	* @param currentDigBlock The coordinates for the block currently being dug out.
-	* @param cornerBlockTypes The types of the corner blocks.
+	* @param cornerBlocks The corner blocks.
 	*/
-	QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<std::pair<CoordinateInBlocks, EBlockType>, 4> cornerBlocks);
+	QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<Block, 4> cornerBlocks);
 
 	// Digs/mines a single block if the Quarry block is digging at that moment.
 	void dig();
+
+	/**
+	* Increments the length of the area that is to be dug out.
+	*
+	* @param side The side (l/r) that is to be incremented.
+	*/
+	void incrementLength(char side);
+
+	/**
+	* Decrements the length of the area that is to be dug out.
+	*
+	* @param side The side (l/r) that is to be decremented.
+	*/
+	void decrementLength(char side);
+
+	/**
+	* Increments the width of the area that is to be dug out.
+	*
+	* @param side The side (b/f) that is to be incremented.
+	*/
+	void incrementWidth(char side);
+
+	/**
+	* Decrements the width of the area that is to be dug out.
+	*
+	* @param side The side (b/f) that is to be decremented.
+	*/
+	void decrementWidth(char side);
 
 	/**
 	* Sets or removes all of the blocks needed for the settings mode.
@@ -79,4 +84,7 @@ public:
 	* @param show Whether to show the blocks.
 	*/
 	void showDigging(bool show);
+	
+	// Resets the currentDigBlock to fit with length & width.
+	void resetDigBlock();
 };

@@ -41,6 +41,11 @@ CoordinateInCentimeters GetPlayerLocation()
 	return InternalFunctions::I_GetPlayerLocation();
 }
 
+std::wstring GetWorldName()
+{
+	return std::wstring(InternalFunctions::I_GetWorldName());
+}
+
 
 /*******************************************************
 	Useful functions
@@ -50,15 +55,15 @@ CoordinateInCentimeters GetPlayerLocation()
 std::vector<CoordinateInBlocks> GetAllCoordinatesInBox(CoordinateInBlocks At, CoordinateInBlocks BoxExtent)
 {
 	std::vector<CoordinateInBlocks> ReturnCoordinates;
-	
+
 	for (int64_t x = -BoxExtent.X; x < BoxExtent.X; x++) {
 		for (int64_t y = -BoxExtent.Y; y < BoxExtent.Y; y++) {
 			for (int16_t z = -BoxExtent.Z; z < BoxExtent.Z; z++) {
 
 				CoordinateInBlocks Offset = CoordinateInBlocks(x, y, z);
 
-				if ( ((int32_t(At.Z) + int32_t(Offset.Z)) >= 0) && ((int32_t(At.Z) + int32_t(Offset.Z)) <= 800)) {
-					ReturnCoordinates.push_back(At + Offset);				
+				if (((int32_t(At.Z) + int32_t(Offset.Z)) >= 0) && ((int32_t(At.Z) + int32_t(Offset.Z)) <= 800)) {
+					ReturnCoordinates.push_back(At + Offset);
 				}
 			}
 		}
@@ -133,7 +138,7 @@ int32_t GetRandomInt()
 	return int32_t(uint32_t(xoroshiro128p()) / DivideBy) + Min;
 }
 
-int main() 
+int main()
 {
-	
+
 }

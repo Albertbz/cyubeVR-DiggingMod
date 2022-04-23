@@ -30,6 +30,9 @@
     <ClCompile Include="Source\DiggingBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\CornerBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\GameAPI.h">
@@ -51,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\DiggingBlock.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Structs.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
