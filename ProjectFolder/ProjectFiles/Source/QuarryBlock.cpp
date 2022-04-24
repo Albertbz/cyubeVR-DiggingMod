@@ -19,35 +19,35 @@ QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition)
 	showNormal(true);
 }
 
-QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<Block, 4> cornerBlocks)
+QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<Block, 4> cornerBlocks)
 	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks) {
 	
 }
 
 void QuarryBlock::dig() {
 	if (currentMode == 3) {
-		EBlockType currentBlockType = GetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2])).Type;
+		EBlockType currentBlockType = GetBlock(blockPosition + currentDigBlock).Type;
 		if (currentBlockType == EBlockType::Stone || currentBlockType == EBlockType::Dirt || currentBlockType == EBlockType::Grass || currentBlockType == EBlockType::Sand) {
-			SetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2]), EBlockType::Air);
+			SetBlock(blockPosition + currentDigBlock, EBlockType::Air);
 
 			// If block was Grass, remove possible flower/foliage on top.
 			if (currentBlockType == EBlockType::Grass) {
-				EBlockType blockAboveType = GetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2] + 1)).Type;
+				EBlockType blockAboveType = GetBlock(blockPosition + currentDigBlock + CoordinateInBlocks(0, 0, 1)).Type;
 				if (blockAboveType == EBlockType::Flower1 || blockAboveType == EBlockType::Flower2 || blockAboveType == EBlockType::Flower3 ||
 					blockAboveType == EBlockType::Flower4 || blockAboveType == EBlockType::FlowerRainbow || blockAboveType == EBlockType::GrassFoliage) {
-					SetBlock(blockPosition + CoordinateInBlocks(currentDigBlock[0], currentDigBlock[1], currentDigBlock[2] + 1), EBlockType::Air);
+					SetBlock(blockPosition + currentDigBlock + CoordinateInBlocks(0, 0, 1), EBlockType::Air);
 				}
 			}
 		}
-		currentDigBlock[0]--;
-		if (currentDigBlock[0] < cornerBlocks[2].position.X) {
-			currentDigBlock[0] = cornerBlocks[0].position.X;
-			currentDigBlock[1]--;
-			if (currentDigBlock[1] < cornerBlocks[0].position.Y) {
-				currentDigBlock[1] = cornerBlocks[1].position.Y;
-				currentDigBlock[2]--;
-				if (currentDigBlock[2] < -depth) {
-					currentDigBlock[2] = -1;
+		currentDigBlock.X--;
+		if (currentDigBlock.X < cornerBlocks[2].position.X) {
+			currentDigBlock.X = cornerBlocks[0].position.X;
+			currentDigBlock.Y--;
+			if (currentDigBlock.Y < cornerBlocks[0].position.Y) {
+				currentDigBlock.Y = cornerBlocks[1].position.Y;
+				currentDigBlock.Z--;
+				if (currentDigBlock.Z < -depth) {
+					currentDigBlock.Z = -1;
 					finishedDigging();
 				}
 			}
@@ -180,7 +180,7 @@ void QuarryBlock::showDigging(bool show) {
 }
 
 void QuarryBlock::resetDigBlock() {
-	currentDigBlock[0] = cornerBlocks[0].position.X;
-	currentDigBlock[1] = cornerBlocks[1].position.Y;
-	currentDigBlock[2] = -1;
+	currentDigBlock.X = cornerBlocks[0].position.X;
+	currentDigBlock.Y = cornerBlocks[1].position.Y;
+	currentDigBlock.Z = -1;
 }

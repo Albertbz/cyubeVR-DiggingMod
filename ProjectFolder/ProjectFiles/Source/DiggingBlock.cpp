@@ -11,9 +11,11 @@ DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition) {
 	this->depth = 5;
 	this->blockPosition = blockPosition;
 	this->currentMode = 1;
+	this->currentDigBlock = CoordinateInBlocks(0, 0, 0);
+	this->cornerBlocks = {};
 }
 
-DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<Block, 4> cornerBlocks) {
+DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<Block, 4> cornerBlocks) {
 	this->length = length;
 	this->width = width;
 	this->depth = depth;
@@ -28,10 +30,10 @@ void DiggingBlock::addCorners() {
 	cornerBlocks[1].infoPrev = GetBlock(blockPosition + cornerBlocks[1].position);
 	cornerBlocks[2].infoPrev = GetBlock(blockPosition + cornerBlocks[2].position);
 	cornerBlocks[3].infoPrev = GetBlock(blockPosition + cornerBlocks[3].position);
-	SetBlock(blockPosition + cornerBlocks[0].position, cornerBlocks[0].infoPrev);
-	SetBlock(blockPosition + cornerBlocks[1].position, cornerBlocks[1].infoPrev);
-	SetBlock(blockPosition + cornerBlocks[2].position, cornerBlocks[2].infoPrev);
-	SetBlock(blockPosition + cornerBlocks[3].position, cornerBlocks[3].infoPrev);
+	SetBlock(blockPosition + cornerBlocks[0].position, cornerBlocks[0].infoBlock);
+	SetBlock(blockPosition + cornerBlocks[1].position, cornerBlocks[1].infoBlock);
+	SetBlock(blockPosition + cornerBlocks[2].position, cornerBlocks[2].infoBlock);
+	SetBlock(blockPosition + cornerBlocks[3].position, cornerBlocks[3].infoBlock);
 }
 
 void DiggingBlock::removeCorners() {
@@ -74,7 +76,7 @@ void DiggingBlock::decrementDepth() {
 void DiggingBlock::printDepth() {
 	std::wstring message = L"Depth: ";
 	message.append(std::to_wstring(depth));
-	SpawnHintText(CoordinateInCentimeters(blockPosition) + CoordinateInCentimeters(0, 0, 125), message, 0.5f, 1.2f);
+	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), message, 0.5f, 1.2f);
 }
 
 void DiggingBlock::printSize() {
@@ -82,7 +84,7 @@ void DiggingBlock::printSize() {
 	message.append(std::to_wstring(length));
 	message.append(L" x ");
 	message.append(std::to_wstring(width));
-	SpawnHintText(CoordinateInCentimeters(blockPosition) + CoordinateInCentimeters(0, 0, 125), message, 0.5f, 1.2f);
+	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), message, 0.5f, 1.2f);
 }
 
 void DiggingBlock::toggleDigging() {
@@ -106,22 +108,7 @@ void DiggingBlock::toggleSettings() {
 	}
 	else if (currentMode == 2) {
 		showSettings(false);
-
-		// calculate time to dig
-		int totalSeconds = length * width * depth / 5;
-		int seconds = totalSeconds % 60;
-		int totalMinutes = totalSeconds / 60;
-		int minutes = totalMinutes % 60;
-		int hours = totalMinutes / 60;
-		std::wstring message = L"Settings saved! It will take ";
-		message.append(std::to_wstring(hours));
-		message.append(L" hours, ");
-		message.append(std::to_wstring(minutes));
-		message.append(L" minutes, and ");
-		message.append(std::to_wstring(seconds));
-		message.append(L"seconds to be dug out.");
-
-		SpawnHintText(CoordinateInCentimeters(blockPosition) + CoordinateInCentimeters(0, 0, 125), message, 5, 1.5f);
+		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 75), L"Settings saved!\nIt will take\n" + timeToDig() + L"\nto dig out the hole.", 5, 2.0f);
 		showNormal(true);
 		currentMode = 1;
 	}
@@ -151,4 +138,48 @@ void DiggingBlock::destroy() {
 		break;
 	};
 	currentMode = 0;
+}
+
+std::wstring DiggingBlock::timeToDig() {
+	int totalSeconds = length * width * depth / 5;
+	int seconds = totalSeconds % 60;
+	int totalMinutes = totalSeconds / 60;
+	int minutes = totalMinutes % 60;
+	int hours = totalMinutes / 60;
+
+	std::wstring message;
+	if (hours > 0) {
+		message.append(std::to_wstring(hours));
+		message.append(L" hour");
+		if (hours > 1) {
+			message.append(L"s");
+		}
+		if (minutes > 0 && seconds > 0) {
+			message.append(L", ");
+		}
+		else if ((minutes == 0 && seconds > 0) || (minutes > 0 && seconds == 0)) {
+			message.append(L" and ");
+		}
+	}
+	if (minutes > 0) {
+		message.append(std::to_wstring(minutes));
+		message.append(L" minute");
+		if (minutes > 1) {
+			message.append(L"s");
+		}
+		if (hours > 0 && seconds > 0) {
+			message.append(L", and ");
+		}
+		else if (seconds > 0 && hours == 0) {
+			message.append(L" and ");
+		}
+	}
+	if (seconds > 0) {
+		message.append(std::to_wstring(seconds));
+		message.append(L" second");
+		if (seconds > 1) {
+			message.append(L"s");
+		}
+	}
+	return message;
 }

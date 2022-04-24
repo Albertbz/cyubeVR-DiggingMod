@@ -1,9 +1,9 @@
 #pragma once
 #include "GameAPI.h"
 struct Block {
-	CoordinateInBlocks position;
-	BlockInfo infoPrev;
-	BlockInfo infoBlock;
+	CoordinateInBlocks position = CoordinateInBlocks(0, 0, 0);
+	BlockInfo infoPrev = BlockInfo();
+	BlockInfo infoBlock = BlockInfo();
 };
 
 template <typename T> 
@@ -31,11 +31,13 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 		pos = line.find_first_of(';', pos + 1);
 		int currentMode = std::stoi(std::string{ line, pos + 1 });
 
-		std::array<int, 3> currentDigBlock{};
-		for (auto &i : currentDigBlock) {
-			pos = line.find_first_of(';', pos + 1);
-			i = std::stoi(std::string{ line, pos + 1 });
-		}
+		CoordinateInBlocks currentDigBlock;
+		pos = line.find_first_of(';', pos + 1);
+		currentDigBlock.X = std::stoi(std::string{ line, pos + 1 });
+		pos = line.find_first_of(';', pos + 1);
+		currentDigBlock.Y = std::stoi(std::string{ line, pos + 1 });
+		pos = line.find_first_of(';', pos + 1);
+		currentDigBlock.Z = std::stoi(std::string{ line, pos + 1 });
 
 		std::array<Block, 4> cornerBlocks;
 		for (auto &i : cornerBlocks) {
@@ -48,12 +50,14 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 			pos = line.find_first_of(';', pos + 1);
 			if (std::string{ line, pos + 1 } == "C") {
 				pos = line.find_first_of(';', pos + 1);
-				i.info = std::stoi(std::string{ line, pos + 1 });
+				i.infoPrev = std::stoi(std::string{ line, pos + 1 });
 			}
 			else {
 				pos = line.find_first_of(';', pos + 1);
-				i.info = (EBlockType)std::stoi(std::string{ line, pos + 1 });
+				i.infoPrev = (EBlockType)std::stoi(std::string{ line, pos + 1 });
 			}
+			pos = line.find_first_of(';', pos + 1);
+			i.infoBlock = std::stoi(std::string{ line, pos + 1 });
 		}
 
 		blocks.push_back(T(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks));
@@ -71,18 +75,16 @@ template <typename T>
 void writeBlocks(std::ostream& file, const std::vector<T>& blocks) {
 	for (auto b : blocks) {
 		file << b.length << ';' << b.width << ';' << b.depth << ';' << b.blockPosition.X << ';' << b.blockPosition.Y << ';' << b.blockPosition.Z << ';'
-			<< b.currentMode << ';';
-		for (auto i : b.currentDigBlock) {
-			file << i << ';';
-		}
+			<< b.currentMode << ';' << b.currentDigBlock.X << ';' << b.currentDigBlock.Y << ';' << b.currentDigBlock.Z << ';';
 		for (auto i : b.cornerBlocks) {
 			file << i.position.X << ';' << i.position.Y << ';' << i.position.Z << ';';
-			if (i.info.Type == EBlockType::ModBlock) {
-				file << 'C' << ';' << (int)i.info.CustomBlockID << '; ';
+			if (i.infoPrev.Type == EBlockType::ModBlock) {
+				file << 'C' << ';' << (int)i.infoPrev.CustomBlockID << ';';
 			}
 			else {
-				file << "N" << ';' << (int)i.info.Type << ';';
+				file << 'N' << ';' << (int)i.infoPrev.Type << ';';
 			}
+			file << i.infoBlock.CustomBlockID << ';';
 		}
 		file << '\n';
 	}

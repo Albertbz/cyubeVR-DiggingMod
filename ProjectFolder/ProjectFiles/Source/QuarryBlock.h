@@ -24,7 +24,7 @@ public:
 	* @param currentDigBlock The coordinates for the block currently being dug out.
 	* @param cornerBlocks The corner blocks.
 	*/
-	QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<Block, 4> cornerBlocks);
+	QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<Block, 4> cornerBlocks);
 
 	// Digs/mines a single block if the Quarry block is digging at that moment.
 	void dig();

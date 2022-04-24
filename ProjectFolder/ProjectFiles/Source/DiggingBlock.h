@@ -10,9 +10,9 @@ public:
 	int depth;											// The depth of the hole.
 	CoordinateInBlocks blockPosition;					// The position of the block.
 	int currentMode;									// The current mode the Quarry block is in. 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
-	std::array<int, 3> currentDigBlock;					// The current block that is being dug out, relative to blockPosition.
-	std::array<Block, 4> cornerBlocks;					// The position of the corner blocks as well as original block type.
-	std::array<Block, 12> buttonBlocks;
+	CoordinateInBlocks currentDigBlock;					// The current block that is being dug out, relative to blockPosition.
+	std::array<Block, 4> cornerBlocks;					// An array of all of the Corner blocks.
+	std::array<Block, 12> buttonBlocks;					// An array of all of the Button blocks.
 	enum {
 		mark1BlockID = 430459851,						// Enum with all of the blocks used for methods.
 		mark2BlockID = 430459852,
@@ -51,7 +51,7 @@ public:
 	* @param currentDigBlock The coordinates for the block currently being dug out.
 	* @param cornerBlocks The corner blocks.
 	*/
-	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, std::array<int, 3> currentDigBlock, std::array<Block, 4> cornerBlocks);
+	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<Block, 4> cornerBlocks);
 
 	// Adds the corners of the area that is to be dug out.
 	void addCorners();
@@ -150,4 +150,15 @@ public:
 
 	// Resets the currentDigBlock to fit with length & width.
 	virtual void resetDigBlock() = 0;
+
+	/**
+	* Computes the time it will take to dig the current hole and
+	* gives it as a wstring.
+	* 
+	* @return A wstring containing the time it will take to
+	* dig out the current hole.
+	*/
+	std::wstring timeToDig();
+
+
 };
