@@ -13,9 +13,12 @@ DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition) {
 	this->currentMode = 1;
 	this->currentDigBlock = CoordinateInBlocks(0, 0, 0);
 	this->cornerBlocks = {};
+	this->buttonBlocks = {};
+	this->settingsPage = 0;
 }
 
-DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<Block, 4> cornerBlocks) {
+DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
+						   std::array<Block, 4> cornerBlocks, std::array<Block, 14> buttonBlocks, int settingsPage) {
 	this->length = length;
 	this->width = width;
 	this->depth = depth;
@@ -23,6 +26,8 @@ DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks 
 	this->currentMode = currentMode;
 	this->currentDigBlock = currentDigBlock;
 	this->cornerBlocks = cornerBlocks;
+	this->buttonBlocks = buttonBlocks;
+	this->settingsPage = settingsPage;
 }
 
 void DiggingBlock::addCorners() {
@@ -182,4 +187,12 @@ std::wstring DiggingBlock::timeToDig() {
 		}
 	}
 	return message;
+}
+
+bool DiggingBlock::diggableBlock(BlockInfo block) {
+	if (block.Type != EBlockType::ModBlock) {
+		return block.Type == EBlockType::Stone || block.Type == EBlockType::Dirt || block.Type == EBlockType::Grass || block.Type == EBlockType::Sand;
+	}
+	return false;
+		
 }

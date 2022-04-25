@@ -1,10 +1,43 @@
 #pragma once
 #include "GameAPI.h"
 struct Block {
-	CoordinateInBlocks position = CoordinateInBlocks(0, 0, 0);
-	BlockInfo infoPrev = BlockInfo();
-	BlockInfo infoBlock = BlockInfo();
+	CoordinateInBlocks position = CoordinateInBlocks(0, 0, 0);	// The position of the block (possibly in relation to another block).
+	BlockInfo infoBlock = BlockInfo();							// The BlockInfo for the block.
+	BlockInfo infoPrev = BlockInfo();							// The BlockInfo for the previous block, a.k.a., the original one.
 };
+
+template <typename T>
+void writeBlocks(std::ostream& file, const std::vector<T>& blocks) {
+	for (auto b : blocks) {
+		file << b.length << ';' << b.width << ';' << b.depth << ';' << b.blockPosition.X << ';' << b.blockPosition.Y << ';' << b.blockPosition.Z << ';'
+			<< b.currentMode << ';' << b.currentDigBlock.X << ';' << b.currentDigBlock.Y << ';' << b.currentDigBlock.Z << ';';
+		for (const auto& i : b.cornerBlocks) {
+			file << i.position.X << ';' << i.position.Y << ';' << i.position.Z << ';' << i.infoBlock.CustomBlockID << ';';;
+			if (i.infoPrev.Type == EBlockType::ModBlock) {
+				file << 'C' << ';' << (int)i.infoPrev.CustomBlockID << ';';
+			}
+			else {
+				file << 'N' << ';' << (int)i.infoPrev.Type << ';';
+			}
+		}
+		for (const auto& i : b.buttonBlocks) {
+			file << i.position.X << ';' << i.position.Y << ';' << i.position.Z << ';' << i.infoBlock.CustomBlockID << ';';
+			if (i.infoPrev.Type == EBlockType::ModBlock) {
+				file << 'C' << ';' << (int)i.infoPrev.CustomBlockID << ';';
+			}
+			else {
+				file << 'N' << ';' << (int)i.infoPrev.Type << ';';
+			}
+		}
+		file << b.settingsPage << ';';
+		file << '\n';
+	}
+}
+
+template <typename T>
+void writeBlocks(std::ostream&& file, const std::vector<T>& blocks) {
+	writeBlocks<T>(file, blocks);
+}
 
 template <typename T> 
 auto readBlocks(std::istream& file)->std::vector<T> {
@@ -48,6 +81,8 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 			pos = line.find_first_of(';', pos + 1);
 			i.position.Z = std::stoi(std::string{ line, pos + 1 });
 			pos = line.find_first_of(';', pos + 1);
+			i.infoBlock = std::stoi(std::string{ line, pos + 1 });
+			pos = line.find_first_of(';', pos + 1);
 			if (std::string{ line, pos + 1 } == "C") {
 				pos = line.find_first_of(';', pos + 1);
 				i.infoPrev = std::stoi(std::string{ line, pos + 1 });
@@ -56,11 +91,33 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 				pos = line.find_first_of(';', pos + 1);
 				i.infoPrev = (EBlockType)std::stoi(std::string{ line, pos + 1 });
 			}
-			pos = line.find_first_of(';', pos + 1);
-			i.infoBlock = std::stoi(std::string{ line, pos + 1 });
 		}
 
-		blocks.push_back(T(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks));
+		std::array<Block, 14> buttonBlocks;
+		for (auto &i : buttonBlocks) {
+			pos = line.find_first_of(';', pos + 1);
+			i.position.X = std::stoi(std::string{ line, pos + 1 });
+			pos = line.find_first_of(';', pos + 1);
+			i.position.Y = std::stoi(std::string{ line, pos + 1 });
+			pos = line.find_first_of(';', pos + 1);
+			i.position.Z = std::stoi(std::string{ line, pos + 1 });
+			pos = line.find_first_of(';', pos + 1);
+			i.infoBlock = std::stoi(std::string{ line, pos + 1 });
+			pos = line.find_first_of(';', pos + 1);
+			if (std::string{ line, pos + 1 } == "C") {
+				pos = line.find_first_of(';', pos + 1);
+				i.infoPrev = std::stoi(std::string{ line, pos + 1 });
+			}
+			else {
+				pos = line.find_first_of(';', pos + 1);
+				i.infoPrev = (EBlockType)std::stoi(std::string{ line, pos + 1 });
+			}
+		}
+
+		pos = line.find_first_of(';', pos + 1);
+		int settingsPage = std::stoi(std::string{ line, pos + 1 });
+
+		blocks.push_back(T(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, buttonBlocks, settingsPage));
 	}
 
 	return blocks;
@@ -69,28 +126,4 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 template <typename T>
 auto readBlocks(std::istream&& file) -> std::vector<T> {
 	return readBlocks<T>(file);
-}
-
-template <typename T>
-void writeBlocks(std::ostream& file, const std::vector<T>& blocks) {
-	for (auto b : blocks) {
-		file << b.length << ';' << b.width << ';' << b.depth << ';' << b.blockPosition.X << ';' << b.blockPosition.Y << ';' << b.blockPosition.Z << ';'
-			<< b.currentMode << ';' << b.currentDigBlock.X << ';' << b.currentDigBlock.Y << ';' << b.currentDigBlock.Z << ';';
-		for (auto i : b.cornerBlocks) {
-			file << i.position.X << ';' << i.position.Y << ';' << i.position.Z << ';';
-			if (i.infoPrev.Type == EBlockType::ModBlock) {
-				file << 'C' << ';' << (int)i.infoPrev.CustomBlockID << ';';
-			}
-			else {
-				file << 'N' << ';' << (int)i.infoPrev.Type << ';';
-			}
-			file << i.infoBlock.CustomBlockID << ';';
-		}
-		file << '\n';
-	}
-}
-
-template <typename T>
-void writeBlocks(std::ostream&& file, const std::vector<T>& blocks) {
-	writeBlocks<T>(file, blocks);
 }

@@ -12,7 +12,8 @@ public:
 	int currentMode;									// The current mode the Quarry block is in. 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
 	CoordinateInBlocks currentDigBlock;					// The current block that is being dug out, relative to blockPosition.
 	std::array<Block, 4> cornerBlocks;					// An array of all of the Corner blocks.
-	std::array<Block, 12> buttonBlocks;					// An array of all of the Button blocks.
+	std::array<Block, 14> buttonBlocks;					// An array of all of the Button blocks. Indices: 0=set, 1=up, 2=down, 3=in, 4=out, 5=excl, 6=check, 7=cross, 8=left, 9=right, 10=back, 11=front, 12=next, 13=prev.
+	int settingsPage;									// The current page of the settings. 
 	enum {
 		mark1BlockID = 430459851,						// Enum with all of the blocks used for methods.
 		mark2BlockID = 430459852,
@@ -29,7 +30,9 @@ public:
 		leftBlockID = 577305854,
 		rightBlockID = 577305855,
 		backBlockID = 577305856,
-		frontBlockID = 577305857
+		frontBlockID = 577305857,
+		nextBlockID = 527579106,
+		prevBlockID = 527579107
 	};
 public:
 	/**
@@ -50,8 +53,10 @@ public:
 	* @param currentMode The current mode of the block.
 	* @param currentDigBlock The coordinates for the block currently being dug out.
 	* @param cornerBlocks The corner blocks.
+	* @param buttonBlocks The button blocks.
 	*/
-	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<Block, 4> cornerBlocks);
+	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
+			     std::array<Block, 4> cornerBlocks, std::array<Block, 14> buttonBlocks, int settingsPage);
 
 	// Adds the corners of the area that is to be dug out.
 	void addCorners();
@@ -160,5 +165,13 @@ public:
 	*/
 	std::wstring timeToDig();
 
-
+	/**
+	* Computes whether the given block is a diggable block and
+	* can therefore be removed by a Digging block.
+	* 
+	* @param block The block to test.
+	* 
+	* @return A boolean telling whether the block is diggable.
+	*/
+	bool diggableBlock(BlockInfo block);
 };
