@@ -13,27 +13,31 @@ QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition)
 	this->cornerBlocks[3] = { CoordinateInBlocks(-2, 2, 0), mark4BlockID, BlockInfo() };
 
 	this->buttonBlocks[0] = { CoordinateInBlocks(0, 0, 4), setBlockID, BlockInfo() };
-	this->buttonBlocks[1] = { CoordinateInBlocks(0, 0, 2), upBlockID ,BlockInfo() };
-	this->buttonBlocks[2] = { CoordinateInBlocks(0, 0, 1), downBlockID, BlockInfo() };
+	this->buttonBlocks[1] = { CoordinateInBlocks(0, 0, 0), upBlockID ,BlockInfo() };
+	this->buttonBlocks[2] = { CoordinateInBlocks(0, 0, 0), downBlockID, BlockInfo() };
 	this->buttonBlocks[3] = { CoordinateInBlocks(0, 0, 0), inBlockID, BlockInfo() };
 	this->buttonBlocks[4] = { CoordinateInBlocks(0, 0, 0), outBlockID, BlockInfo() };
 	this->buttonBlocks[5] = { CoordinateInBlocks(0, 0, 6), exclBlockID, BlockInfo() };
 	this->buttonBlocks[6] = { CoordinateInBlocks(0, 0, 6), checkBlockID, BlockInfo() };
 	this->buttonBlocks[7] = { CoordinateInBlocks(0, 0, 6), crossBlockID, BlockInfo() };
-	this->buttonBlocks[8] = { CoordinateInBlocks(0, 0, 0), leftBlockID, BlockInfo() };
-	this->buttonBlocks[9] = { CoordinateInBlocks(0, 0, 0), rightBlockID, BlockInfo() };
-	this->buttonBlocks[10] = { CoordinateInBlocks(0, 0, 0), backBlockID, BlockInfo() };
-	this->buttonBlocks[11] = { CoordinateInBlocks(0, 0, 0), frontBlockID, BlockInfo() };
+	this->buttonBlocks[8] = { CoordinateInBlocks(0, -5, 0), leftBlockID, BlockInfo() };
+	this->buttonBlocks[9] = { CoordinateInBlocks(0, 5, 0), rightBlockID, BlockInfo() };
+	this->buttonBlocks[10] = { CoordinateInBlocks(5, 0, 0), backBlockID, BlockInfo() };
+	this->buttonBlocks[11] = { CoordinateInBlocks(-5, 0, 0), frontBlockID, BlockInfo() };
 	this->buttonBlocks[12] = { CoordinateInBlocks(0, 0, 0), nextBlockID, BlockInfo() };
 	this->buttonBlocks[13] = { CoordinateInBlocks(0, 0, 0), prevBlockID, BlockInfo() };
+	this->buttonBlocks[14] = { CoordinateInBlocks(0, 4, 0), leftBlockID, BlockInfo() };
+	this->buttonBlocks[15] = { CoordinateInBlocks(0, -4, 0), rightBlockID, BlockInfo() };
+	this->buttonBlocks[16] = { CoordinateInBlocks(-4, 0, 0), backBlockID, BlockInfo() };
+	this->buttonBlocks[17] = { CoordinateInBlocks(4, 0, 0), frontBlockID, BlockInfo() };
 
 	this->resetDigBlock();
 	showNormal(true);
 }
 
 QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-						 std::array<Block, 4> cornerBlocks, std::array<Block, 14> buttonBlocks, int settingsPage)
-	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, buttonBlocks, settingsPage) {
+						 std::array<Block, 4> cornerBlocks, std::array<Block, 18> buttonBlocks, int settingsPage, bool digOres)
+	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, buttonBlocks, settingsPage, digOres) {
 	
 }
 
@@ -148,73 +152,42 @@ void QuarryBlock::showSettings(bool show) {
 	if (show) {
 		addCorners();
 		updateSettingsBlockLocations();
-		buttonBlocks[0].infoPrev = GetBlock(blockPosition + buttonBlocks[0].position);
-		SetBlock(blockPosition + buttonBlocks[0].position, buttonBlocks[0].infoBlock); // Set Settings block
-
-		buttonBlocks[1].infoPrev = GetBlock(blockPosition + buttonBlocks[1].position);
-		SetBlock(blockPosition + buttonBlocks[1].position, buttonBlocks[1].infoBlock); // Set Up block
-
-		buttonBlocks[2].infoPrev = GetBlock(blockPosition + buttonBlocks[2].position);
-		SetBlock(blockPosition + buttonBlocks[2].position, buttonBlocks[2].infoBlock); // Set Down block
-
-		buttonBlocks[3].infoPrev = GetBlock(blockPosition + buttonBlocks[3].position);
-		SetBlock(blockPosition + buttonBlocks[3].position, buttonBlocks[3].infoBlock); // Set In block
-
-		buttonBlocks[4].infoPrev = GetBlock(blockPosition + buttonBlocks[4].position);
-		SetBlock(blockPosition + buttonBlocks[4].position, buttonBlocks[4].infoBlock); // Set Out block
-
-		buttonBlocks[12].infoPrev = GetBlock(blockPosition + buttonBlocks[12].position);
-		SetBlock(blockPosition + buttonBlocks[12].position, buttonBlocks[12].infoBlock); // Set Next block
-
-		buttonBlocks[13].infoPrev = GetBlock(blockPosition + buttonBlocks[13].position);
-		SetBlock(blockPosition + buttonBlocks[13].position, buttonBlocks[13].infoBlock); // Set Previous block
-
+		setSettingsBlocks();
 	}
 	else {
 		removeCorners();
-		SetBlock(blockPosition + buttonBlocks[0].position, buttonBlocks[0].infoPrev);
-		SetBlock(blockPosition + buttonBlocks[1].position, buttonBlocks[1].infoPrev);
-		SetBlock(blockPosition + buttonBlocks[2].position, buttonBlocks[2].infoPrev);
-		SetBlock(blockPosition + buttonBlocks[3].position, buttonBlocks[3].infoPrev);
-		SetBlock(blockPosition + buttonBlocks[4].position, buttonBlocks[4].infoPrev);
-		SetBlock(blockPosition + buttonBlocks[12].position, buttonBlocks[12].infoPrev);
-		SetBlock(blockPosition + buttonBlocks[13].position, buttonBlocks[13].infoPrev);
+		removeSettingsBlocks();
 	}
 }
 
 void QuarryBlock::showNormal(bool show) {
 	if (show) {
 		addCorners();
-		buttonBlocks[0].infoPrev = GetBlock(blockPosition + buttonBlocks[0].position);
-		SetBlock(blockPosition + buttonBlocks[0].position, buttonBlocks[0].infoBlock); // Set Settings block
-
-		buttonBlocks[6].infoPrev = GetBlock(blockPosition + buttonBlocks[6].position);
-		SetBlock(blockPosition + buttonBlocks[6].position, buttonBlocks[6].infoBlock); // Set Check Mark block
+		setButtonBlock(0); // Set Settings block
+		setButtonBlock(6); // Set Check Mark block
 	}
 	else {
 		removeCorners();
-		SetBlock(blockPosition + buttonBlocks[0].position, buttonBlocks[0].infoPrev);
-		SetBlock(blockPosition + buttonBlocks[6].position, buttonBlocks[6].infoPrev);
+		removeButtonBlock(0);
+		removeButtonBlock(6);
 	}
 }
 
 void QuarryBlock::showFinished(bool show) {
 	if (show) {
-		buttonBlocks[5].infoPrev = GetBlock(blockPosition + buttonBlocks[5].position);
-		SetBlock(blockPosition + buttonBlocks[5].position, buttonBlocks[5].infoBlock); // Set Exclamation Mark block
+		setButtonBlock(5); // Set Exclamation Mark block
 	}
 	else {
-		SetBlock(blockPosition + buttonBlocks[5].position, buttonBlocks[5].infoPrev);
+		removeButtonBlock(5);
 	}
 }
 
 void QuarryBlock::showDigging(bool show) {
 	if (show) {
-		buttonBlocks[7].infoPrev = GetBlock(blockPosition + buttonBlocks[7].position);
-		SetBlock(blockPosition + buttonBlocks[7].position, buttonBlocks[7].infoBlock); // Set Cross Mark block
+		setButtonBlock(7); // Set Cross Mark block
 	}
 	else {
-		SetBlock(blockPosition + buttonBlocks[7].position, buttonBlocks[7].infoPrev);
+		removeButtonBlock(7);
 	}
 }
 
@@ -231,27 +204,97 @@ void QuarryBlock::updateSettingsBlockLocations() {
 	int yDifference = std::abs(playerLocation.Y - blockPositionCm.Y);
 
 	if (playerLocation.X > blockPositionCm.X + 25 && playerLocation.Y < blockPositionCm.Y + xDifference && playerLocation.Y > blockPositionCm.Y - xDifference) {
+		buttonBlocks[1].position = CoordinateInBlocks(0, 1, 0);
+		buttonBlocks[2].position = CoordinateInBlocks(0, -1, 0);
 		buttonBlocks[3].position = CoordinateInBlocks(0, 1, 0);
 		buttonBlocks[4].position = CoordinateInBlocks(0, -1, 0);
 		buttonBlocks[12].position = buttonBlocks[0].position + CoordinateInBlocks(0, -1, 0);
 		buttonBlocks[13].position = buttonBlocks[0].position + CoordinateInBlocks(0, 1, 0);
 	}
 	else if (playerLocation.X < blockPositionCm.X - 25 && playerLocation.Y < blockPositionCm.Y + xDifference && playerLocation.Y > blockPositionCm.Y - xDifference) {
+		buttonBlocks[1].position = CoordinateInBlocks(0, -1, 0);
+		buttonBlocks[2].position = CoordinateInBlocks(0, 1, 0);
 		buttonBlocks[3].position = CoordinateInBlocks(0, -1, 0);
 		buttonBlocks[4].position = CoordinateInBlocks(0, 1, 0);
 		buttonBlocks[12].position = buttonBlocks[0].position + CoordinateInBlocks(0, 1, 0);
 		buttonBlocks[13].position = buttonBlocks[0].position + CoordinateInBlocks(0, -1, 0);
 	}
 	else if (playerLocation.Y > blockPositionCm.Y + 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
+		buttonBlocks[1].position = CoordinateInBlocks(-1, 0, 0);
+		buttonBlocks[2].position = CoordinateInBlocks(1, 0, 0);
 		buttonBlocks[3].position = CoordinateInBlocks(-1, 0, 0);
 		buttonBlocks[4].position = CoordinateInBlocks(1, 0, 0);
 		buttonBlocks[12].position = buttonBlocks[0].position + CoordinateInBlocks(1, 0, 0);
 		buttonBlocks[13].position = buttonBlocks[0].position + CoordinateInBlocks(-1, 0, 0);
 	}
 	else if (playerLocation.Y < blockPositionCm.Y - 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
+		buttonBlocks[1].position = CoordinateInBlocks(1, 0, 0);
+		buttonBlocks[2].position = CoordinateInBlocks(-1, 0, 0);
 		buttonBlocks[3].position = CoordinateInBlocks(1, 0, 0);
 		buttonBlocks[4].position = CoordinateInBlocks(-1, 0, 0);
 		buttonBlocks[12].position = buttonBlocks[0].position + CoordinateInBlocks(-1, 0, 0);
 		buttonBlocks[13].position = buttonBlocks[0].position + CoordinateInBlocks(1, 0, 0);
+	}
+}
+
+void QuarryBlock::setSettingsBlocks() {
+	setButtonBlock(0); // Set Settings block
+
+	if (settingsPage != 1) {
+		setButtonBlock(13); // Set Previous block
+	}
+	if (settingsPage != 4) {
+		setButtonBlock(12); // Set Next block
+	}
+
+
+	if (settingsPage == 1) {
+		setButtonBlock(1); // Set Up block
+		setButtonBlock(2); // Set Down block
+	}
+	else if (settingsPage == 2) {
+		setButtonBlock(3); // Set In block
+		setButtonBlock(4); // Set Out block
+	}
+	else if (settingsPage == 3) {
+		setButtonBlock(8); // Set Left block (increment)
+		setButtonBlock(9); // Set Right block (increment)
+		setButtonBlock(10); // Set Back block (increment)
+		setButtonBlock(11); // Set Front block (increment)
+		setButtonBlock(14); // Set Left block (decrement)
+		setButtonBlock(15); // Set Right block (decrement)
+		setButtonBlock(16); // Set Back block (decrement)
+		setButtonBlock(17); // Set Front block (decrement)
+	}
+}
+
+void QuarryBlock::removeSettingsBlocks() {
+	removeButtonBlock(0);
+
+	if (settingsPage != 1) {
+		removeButtonBlock(13);
+	}
+	if (settingsPage != 4) {
+		removeButtonBlock(12);
+	}
+
+
+	if (settingsPage == 1) {
+		removeButtonBlock(1);
+		removeButtonBlock(2);
+	}
+	else if (settingsPage == 2) {
+		removeButtonBlock(3);
+		removeButtonBlock(4);
+	}
+	else if (settingsPage == 3) {
+		removeButtonBlock(8);
+		removeButtonBlock(9);
+		removeButtonBlock(10);
+		removeButtonBlock(11);
+		removeButtonBlock(14);
+		removeButtonBlock(15);
+		removeButtonBlock(16);
+		removeButtonBlock(17);
 	}
 }

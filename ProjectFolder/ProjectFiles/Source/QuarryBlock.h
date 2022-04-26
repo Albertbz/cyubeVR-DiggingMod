@@ -25,7 +25,7 @@ public:
 	* @param cornerBlocks The corner blocks.
 	*/
 	QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-				std::array<Block, 4> cornerBlocks, std::array<Block, 14> buttonBlocks, int settingsPage);
+				std::array<Block, 4> cornerBlocks, std::array<Block, 18> buttonBlocks, int settingsPage, bool digOres);
 
 	// Digs/mines a single block if the Quarry block is digging at that moment.
 	void dig();
@@ -92,4 +92,10 @@ public:
 	// Updates the locations of the Button blocks in the settings mode 
 	// to correspond to player's location.
 	void updateSettingsBlockLocations();
+
+	// Sets the settings blocks to match the current settings page.
+	void setSettingsBlocks();
+
+	// Removes the settings blocks matching the current settings page.
+	void removeSettingsBlocks();
 };

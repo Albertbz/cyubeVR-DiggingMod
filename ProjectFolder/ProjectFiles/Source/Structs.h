@@ -29,7 +29,7 @@ void writeBlocks(std::ostream& file, const std::vector<T>& blocks) {
 				file << 'N' << ';' << (int)i.infoPrev.Type << ';';
 			}
 		}
-		file << b.settingsPage << ';';
+		file << b.settingsPage << ';' << b.digOres << ';';
 		file << '\n';
 	}
 }
@@ -93,7 +93,7 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 			}
 		}
 
-		std::array<Block, 14> buttonBlocks;
+		std::array<Block, 18> buttonBlocks;
 		for (auto &i : buttonBlocks) {
 			pos = line.find_first_of(';', pos + 1);
 			i.position.X = std::stoi(std::string{ line, pos + 1 });
@@ -117,7 +117,10 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 		pos = line.find_first_of(';', pos + 1);
 		int settingsPage = std::stoi(std::string{ line, pos + 1 });
 
-		blocks.push_back(T(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, buttonBlocks, settingsPage));
+		pos = line.find_first_of(';', pos + 1);
+		bool digOres = std::stoi(std::string{ line, pos + 1 });
+
+		blocks.push_back(T(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, buttonBlocks, settingsPage, digOres));
 	}
 
 	return blocks;

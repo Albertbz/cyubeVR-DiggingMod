@@ -90,7 +90,7 @@ void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID, bool Mo
 // Run every time a block is hit by a tool
 void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::wstring ToolName)
 {
-	bool isLeftover = true;
+	bool isLeftover = true; // Keeps track of whether the block is leftover (from bug or something else), i.e., it doesn't belong to a Digging Block.
 
 	if (CustomBlockID == quarryBlockID) {
 		isLeftover = false;
@@ -198,23 +198,92 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 		}
 	}
 	else if (CustomBlockID == nextBlockID) {
+
+		// Goes through all Quarry blocks, goes to the next page of the settings of the one the Next block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[12].position)) {
-				// do stuff
+				it->nextSettingsPage();
 				isLeftover = false;
 				break;
 			}
 		}
 	}
 	else if (CustomBlockID == prevBlockID) {
+
+		// Goes through all Quarry blocks, goes to the previous page of the settings of the one the Previous block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[13].position)) {
-				// do stuff
+				it->prevSettingsPage();
 				isLeftover = false;
 				break;
 			}
 		}
 	}
+	else if (CustomBlockID == leftBlockID) {
+
+		// Goes through all Quarry blocks, increments left or decrements right length of the one the Left block belongs to.
+		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[8].position)) {
+				it->incrementWidth('b');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[14].position)) {
+				it->decrementWidth('f');
+				isLeftover = false;
+				break;
+			}
+		}
+	}
+	else if (CustomBlockID == rightBlockID) {
+
+		// Goes through all Quarry blocks, increments right or decrements left length of the one the Right block belongs to.
+		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[9].position)) {
+				it->incrementWidth('f');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[15].position)) {
+				it->decrementWidth('b');
+				isLeftover = false;
+				break;
+			}
+		}
+	}
+	else if (CustomBlockID == backBlockID) {
+
+		// Goes through all Quarry blocks, increments back or decrements front width of the one the Back block belongs to.
+		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[10].position)) {
+				it->incrementLength('l');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[16].position)) {
+				it->decrementLength('r');
+				isLeftover = false;
+				break;
+			}
+		}
+	}
+	else if (CustomBlockID == frontBlockID) {
+
+		// Goes through all Quarry blocks, increments front or decrements back width of the one the Front block belongs to.
+		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[11].position)) {
+				it->incrementLength('r');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[17].position)) {
+				it->decrementLength('l');
+				isLeftover = false;
+				break;
+			}
+		}
+	}
+	
 
 	if (isLeftover) {
 		SetBlock(At, EBlockType::Air);
@@ -240,6 +309,17 @@ void Event_OnLoad()
 	
 	// Loads all Quarry blocks previously placed in the world into the quarryBlocks vector.
 	quarryBlocks = readBlocks<QuarryBlock>(std::ifstream{worldName + L"-QuarryBlocks.txt"});
+
+	auto it = quarryBlocks.begin();
+	while (it != quarryBlocks.end()) {
+		if (GetBlock(it->blockPosition).CustomBlockID != quarryBlockID) {
+			it->destroy();
+			it = quarryBlocks.erase(it);
+		}
+		else {
+			it++;
+		}
+	}
 }
 
 // Run once when the world is exited
@@ -248,6 +328,32 @@ void Event_OnExit()
 
 	// Saves all Quarry blocks to a file for later loading.
 	writeBlocks<QuarryBlock>(std::ofstream{worldName + L"-QuarryBlocks.txt"}, quarryBlocks);
+}
+
+
+
+/*******************************************************
+
+	Advanced functions
+
+*******************************************************/
+
+// Run every time any block (not part of the ThisModUniqueIDs) is placed by the player
+void Event_AnyBlockPlaced(CoordinateInBlocks At, BlockInfo Type, bool Moved)
+{
+
+}
+
+// Run every time any block (not part of the ThisModUniqueIDs) is destroyed by the player
+void Event_AnyBlockDestroyed(CoordinateInBlocks At, BlockInfo Type, bool Moved)
+{
+
+}
+
+// Run every time any block (not part of the ThisModUniqueIDs) is hit by a tool
+void Event_AnyBlockHitByTool(CoordinateInBlocks At, BlockInfo Type, std::wstring ToolName)
+{
+
 }
 
 /*******************************************************

@@ -12,8 +12,9 @@ public:
 	int currentMode;									// The current mode the Quarry block is in. 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
 	CoordinateInBlocks currentDigBlock;					// The current block that is being dug out, relative to blockPosition.
 	std::array<Block, 4> cornerBlocks;					// An array of all of the Corner blocks.
-	std::array<Block, 14> buttonBlocks;					// An array of all of the Button blocks. Indices: 0=set, 1=up, 2=down, 3=in, 4=out, 5=excl, 6=check, 7=cross, 8=left, 9=right, 10=back, 11=front, 12=next, 13=prev.
-	int settingsPage;									// The current page of the settings. 
+	std::array<Block, 18> buttonBlocks;					// An array of all of the Button blocks. 0=set, 1=up, 2=down, 3=in, 4=out, 5=excl, 6=check, 7=cross, 8-11:inc L+R+B+F, 12=next, 13=prev, 14-17:dec L+R+B+F.
+	int settingsPage;									// The current page of the settings. 1=depth, 2=simple size, 3=advanced size, 4=dig ores
+	bool digOres;										// Keeps track of whether to dig ores as well.
 	enum {
 		mark1BlockID = 430459851,						// Enum with all of the blocks used for methods.
 		mark2BlockID = 430459852,
@@ -56,7 +57,7 @@ public:
 	* @param buttonBlocks The button blocks.
 	*/
 	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-			     std::array<Block, 4> cornerBlocks, std::array<Block, 14> buttonBlocks, int settingsPage);
+			     std::array<Block, 4> cornerBlocks, std::array<Block, 18> buttonBlocks, int settingsPage, bool digOres);
 
 	// Adds the corners of the area that is to be dug out.
 	void addCorners();
@@ -174,4 +175,34 @@ public:
 	* @return A boolean telling whether the block is diggable.
 	*/
 	bool diggableBlock(BlockInfo block);
+
+	// Updates the locations of the Button blocks in the settings mode 
+	// to correspond to player's location.
+	virtual void updateSettingsBlockLocations() = 0;
+
+	// Turns to the next page in the settings mode.
+	void nextSettingsPage();
+
+	// Turns to the previous page in the settings mode.
+	void prevSettingsPage();
+
+	// Sets the blocks corresponding to the current settings page.
+	virtual void setSettingsBlocks() = 0;
+
+	// Removes the blocks corresponding to the current settings page.
+	virtual void removeSettingsBlocks() = 0;
+
+	/**
+	* Updates infoPrev and sets the button block specified.
+	* 
+	* @param i The index of the button block to place.
+	*/
+	void setButtonBlock(int i);
+
+	/**
+	* Removes the button block specified.
+	*
+	* @param i The index of the button block to place.
+	*/
+	void removeButtonBlock(int i);
 };

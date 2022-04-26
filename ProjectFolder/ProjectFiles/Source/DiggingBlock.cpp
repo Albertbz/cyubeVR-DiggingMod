@@ -14,11 +14,12 @@ DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition) {
 	this->currentDigBlock = CoordinateInBlocks(0, 0, 0);
 	this->cornerBlocks = {};
 	this->buttonBlocks = {};
-	this->settingsPage = 0;
+	this->settingsPage = 1;
+	this->digOres = false;
 }
 
 DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-						   std::array<Block, 4> cornerBlocks, std::array<Block, 14> buttonBlocks, int settingsPage) {
+						   std::array<Block, 4> cornerBlocks, std::array<Block, 18> buttonBlocks, int settingsPage, bool digOres) {
 	this->length = length;
 	this->width = width;
 	this->depth = depth;
@@ -28,6 +29,7 @@ DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks 
 	this->cornerBlocks = cornerBlocks;
 	this->buttonBlocks = buttonBlocks;
 	this->settingsPage = settingsPage;
+	this->digOres = digOres;
 }
 
 void DiggingBlock::addCorners() {
@@ -190,9 +192,38 @@ std::wstring DiggingBlock::timeToDig() {
 }
 
 bool DiggingBlock::diggableBlock(BlockInfo block) {
+	bool diggable = false;
 	if (block.Type != EBlockType::ModBlock) {
-		return block.Type == EBlockType::Stone || block.Type == EBlockType::Dirt || block.Type == EBlockType::Grass || block.Type == EBlockType::Sand;
+		diggable = block.Type == EBlockType::Stone || block.Type == EBlockType::Dirt || block.Type == EBlockType::Grass || block.Type == EBlockType::Sand;
+		if (!diggable && digOres) {
+			diggable = block.Type == EBlockType::Ore_Coal || block.Type == EBlockType::Ore_Copper || block.Type == EBlockType::Ore_Gold ||
+				block.Type == EBlockType::Ore_Iron || block.Type == EBlockType::CrystalBlock;
+		}
 	}
-	return false;
-		
+	return diggable;
+}
+
+void DiggingBlock::nextSettingsPage() {
+	if (settingsPage < 4) {
+		removeSettingsBlocks();
+		settingsPage++;
+		setSettingsBlocks();
+	}
+}
+
+void DiggingBlock::prevSettingsPage() {
+	if (settingsPage > 1) {
+		removeSettingsBlocks();
+		settingsPage--;
+		setSettingsBlocks();
+	}
+}
+
+void DiggingBlock::setButtonBlock(int i) {
+	buttonBlocks[i].infoPrev = GetBlock(blockPosition + buttonBlocks[i].position);
+	SetBlock(blockPosition + buttonBlocks[i].position, buttonBlocks[i].infoBlock);
+}
+
+void DiggingBlock::removeButtonBlock(int i) {
+	SetBlock(blockPosition + buttonBlocks[i].position, buttonBlocks[i].infoPrev);
 }
