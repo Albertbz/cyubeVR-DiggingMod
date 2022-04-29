@@ -25,7 +25,7 @@ public:
 	* @param cornerBlocks The corner blocks.
 	*/
 	QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-				std::array<Block, 4> cornerBlocks, std::array<Block, 18> buttonBlocks, int settingsPage, bool digOres);
+				std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres);
 
 	// Digs/mines a single block if the Quarry block is digging at that moment.
 	void dig();
@@ -33,30 +33,30 @@ public:
 	/**
 	* Increments the length of the area that is to be dug out.
 	*
-	* @param side The side (l/r) that is to be incremented.
+	* @param block The block that is hit - b/f.
 	*/
-	void incrementLength(char side);
+	void incrementLength(char block);
 
 	/**
 	* Decrements the length of the area that is to be dug out.
 	*
-	* @param side The side (l/r) that is to be decremented.
+	* @param block The block that is hit - b/f.
 	*/
-	void decrementLength(char side);
+	void decrementLength(char block);
 
 	/**
 	* Increments the width of the area that is to be dug out.
 	*
-	* @param side The side (b/f) that is to be incremented.
+	* @param block The block that is hit - l/r.
 	*/
-	void incrementWidth(char side);
+	void incrementWidth(char block);
 
 	/**
 	* Decrements the width of the area that is to be dug out.
 	*
-	* @param side The side (b/f) that is to be decremented.
+	* @param block The block that is hit - l/r.
 	*/
-	void decrementWidth(char side);
+	void decrementWidth(char block);
 
 	/**
 	* Sets or removes all of the blocks needed for the settings mode.

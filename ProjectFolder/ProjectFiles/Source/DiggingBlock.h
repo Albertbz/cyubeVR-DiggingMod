@@ -1,6 +1,6 @@
 #pragma once
 #include "GameAPI.h"
-#include "Structs.h"
+#include "Misc.h"
 #include <array>
 
 class DiggingBlock {
@@ -12,7 +12,7 @@ public:
 	int currentMode;									// The current mode the Quarry block is in. 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
 	CoordinateInBlocks currentDigBlock;					// The current block that is being dug out, relative to blockPosition.
 	std::array<Block, 4> cornerBlocks;					// An array of all of the Corner blocks.
-	std::array<Block, 18> buttonBlocks;					// An array of all of the Button blocks. 0=set, 1=up, 2=down, 3=in, 4=out, 5=excl, 6=check, 7=cross, 8-11:inc L+R+B+F, 12=next, 13=prev, 14-17:dec L+R+B+F.
+	std::array<Block, buttonBlocksAmount> buttonBlocks;					// An array of all of the Button blocks. 0=set, 1=up, 2=down, 3=in, 4=out, 5=excl, 6=check, 7=cross, 8-11:inc L+R+B+F, 12=next, 13=prev, 14-17:dec L+R+B+F, 18=ores.
 	int settingsPage;									// The current page of the settings. 1=depth, 2=simple size, 3=advanced size, 4=dig ores
 	bool digOres;										// Keeps track of whether to dig ores as well.
 	enum {
@@ -33,7 +33,8 @@ public:
 		backBlockID = 577305856,
 		frontBlockID = 577305857,
 		nextBlockID = 527579106,
-		prevBlockID = 527579107
+		prevBlockID = 527579107,
+		oresBlockID = 527579108
 	};
 public:
 	/**
@@ -57,7 +58,7 @@ public:
 	* @param buttonBlocks The button blocks.
 	*/
 	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-			     std::array<Block, 4> cornerBlocks, std::array<Block, 18> buttonBlocks, int settingsPage, bool digOres);
+			     std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres);
 
 	// Adds the corners of the area that is to be dug out.
 	void addCorners();
@@ -68,30 +69,30 @@ public:
 	/**
 	* Increments the length of the area that is to be dug out.
 	* 
-	* @param side The side (l/r) that is to be incremented.
+	* @param block The block that is hit - b/f.
 	*/
-	virtual void incrementLength(char side) = 0;
+	virtual void incrementLength(char block) = 0;
 
 	/**
 	* Decrements the length of the area that is to be dug out.
 	*
-	* @param side The side (l/r) that is to be decremented.
+	* @param block The block that is hit - b/f.
 	*/
-	virtual void decrementLength(char side) = 0;
+	virtual void decrementLength(char block) = 0;
 
 	/**
 	* Increments the width of the area that is to be dug out.
 	*
-	* @param side The side (b/f) that is to be incremented.
+	* @param block The block that is hit - l/r.
 	*/
-	virtual void incrementWidth(char side) = 0;
+	virtual void incrementWidth(char block) = 0;
 
 	/**
 	* Decrements the width of the area that is to be dug out.
 	*
-	* @param side The side (b/f) that is to be decremented.
+	* @param block The block that is hit - l/r.
 	*/
-	virtual void decrementWidth(char side) = 0;
+	virtual void decrementWidth(char block) = 0;
 
 	// Increments the size of the area that is to be dug out.
 	void incrementSize();
@@ -110,6 +111,13 @@ public:
 
 	// Spawns a Text with the current size as the corresponding area.
 	void printSize();
+
+	/**
+	* Gets the size of the area (lxwxd) as a wString.
+	* 
+	* @return The size of the area (lxwxd) as a wString.
+	*/
+	wString getSize();
 
 	// Digs/mines a single block if the DiggingBlock is digging at that moment.
 	virtual void dig() = 0;
@@ -180,6 +188,12 @@ public:
 	// to correspond to player's location.
 	virtual void updateSettingsBlockLocations() = 0;
 
+	// Toggles whether to dig ores.
+	void toggleDigOres();
+
+	// Prints what digOres is set to.
+	void printDigOres();
+
 	// Turns to the next page in the settings mode.
 	void nextSettingsPage();
 
@@ -205,4 +219,7 @@ public:
 	* @param i The index of the button block to place.
 	*/
 	void removeButtonBlock(int i);
+
+	// Prints a message saying what settings you are changing.
+	void printSettingsPage();
 };

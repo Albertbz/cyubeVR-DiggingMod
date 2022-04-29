@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Structs.h" />
+    <ClInclude Include="Source\Misc.h" />
     <ClInclude Include="Source\DiggingBlock.h" />
     <ClInclude Include="Source\QuarryBlock.h" />
     <ClInclude Include="Source\GameAPI.cpp" />

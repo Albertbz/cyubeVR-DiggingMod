@@ -19,7 +19,7 @@ DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition) {
 }
 
 DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-						   std::array<Block, 4> cornerBlocks, std::array<Block, 18> buttonBlocks, int settingsPage, bool digOres) {
+						   std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres) {
 	this->length = length;
 	this->width = width;
 	this->depth = depth;
@@ -52,19 +52,19 @@ void DiggingBlock::removeCorners() {
 
 void DiggingBlock::incrementSize() {
 	if (currentMode == 2) {
-		incrementLength('l');
-		incrementLength('r');
-		incrementWidth('f');
-		incrementWidth('b');
+		incrementLength('b');
+		incrementLength('f');
+		incrementWidth('l');
+		incrementWidth('r');
 	}
 }
 
 void DiggingBlock::decrementSize() {
 	if (currentMode == 2) {
-		decrementLength('l');
-		decrementLength('r');
-		decrementWidth('f');
-		decrementWidth('b');
+		decrementLength('b');
+		decrementLength('f');
+		decrementWidth('l');
+		decrementWidth('r');
 	}
 }
 
@@ -83,15 +83,16 @@ void DiggingBlock::decrementDepth() {
 void DiggingBlock::printDepth() {
 	std::wstring message = L"Depth: ";
 	message.append(std::to_wstring(depth));
-	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), message, 0.5f, 1.2f);
+	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 75), message, 0.5f, 1.5f);
 }
 
 void DiggingBlock::printSize() {
-	std::wstring message = L"Size: ";
-	message.append(std::to_wstring(length));
-	message.append(L" x ");
-	message.append(std::to_wstring(width));
-	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), message, 0.5f, 1.2f);
+	std::wstring message = L"Size (LxWxD)\n---------------\n" + getSize();
+	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 75), message, 1, 1.5f);
+}
+
+wString DiggingBlock::getSize() {
+	return std::to_wstring(length) + L"x" + std::to_wstring(width) + L"x" + std::to_wstring(depth);
 }
 
 void DiggingBlock::toggleDigging() {
@@ -112,10 +113,11 @@ void DiggingBlock::toggleSettings() {
 		showNormal(false);
 		showSettings(true);
 		currentMode = 2;
+		printSettingsPage();
 	}
 	else if (currentMode == 2) {
 		showSettings(false);
-		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 75), L"Settings saved!\nIt will take\n" + timeToDig() + L"\nto dig out the hole.", 5, 2.0f);
+		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 75), L"Settings saved!\nIt will take\n" + timeToDig() + L"\nto dig out the " + getSize() + L" hole.", 5, 2.0f);
 		showNormal(true);
 		currentMode = 1;
 	}
@@ -207,6 +209,7 @@ void DiggingBlock::nextSettingsPage() {
 	if (settingsPage < 4) {
 		removeSettingsBlocks();
 		settingsPage++;
+		printSettingsPage();
 		setSettingsBlocks();
 	}
 }
@@ -215,6 +218,7 @@ void DiggingBlock::prevSettingsPage() {
 	if (settingsPage > 1) {
 		removeSettingsBlocks();
 		settingsPage--;
+		printSettingsPage();
 		setSettingsBlocks();
 	}
 }
@@ -226,4 +230,39 @@ void DiggingBlock::setButtonBlock(int i) {
 
 void DiggingBlock::removeButtonBlock(int i) {
 	SetBlock(blockPosition + buttonBlocks[i].position, buttonBlocks[i].infoPrev);
+}
+
+void DiggingBlock::toggleDigOres() {
+	if (digOres) {
+		digOres = false;
+	}
+	else {
+		digOres = true;
+	}
+}
+
+void DiggingBlock::printDigOres() {
+	wString message = L"The Quarry will now\n";
+	if (digOres) {
+		message.append(L"dig ores!");
+	}
+	else {
+		message.append(L"not dig ores!");
+	}
+	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 75), message, 1, 1.5f);
+}
+
+void DiggingBlock::printSettingsPage() {
+	if (settingsPage == 1) {
+		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), L"Change depth", 2);
+	}
+	else if (settingsPage == 2) {
+		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), L"Change size (simple)", 2);
+	}
+	else if (settingsPage == 3) {
+		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), L"Change size (advanced)", 2);
+	}
+	else if (settingsPage == 4) {
+		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), L"Toggle digging of\nores", 2);
+	}
 }

@@ -56,7 +56,7 @@
     <ClInclude Include="Source\DiggingBlock.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Structs.h">
+    <ClInclude Include="Source\Misc.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

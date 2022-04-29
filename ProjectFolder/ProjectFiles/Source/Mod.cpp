@@ -33,7 +33,7 @@ const int backBlockID = 577305856;
 const int frontBlockID = 577305857;
 const int nextBlockID = 527579106;
 const int prevBlockID = 527579107;
-
+const int oresBlockID = 527579108;
 
 /************************************************************
 	Config Variables (Set these to whatever you need. They are automatically read by the game.)
@@ -41,7 +41,7 @@ const int prevBlockID = 527579107;
 
 UniqueID ThisModUniqueIDs[] = { quarryBlockID, outBlockID, downBlockID, upBlockID, inBlockID, setBlockID, exclBlockID, checkBlockID, 
 								crossBlockID, leftBlockID, rightBlockID, backBlockID, frontBlockID, nextBlockID, prevBlockID,
-								mark1BlockID, mark2BlockID, mark3BlockID, mark4BlockID}; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
+								mark1BlockID, mark2BlockID, mark3BlockID, mark4BlockID, oresBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
 float TickRate = 5;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
 
@@ -88,7 +88,7 @@ void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID, bool Mo
 
 
 // Run every time a block is hit by a tool
-void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::wstring ToolName)
+void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString ToolName)
 {
 	bool isLeftover = true; // Keeps track of whether the block is leftover (from bug or something else), i.e., it doesn't belong to a Digging Block.
 
@@ -221,15 +221,15 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 	}
 	else if (CustomBlockID == leftBlockID) {
 
-		// Goes through all Quarry blocks, increments left or decrements right length of the one the Left block belongs to.
+		// Goes through all Quarry blocks, increments or decrements width of the one the Left block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[8].position)) {
-				it->incrementWidth('b');
+				it->incrementWidth('l');
 				isLeftover = false;
 				break;
 			}
 			else if (it->blockPosition == (At - it->buttonBlocks[14].position)) {
-				it->decrementWidth('f');
+				it->decrementWidth('l');
 				isLeftover = false;
 				break;
 			}
@@ -237,15 +237,15 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 	}
 	else if (CustomBlockID == rightBlockID) {
 
-		// Goes through all Quarry blocks, increments right or decrements left length of the one the Right block belongs to.
+		// Goes through all Quarry blocks, increments or decrements width of the one the Right block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[9].position)) {
-				it->incrementWidth('f');
+				it->incrementWidth('r');
 				isLeftover = false;
 				break;
 			}
 			else if (it->blockPosition == (At - it->buttonBlocks[15].position)) {
-				it->decrementWidth('b');
+				it->decrementWidth('r');
 				isLeftover = false;
 				break;
 			}
@@ -256,12 +256,12 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 		// Goes through all Quarry blocks, increments back or decrements front width of the one the Back block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[10].position)) {
-				it->incrementLength('l');
+				it->incrementLength('b');
 				isLeftover = false;
 				break;
 			}
 			else if (it->blockPosition == (At - it->buttonBlocks[16].position)) {
-				it->decrementLength('r');
+				it->decrementLength('b');
 				isLeftover = false;
 				break;
 			}
@@ -272,18 +272,29 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, std::ws
 		// Goes through all Quarry blocks, increments front or decrements back width of the one the Front block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[11].position)) {
-				it->incrementLength('r');
+				it->incrementLength('f');
 				isLeftover = false;
 				break;
 			}
 			else if (it->blockPosition == (At - it->buttonBlocks[17].position)) {
-				it->decrementLength('l');
+				it->decrementLength('f');
 				isLeftover = false;
 				break;
 			}
 		}
 	}
-	
+	else if (CustomBlockID == oresBlockID) {
+
+		// Goes through all Quarry blocks, toggles whether to dig ores for the corresponding Quarry block.
+		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[18].position)) {
+				it->toggleDigOres();
+				it->printDigOres();
+				isLeftover = false;
+				break;
+			}
+		}
+	}
 
 	if (isLeftover) {
 		SetBlock(At, EBlockType::Air);
@@ -338,20 +349,20 @@ void Event_OnExit()
 
 *******************************************************/
 
-// Run every time any block (not part of the ThisModUniqueIDs) is placed by the player
+// Run every time any block is placed by the player
 void Event_AnyBlockPlaced(CoordinateInBlocks At, BlockInfo Type, bool Moved)
 {
 
 }
 
-// Run every time any block (not part of the ThisModUniqueIDs) is destroyed by the player
+// Run every time any block is destroyed by the player
 void Event_AnyBlockDestroyed(CoordinateInBlocks At, BlockInfo Type, bool Moved)
 {
 
 }
 
-// Run every time any block (not part of the ThisModUniqueIDs) is hit by a tool
-void Event_AnyBlockHitByTool(CoordinateInBlocks At, BlockInfo Type, std::wstring ToolName)
+// Run every time any block is hit by a tool
+void Event_AnyBlockHitByTool(CoordinateInBlocks At, BlockInfo Type, wString ToolName)
 {
 
 }

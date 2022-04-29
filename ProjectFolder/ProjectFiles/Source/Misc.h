@@ -1,5 +1,8 @@
 #pragma once
 #include "GameAPI.h"
+
+const int buttonBlocksAmount = 19;
+
 struct Block {
 	CoordinateInBlocks position = CoordinateInBlocks(0, 0, 0);	// The position of the block (possibly in relation to another block).
 	BlockInfo infoBlock = BlockInfo();							// The BlockInfo for the block.
@@ -93,7 +96,7 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 			}
 		}
 
-		std::array<Block, 18> buttonBlocks;
+		std::array<Block, buttonBlocksAmount> buttonBlocks;
 		for (auto &i : buttonBlocks) {
 			pos = line.find_first_of(';', pos + 1);
 			i.position.X = std::stoi(std::string{ line, pos + 1 });
