@@ -14,17 +14,19 @@ void Internals::Init()
 		__debugbreak();
 	}
 
-	InternalFunctions::I_Log = (Log_T)GetProcAddress(app, "Log");
+	InternalFunctions::I_Log = (Log_T) GetProcAddress(app, "Log");
 
-	InternalFunctions::I_GetBlock = (GetBlock_T)GetProcAddress(app, "GetBlock");
+	InternalFunctions::I_GetBlock = (GetBlock_T) GetProcAddress(app, "GetBlock");
 
-	InternalFunctions::I_SetBlock = (SetBlock_T)GetProcAddress(app, "SetBlock");
+	InternalFunctions::I_SetBlock = (SetBlock_T) GetProcAddress(app, "SetBlock");
 
-	InternalFunctions::I_SpawnHintText = (SpawnHintText_T)GetProcAddress(app, "SpawnHintText");
+	InternalFunctions::I_SpawnHintText = (SpawnHintText_T) GetProcAddress(app, "SpawnHintText");
 
-	InternalFunctions::I_GetPlayerLocation = (GetPlayerLocation_T)GetProcAddress(app, "GetPlayerLocation");
+	InternalFunctions::I_GetPlayerLocation = (GetPlayerLocation_T) GetProcAddress(app, "GetPlayerLocation");
 
-	InternalFunctions::I_GetWorldName = (GetWorldName_T)GetProcAddress(app, "GetWorldName");
+	InternalFunctions::I_GetPlayerViewDirection = (GetPlayerViewDirection_T) GetProcAddress(app, "GetPlayerViewDirection");
+
+	InternalFunctions::I_GetWorldName = (GetWorldName_T) GetProcAddress(app, "GetWorldName");
 
 	std::string ErrorString = GetLastErrorAsString();
 
@@ -64,7 +66,7 @@ const void Internals::E_Event_BlockDestroyed(const CoordinateInBlocks& At, const
 }
 
 const void Internals::E_Event_BlockHitByTool(const CoordinateInBlocks& At, const UniqueID& CustomBlockID, const wchar_t* ToolName)
-{
+{	
 	Event_BlockHitByTool(At, CustomBlockID, ToolName);
 }
 

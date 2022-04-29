@@ -4,7 +4,7 @@
 #include <random>
 #include <limits>
 
-void Log(const std::wstring& String)
+void Log(const wString& String)
 {
 	InternalFunctions::I_Log(String.c_str());
 }
@@ -20,7 +20,7 @@ bool SetBlock(CoordinateInBlocks At, BlockInfo BlockType)
 	return InternalFunctions::I_SetBlock(At, BlockType);
 }
 
-void SpawnHintText(CoordinateInCentimeters At, const std::wstring& Text, float DurationInSeconds, float SizeMultiplier, float SizeMultiplierVertical)
+void SpawnHintText(CoordinateInCentimeters At, const wString& Text, float DurationInSeconds, float SizeMultiplier, float SizeMultiplierVertical)
 {
 	return InternalFunctions::I_SpawnHintText(At, Text.c_str(), DurationInSeconds, SizeMultiplier, SizeMultiplierVertical);
 }
@@ -28,6 +28,11 @@ void SpawnHintText(CoordinateInCentimeters At, const std::wstring& Text, float D
 bool SetBlock(CoordinateInBlocks At, EBlockType NativeType)
 {
 	return SetBlock(At, BlockInfo(NativeType));
+}
+
+bool SetBlock(CoordinateInBlocks At, EBlockType NativeType, ERotation Rotation)
+{
+	return SetBlock(At, BlockInfo(NativeType, Rotation));
 }
 
 bool SetBlock(CoordinateInBlocks At, UniqueID CustomBlockID)
@@ -41,9 +46,15 @@ CoordinateInCentimeters GetPlayerLocation()
 	return InternalFunctions::I_GetPlayerLocation();
 }
 
-std::wstring GetWorldName()
+DirectionVectorInCentimeters GetPlayerViewDirection()
 {
-	return std::wstring(InternalFunctions::I_GetWorldName());
+	DirectionVectorInCentimetersC Type = InternalFunctions::I_GetPlayerViewDirection();
+	return*((DirectionVectorInCentimeters*)(&Type));
+}
+
+wString GetWorldName()
+{
+	return wString(InternalFunctions::I_GetWorldName());
 }
 
 
@@ -55,15 +66,15 @@ std::wstring GetWorldName()
 std::vector<CoordinateInBlocks> GetAllCoordinatesInBox(CoordinateInBlocks At, CoordinateInBlocks BoxExtent)
 {
 	std::vector<CoordinateInBlocks> ReturnCoordinates;
-
+	
 	for (int64_t x = -BoxExtent.X; x < BoxExtent.X; x++) {
 		for (int64_t y = -BoxExtent.Y; y < BoxExtent.Y; y++) {
 			for (int16_t z = -BoxExtent.Z; z < BoxExtent.Z; z++) {
 
 				CoordinateInBlocks Offset = CoordinateInBlocks(x, y, z);
 
-				if (((int32_t(At.Z) + int32_t(Offset.Z)) >= 0) && ((int32_t(At.Z) + int32_t(Offset.Z)) <= 800)) {
-					ReturnCoordinates.push_back(At + Offset);
+				if ( ((int32_t(At.Z) + int32_t(Offset.Z)) >= 0) && ((int32_t(At.Z) + int32_t(Offset.Z)) <= 800)) {
+					ReturnCoordinates.push_back(At + Offset);				
 				}
 			}
 		}
@@ -138,7 +149,7 @@ int32_t GetRandomInt()
 	return int32_t(uint32_t(xoroshiro128p()) / DivideBy) + Min;
 }
 
-int main()
+int main() 
 {
-
+	
 }
