@@ -16,10 +16,12 @@ DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition) {
 	this->buttonBlocks = {};
 	this->settingsPage = 1;
 	this->digOres = false;
+	this->digDirection = 1;
 }
 
 DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-						   std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres) {
+						   std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres,
+						   int digDirection) {
 	this->length = length;
 	this->width = width;
 	this->depth = depth;
@@ -30,9 +32,10 @@ DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks 
 	this->buttonBlocks = buttonBlocks;
 	this->settingsPage = settingsPage;
 	this->digOres = digOres;
+	this->digDirection = digDirection;
 }
 
-void DiggingBlock::addCorners() {
+void DiggingBlock::setCorners() {
 	cornerBlocks[0].infoPrev = GetBlock(blockPosition + cornerBlocks[0].position);
 	cornerBlocks[1].infoPrev = GetBlock(blockPosition + cornerBlocks[1].position);
 	cornerBlocks[2].infoPrev = GetBlock(blockPosition + cornerBlocks[2].position);

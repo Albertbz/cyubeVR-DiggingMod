@@ -5,18 +5,37 @@
 
 class DiggingBlock {
 public:
-	int length;											// The length of the hole.
-	int width;											// The width of the hole.
-	int depth;											// The depth of the hole.
-	CoordinateInBlocks blockPosition;					// The position of the block.
-	int currentMode;									// The current mode the Quarry block is in. 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
-	CoordinateInBlocks currentDigBlock;					// The current block that is being dug out, relative to blockPosition.
-	std::array<Block, 4> cornerBlocks;					// An array of all of the Corner blocks.
-	std::array<Block, buttonBlocksAmount> buttonBlocks;					// An array of all of the Button blocks. 0=set, 1=up, 2=down, 3=in, 4=out, 5=excl, 6=check, 7=cross, 8-11:inc L+R+B+F, 12=next, 13=prev, 14-17:dec L+R+B+F, 18=ores.
-	int settingsPage;									// The current page of the settings. 1=depth, 2=simple size, 3=advanced size, 4=dig ores
-	bool digOres;										// Keeps track of whether to dig ores as well.
+	// The length of the hole.
+	int length;
+	// The width of the hole.
+	int width;
+	// The depth of the hole.
+	int depth;
+	// The position of the block.
+	CoordinateInBlocks blockPosition;
+	// The current mode the Quarry block is in. 
+	// 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
+	int currentMode;
+	// The current block that is being dug out, relative to blockPosition.
+	CoordinateInBlocks currentDigBlock;
+	// An array of all of the Corner blocks.
+	std::array<Block, 4> cornerBlocks;
+	// An array of all of the Button blocks. 
+	// 0=set, 1=-depth, 2=+depth, 3=-size, 4=+size, 5=excl, 6=check, 
+	// 7=cross, 8=+W1, 9=+W2, 10=+L1, 11=+L2, 12=next, 13=prev, 
+	// 14=-W1, 15=-W2, 16=-L1, 17=-L2, 18=ores.
+	std::array<Block, buttonBlocksAmount> buttonBlocks;
+	// The current page of the settings. 
+	// 1=depth, 2=simple size, 3=advanced size, 4=dig ores.
+	int settingsPage;
+	// Keeps track of whether to dig ores as well.
+	bool digOres;
+	// Keeps track of what direction to dig in. 
+	// 1=+x, 2=-x, 3=+y, 4=-y, 5=+z, 6=-z.
+	int digDirection;
+	// Enum with all of the blocks used for methods.
 	enum {
-		mark1BlockID = 430459851,						// Enum with all of the blocks used for methods.
+		mark1BlockID = 430459851,
 		mark2BlockID = 430459852,
 		mark3BlockID = 430459853,
 		mark4BlockID = 430459854,
@@ -56,12 +75,15 @@ public:
 	* @param currentDigBlock The coordinates for the block currently being dug out.
 	* @param cornerBlocks The corner blocks.
 	* @param buttonBlocks The button blocks.
+	* @param settingsPage The current settings page.
+	* @param digOres Whether to dig ores.
 	*/
 	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-			     std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres);
+			     std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres,
+				 int digDirection);
 
 	// Adds the corners of the area that is to be dug out.
-	void addCorners();
+	void setCorners();
 
 	// Removes the corners of the area that is to be dug out.
 	void removeCorners();
@@ -186,7 +208,7 @@ public:
 
 	// Updates the locations of the Button blocks in the settings mode 
 	// to correspond to player's location.
-	virtual void updateSettingsBlockLocations() = 0;
+	//virtual void updateSettingsBlockLocations() = 0;
 
 	// Toggles whether to dig ores.
 	void toggleDigOres();

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\TunnelBlock.cpp" />
     <ClInclude Include="Source\Misc.h" />
     <ClInclude Include="Source\DiggingBlock.h" />
     <ClInclude Include="Source\QuarryBlock.h" />
@@ -29,6 +30,7 @@
     <ClCompile Include="Source\GameFunctions.cpp" />
     <ClInclude Include="Source\Mod.cpp" />
     <ClCompile Include="Source\Internals.cpp" />
+    <ClInclude Include="Source\TunnelBlock.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\GameAPI.h" />

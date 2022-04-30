@@ -1,5 +1,6 @@
 #include "GameAPI.h"
 #include "QuarryBlock.h"
+#include "TunnelBlock.h"
 #include <fstream>
 #include <iostream>
 
@@ -9,6 +10,8 @@
 
 // Stores all Quarry blocks currently in the world
 std::vector<QuarryBlock> quarryBlocks;
+// Stores all Tunnel blocks currently in the world
+std::vector<TunnelBlock> tunnelBlocks;
 
 // The name of the world
 std::wstring worldName;
@@ -34,6 +37,7 @@ const int frontBlockID = 577305857;
 const int nextBlockID = 527579106;
 const int prevBlockID = 527579107;
 const int oresBlockID = 527579108;
+const int tunBlockID = 894654498;
 
 /************************************************************
 	Config Variables (Set these to whatever you need. They are automatically read by the game.)
@@ -41,7 +45,7 @@ const int oresBlockID = 527579108;
 
 UniqueID ThisModUniqueIDs[] = { quarryBlockID, outBlockID, downBlockID, upBlockID, inBlockID, setBlockID, exclBlockID, checkBlockID, 
 								crossBlockID, leftBlockID, rightBlockID, backBlockID, frontBlockID, nextBlockID, prevBlockID,
-								mark1BlockID, mark2BlockID, mark3BlockID, mark4BlockID, oresBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
+								mark1BlockID, mark2BlockID, mark3BlockID, mark4BlockID, oresBlockID, tunBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
 float TickRate = 5;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
 
@@ -67,6 +71,20 @@ void Event_BlockPlaced(CoordinateInBlocks At, UniqueID CustomBlockID, bool Moved
 			quarryBlocks.push_back(QuarryBlock(At));
 		}
 	}
+	else if (CustomBlockID == tunBlockID) {
+		
+		// Adds the newly placed Tunnel block to the list of Quarry blocks (if it doesn't already exist).
+		bool newBlock = true;
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == At) {
+				newBlock = false;
+				break;
+			}
+		}
+		if (newBlock) {
+			tunnelBlocks.push_back(TunnelBlock(At));
+		}
+	}
 }
 
 
@@ -84,6 +102,17 @@ void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID, bool Mo
 			}
 		}
 	}
+	else if (CustomBlockID == tunBlockID) {
+
+		// Goes through all Tunnel blocks, deletes the one that was destroyed.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == At) {
+				it->destroy();
+				tunnelBlocks.erase(it);
+				break;
+			}
+		}
+	}
 }
 
 
@@ -92,13 +121,22 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 {
 	bool isLeftover = true; // Keeps track of whether the block is leftover (from bug or something else), i.e., it doesn't belong to a Digging Block.
 
-	if (CustomBlockID == quarryBlockID) {
+	if (CustomBlockID == quarryBlockID || CustomBlockID == tunBlockID) {
 		isLeftover = false;
 	}
 	else if (CustomBlockID == checkBlockID || CustomBlockID == crossBlockID) {
 
 		// Goes through all Quarry blocks, toggles the digging of the one the Check/Cross Mark block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[6].position)) { // Specifically checks the Check Mark block (should always be the same as Cross Mark).
+				it->toggleDigging();
+				isLeftover = false;
+				break;
+			}
+		}
+
+		// Goes through all Tunnel blocks, toggles the digging of the one the Check/Cross Mark block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[6].position)) { // Specifically checks the Check Mark block (should always be the same as Cross Mark).
 				it->toggleDigging();
 				isLeftover = false;
@@ -116,11 +154,30 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
+
+		// Goes through all Tunnel blocks, toggles the settings of the one the Settings block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[0].position)) {
+				it->toggleSettings();
+				isLeftover = false;
+				break;
+			}
+		}
 	}
 	else if (CustomBlockID == outBlockID) {
 		
 		// Goes through all Quarry blocks, increments the size of the one the Outwards block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[4].position)) {
+				it->incrementSize();
+				it->printSize();
+				isLeftover = false;
+				break;
+			}
+		}
+
+		// Goes through all Tunnel blocks, increments the size of the one the Outwards block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[4].position)) {
 				it->incrementSize();
 				it->printSize();
@@ -140,11 +197,31 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
+
+		// Goes through all Tunnel blocks, decrements the size of the one the Inwards block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[3].position)) {
+				it->decrementSize();
+				it->printSize();
+				isLeftover = false;
+				break;
+			}
+		}
 	}
 	else if (CustomBlockID == upBlockID) {
 
 		// Goes through all Quarry blocks, decrements the depth of the one the Up block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[1].position)) {
+				it->decrementDepth();
+				it->printDepth();
+				isLeftover = false;
+				break;
+			}
+		}
+
+		// Goes through all Tunnel blocks, decrements the depth of the one the Up block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[1].position)) {
 				it->decrementDepth();
 				it->printDepth();
@@ -164,9 +241,25 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
+
+		// Goes through all Tunnel blocks, increments the depth of the one the Down block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[2].position)) {
+				it->incrementDepth();
+				it->printDepth();
+				isLeftover = false;
+				break;
+			}
+		}
 	}
 	else if (CustomBlockID == mark1BlockID) {
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
+				isLeftover = false;
+				break;
+			}
+		}
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
 				isLeftover = false;
 				break;
@@ -180,9 +273,21 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
+				isLeftover = false;
+				break;
+			}
+		}
 	}
 	else if (CustomBlockID == mark3BlockID) {
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
+				isLeftover = false;
+				break;
+			}
+		}
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
 				isLeftover = false;
 				break;
@@ -196,11 +301,26 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
+				isLeftover = false;
+				break;
+			}
+		}
 	}
 	else if (CustomBlockID == nextBlockID) {
 
 		// Goes through all Quarry blocks, goes to the next page of the settings of the one the Next block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[12].position)) {
+				it->nextSettingsPage();
+				isLeftover = false;
+				break;
+			}
+		}
+
+		// Goes through all Tunnel blocks, goes to the next page of the settings of the one the Next block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[12].position)) {
 				it->nextSettingsPage();
 				isLeftover = false;
@@ -218,11 +338,34 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
+
+		// Goes through all Tunnel blocks, goes to the previous page of the settings of the one the Previous block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[13].position)) {
+				it->prevSettingsPage();
+				isLeftover = false;
+				break;
+			}
+		}
 	}
 	else if (CustomBlockID == leftBlockID) {
 
 		// Goes through all Quarry blocks, increments or decrements width of the one the Left block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[8].position)) {
+				it->incrementWidth('l');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[14].position)) {
+				it->decrementWidth('l');
+				isLeftover = false;
+				break;
+			}
+		}
+
+		// Goes through all Tunnel blocks, increments or decrements width of the one the Left block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[8].position)) {
 				it->incrementWidth('l');
 				isLeftover = false;
@@ -250,11 +393,39 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
+
+		// Goes through all Tunnel blocks, increments or decrements width of the one the Right block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[9].position)) {
+				it->incrementWidth('r');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[15].position)) {
+				it->decrementWidth('r');
+				isLeftover = false;
+				break;
+			}
+		}
 	}
 	else if (CustomBlockID == backBlockID) {
 
 		// Goes through all Quarry blocks, increments back or decrements front width of the one the Back block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[10].position)) {
+				it->incrementLength('b');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[16].position)) {
+				it->decrementLength('b');
+				isLeftover = false;
+				break;
+			}
+		}
+
+		// Goes through all Tunnel blocks, increments back or decrements front width of the one the Back block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[10].position)) {
 				it->incrementLength('b');
 				isLeftover = false;
@@ -282,11 +453,35 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
+
+		// Goes through all Tunnel blocks, increments front or decrements back width of the one the Front block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[11].position)) {
+				it->incrementLength('f');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[17].position)) {
+				it->decrementLength('f');
+				isLeftover = false;
+				break;
+			}
+		}
 	}
 	else if (CustomBlockID == oresBlockID) {
 
 		// Goes through all Quarry blocks, toggles whether to dig ores for the corresponding Quarry block.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[18].position)) {
+				it->toggleDigOres();
+				it->printDigOres();
+				isLeftover = false;
+				break;
+			}
+		}
+
+		// Goes through all Tunnel blocks, toggles whether to dig ores for the corresponding Quarry block.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[18].position)) {
 				it->toggleDigOres();
 				it->printDigOres();
@@ -310,6 +505,11 @@ void Event_Tick()
 	for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 		it->dig();
 	}
+
+	// Goes through all Quarry blocks and runs the dig method.
+	for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+		it->dig();
+	}
 }
 
 
@@ -321,14 +521,28 @@ void Event_OnLoad()
 	// Loads all Quarry blocks previously placed in the world into the quarryBlocks vector.
 	quarryBlocks = readBlocks<QuarryBlock>(std::ifstream{worldName + L"-QuarryBlocks.txt"});
 
-	auto it = quarryBlocks.begin();
-	while (it != quarryBlocks.end()) {
-		if (GetBlock(it->blockPosition).CustomBlockID != quarryBlockID) {
-			it->destroy();
-			it = quarryBlocks.erase(it);
+	auto itQ = quarryBlocks.begin();
+	while (itQ != quarryBlocks.end()) {
+		if (GetBlock(itQ->blockPosition).CustomBlockID != quarryBlockID) {
+			itQ->destroy();
+			itQ = quarryBlocks.erase(itQ);
 		}
 		else {
-			it++;
+			itQ++;
+		}
+	}
+
+	// Loads all Tunnel blocks previously placed in the world into the quarryBlocks vector.
+	tunnelBlocks = readBlocks<TunnelBlock>(std::ifstream{ worldName + L"-TunnelBlocks.txt" });
+
+	auto itT = tunnelBlocks.begin();
+	while (itT != tunnelBlocks.end()) {
+		if (GetBlock(itT->blockPosition).CustomBlockID != tunBlockID) {
+			itT->destroy();
+			itT = tunnelBlocks.erase(itT);
+		}
+		else {
+			itT++;
 		}
 	}
 }
@@ -339,6 +553,9 @@ void Event_OnExit()
 
 	// Saves all Quarry blocks to a file for later loading.
 	writeBlocks<QuarryBlock>(std::ofstream{worldName + L"-QuarryBlocks.txt"}, quarryBlocks);
+
+	// Saves all Tunnel blocks to a file for later loading.
+	writeBlocks<TunnelBlock>(std::ofstream{ worldName + L"-TunnelBlocks.txt" }, tunnelBlocks);
 }
 
 

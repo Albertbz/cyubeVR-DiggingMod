@@ -23,9 +23,13 @@ public:
 	* @param currentMode The current mode of the Quarry block.
 	* @param currentDigBlock The coordinates for the block currently being dug out.
 	* @param cornerBlocks The corner blocks.
+	* @param buttonBlocks The button blocks.
+	* @param settingsPage The current settings page.
+	* @param digOres Whether to dig ores.
 	*/
 	QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-				std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres);
+				std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres,
+				int digDirection);
 
 	// Digs/mines a single block if the Quarry block is digging at that moment.
 	void dig();

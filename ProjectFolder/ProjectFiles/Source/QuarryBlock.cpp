@@ -7,6 +7,8 @@
 
 QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition) 
 	: DiggingBlock(blockPosition) {
+	this->digDirection = 6;
+
 	this->cornerBlocks[0] = { CoordinateInBlocks(2, -2, 0), mark1BlockID, BlockInfo() };
 	this->cornerBlocks[1] = { CoordinateInBlocks(2, 2, 0), mark2BlockID, BlockInfo() };
 	this->cornerBlocks[2] = { CoordinateInBlocks(-2, -2, 0), mark3BlockID, BlockInfo() };
@@ -32,13 +34,14 @@ QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition)
 	this->buttonBlocks[17] = { CoordinateInBlocks(4, 0, 0), frontBlockID, BlockInfo() };
 	this->buttonBlocks[18] = { CoordinateInBlocks(0, 0, 0), oresBlockID, BlockInfo() };
 
-	this->resetDigBlock();
+	resetDigBlock();
 	showNormal(true);
 }
 
 QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-						 std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres)
-	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, buttonBlocks, settingsPage, digOres) {
+						 std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres,
+						 int digDirection)
+	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, buttonBlocks, settingsPage, digOres, digDirection) {
 	
 }
 
@@ -90,7 +93,7 @@ void QuarryBlock::incrementLength(char block) {
 		else {
 			length--;
 		}
-		addCorners();
+		setCorners();
 		resetDigBlock();
 	}
 }
@@ -110,7 +113,7 @@ void QuarryBlock::decrementLength(char block) {
 		else {
 			length++;
 		}
-		addCorners();
+		setCorners();
 		resetDigBlock();
 	}
 }
@@ -130,7 +133,7 @@ void QuarryBlock::incrementWidth(char block) {
 		else {
 			width--;
 		}
-		addCorners();
+		setCorners();
 		resetDigBlock();
 	}
 }
@@ -150,14 +153,14 @@ void QuarryBlock::decrementWidth(char block) {
 		else {
 			width++;
 		}
-		addCorners();
+		setCorners();
 		resetDigBlock();
 	}
 }
 
 void QuarryBlock::showSettings(bool show) {
 	if (show) {
-		addCorners();
+		setCorners();
 		updateSettingsBlockLocations();
 		setSettingsBlocks();
 	}
@@ -169,7 +172,7 @@ void QuarryBlock::showSettings(bool show) {
 
 void QuarryBlock::showNormal(bool show) {
 	if (show) {
-		addCorners();
+		setCorners();
 		setButtonBlock(0); // Set Settings block
 		setButtonBlock(6); // Set Check Mark block
 	}
