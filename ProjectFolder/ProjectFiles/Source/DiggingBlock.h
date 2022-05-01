@@ -53,7 +53,23 @@ public:
 		frontBlockID = 577305857,
 		nextBlockID = 527579106,
 		prevBlockID = 527579107,
-		oresBlockID = 527579108
+		oresBlockID = 527579108,
+		tMark11BlockID = 633982711,
+		tMark12BlockID = 633982712,
+		tMark13BlockID = 633982713,
+		tMark14BlockID = 633982714,
+		tMark21BlockID = 633982721,
+		tMark22BlockID = 633982722,
+		tMark23BlockID = 633982723,
+		tMark24BlockID = 633982724,
+		tMark31BlockID = 633982731,
+		tMark32BlockID = 633982732,
+		tMark33BlockID = 633982733,
+		tMark34BlockID = 633982734,
+		tMark41BlockID = 633982741,
+		tMark42BlockID = 633982742,
+		tMark43BlockID = 633982743,
+		tMark44BlockID = 633982744
 	};
 public:
 	/**

@@ -13,30 +13,8 @@ TunnelBlock::TunnelBlock(CoordinateInBlocks blockPosition)
 	CoordinateInCentimeters blockPositionCm = CoordinateInCentimeters(blockPosition);
 	int64_t xDifference = std::abs(playerLocation.X - blockPositionCm.X);
 	int64_t yDifference = std::abs(playerLocation.Y - blockPositionCm.Y);
-	if (playerLocation.X > blockPositionCm.X + 25 && playerLocation.Y < blockPositionCm.Y + xDifference && playerLocation.Y > blockPositionCm.Y - xDifference) {
-		this->digDirection = 2;
-		this->buttonBlocks[1] = { CoordinateInBlocks(0, 1, 0), upBlockID, BlockInfo() };
-		this->buttonBlocks[2] = { CoordinateInBlocks(0, -1, 0), downBlockID, BlockInfo() };
-
-		this->buttonBlocks[3] = { CoordinateInBlocks(0, 1, 0), inBlockID, BlockInfo() };
-		this->buttonBlocks[4] = { CoordinateInBlocks(0, -1, 0), outBlockID, BlockInfo() };
-
-		this->buttonBlocks[12] = { buttonBlocks[0].position + CoordinateInBlocks(0, -1, 0), nextBlockID, BlockInfo() };
-		this->buttonBlocks[13] = { buttonBlocks[0].position + CoordinateInBlocks(0, 1, 0), prevBlockID, BlockInfo() };
-
-		this->buttonBlocks[18] = { CoordinateInBlocks(0, 1, 0), oresBlockID, BlockInfo() };
-
-		this->buttonBlocks[8] = { CoordinateInBlocks(0, -3, 1), leftBlockID, BlockInfo() };
-		this->buttonBlocks[9] = { CoordinateInBlocks(0, 3, 1), rightBlockID, BlockInfo() };
-		this->buttonBlocks[10] = { CoordinateInBlocks(0, 1, 3), backBlockID, BlockInfo() };
-		this->buttonBlocks[11] = { CoordinateInBlocks(0, 1, -3), frontBlockID, BlockInfo() };
-
-		this->buttonBlocks[14] = { CoordinateInBlocks(0, 3, -1), leftBlockID, BlockInfo() };
-		this->buttonBlocks[15] = { CoordinateInBlocks(0, -3, -1), rightBlockID, BlockInfo() };
-		this->buttonBlocks[16] = { CoordinateInBlocks(0, -1, -3), backBlockID, BlockInfo() };
-		this->buttonBlocks[17] = { CoordinateInBlocks(0, -1, 3), frontBlockID, BlockInfo() };
-	}
-	else if (playerLocation.X < blockPositionCm.X - 25 && playerLocation.Y < blockPositionCm.Y + xDifference && playerLocation.Y > blockPositionCm.Y - xDifference) {
+	
+	if (playerLocation.X < blockPositionCm.X - 25 && playerLocation.Y < blockPositionCm.Y + xDifference && playerLocation.Y > blockPositionCm.Y - xDifference) {
 		this->digDirection = 1;
 		this->buttonBlocks[1] = { CoordinateInBlocks(0, -1, 0), upBlockID, BlockInfo() };
 		this->buttonBlocks[2] = { CoordinateInBlocks(0, 1, 0), downBlockID, BlockInfo() };
@@ -49,38 +27,38 @@ TunnelBlock::TunnelBlock(CoordinateInBlocks blockPosition)
 
 		this->buttonBlocks[18] = { CoordinateInBlocks(0, -1, 0), oresBlockID, BlockInfo() };
 
-		this->buttonBlocks[8] = { CoordinateInBlocks(0, -3, 1), leftBlockID, BlockInfo() };
-		this->buttonBlocks[9] = { CoordinateInBlocks(0, 3, 1), rightBlockID, BlockInfo() };
-		this->buttonBlocks[10] = { CoordinateInBlocks(0, 1, 3), backBlockID, BlockInfo() };
-		this->buttonBlocks[11] = { CoordinateInBlocks(0, 1, -3), frontBlockID, BlockInfo() };
+		this->buttonBlocks[8] = { CoordinateInBlocks(0, -2, 1), leftBlockID, BlockInfo() };
+		this->buttonBlocks[9] = { CoordinateInBlocks(0, 2, 1), rightBlockID, BlockInfo() };
+		this->buttonBlocks[10] = { CoordinateInBlocks(0, 1, 2), backBlockID, BlockInfo() };
+		this->buttonBlocks[11] = { CoordinateInBlocks(0, 1, -2), frontBlockID, BlockInfo() };
 
-		this->buttonBlocks[14] = { CoordinateInBlocks(0, 3, -1), leftBlockID, BlockInfo() };
-		this->buttonBlocks[15] = { CoordinateInBlocks(0, -3, -1), rightBlockID, BlockInfo() };
-		this->buttonBlocks[16] = { CoordinateInBlocks(0, -1, -3), backBlockID, BlockInfo() };
-		this->buttonBlocks[17] = { CoordinateInBlocks(0, -1, 3), frontBlockID, BlockInfo() };
+		this->buttonBlocks[14] = { CoordinateInBlocks(0, 2, -1), leftBlockID, BlockInfo() };
+		this->buttonBlocks[15] = { CoordinateInBlocks(0, -2, -1), rightBlockID, BlockInfo() };
+		this->buttonBlocks[16] = { CoordinateInBlocks(0, -1, -2), backBlockID, BlockInfo() };
+		this->buttonBlocks[17] = { CoordinateInBlocks(0, -1, 2), frontBlockID, BlockInfo() };
 	}
-	else if (playerLocation.Y > blockPositionCm.Y + 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
-		this->digDirection = 4;
-		this->buttonBlocks[1] = { CoordinateInBlocks(-1, 0, 0), upBlockID, BlockInfo() };
-		this->buttonBlocks[2] = { CoordinateInBlocks(1, 0, 0), downBlockID, BlockInfo() };
+	else if (playerLocation.X > blockPositionCm.X + 25 && playerLocation.Y < blockPositionCm.Y + xDifference && playerLocation.Y > blockPositionCm.Y - xDifference) {
+		this->digDirection = 2;
+		this->buttonBlocks[1] = { CoordinateInBlocks(0, 1, 0), upBlockID, BlockInfo() };
+		this->buttonBlocks[2] = { CoordinateInBlocks(0, -1, 0), downBlockID, BlockInfo() };
 
-		this->buttonBlocks[3] = { CoordinateInBlocks(-1, 0, 0), inBlockID, BlockInfo() };
-		this->buttonBlocks[4] = { CoordinateInBlocks(1, 0, 0), outBlockID, BlockInfo() };
+		this->buttonBlocks[3] = { CoordinateInBlocks(0, 1, 0), inBlockID, BlockInfo() };
+		this->buttonBlocks[4] = { CoordinateInBlocks(0, -1, 0), outBlockID, BlockInfo() };
 
-		this->buttonBlocks[12] = { buttonBlocks[0].position + CoordinateInBlocks(1, 0, 0), nextBlockID, BlockInfo() };
-		this->buttonBlocks[13] = { buttonBlocks[0].position + CoordinateInBlocks(-1, 0, 0), prevBlockID, BlockInfo() };
+		this->buttonBlocks[12] = { buttonBlocks[0].position + CoordinateInBlocks(0, -1, 0), nextBlockID, BlockInfo() };
+		this->buttonBlocks[13] = { buttonBlocks[0].position + CoordinateInBlocks(0, 1, 0), prevBlockID, BlockInfo() };
 
-		this->buttonBlocks[18] = { CoordinateInBlocks(-1, 0, 0), oresBlockID, BlockInfo() };
+		this->buttonBlocks[18] = { CoordinateInBlocks(0, 1, 0), oresBlockID, BlockInfo() };
 
-		this->buttonBlocks[8] = { CoordinateInBlocks(-3, 0, 1), leftBlockID, BlockInfo() };
-		this->buttonBlocks[9] = { CoordinateInBlocks(3, 0, 1), rightBlockID, BlockInfo() };
-		this->buttonBlocks[10] = { CoordinateInBlocks(1, 0, 3), backBlockID, BlockInfo() };
-		this->buttonBlocks[11] = { CoordinateInBlocks(1, 0, -3), frontBlockID, BlockInfo() };
+		this->buttonBlocks[8] = { CoordinateInBlocks(0, -2, 1), leftBlockID, BlockInfo() };
+		this->buttonBlocks[9] = { CoordinateInBlocks(0, 2, 1), rightBlockID, BlockInfo() };
+		this->buttonBlocks[10] = { CoordinateInBlocks(0, 1, 2), backBlockID, BlockInfo() };
+		this->buttonBlocks[11] = { CoordinateInBlocks(0, 1, -2), frontBlockID, BlockInfo() };
 
-		this->buttonBlocks[14] = { CoordinateInBlocks(3, 0, -1), leftBlockID, BlockInfo() };
-		this->buttonBlocks[15] = { CoordinateInBlocks(-3, 0, -1), rightBlockID, BlockInfo() };
-		this->buttonBlocks[16] = { CoordinateInBlocks(-1, 0, -3), backBlockID, BlockInfo() };
-		this->buttonBlocks[17] = { CoordinateInBlocks(-1, 0, 3), frontBlockID, BlockInfo() };
+		this->buttonBlocks[14] = { CoordinateInBlocks(0, 2, -1), leftBlockID, BlockInfo() };
+		this->buttonBlocks[15] = { CoordinateInBlocks(0, -2, -1), rightBlockID, BlockInfo() };
+		this->buttonBlocks[16] = { CoordinateInBlocks(0, -1, -2), backBlockID, BlockInfo() };
+		this->buttonBlocks[17] = { CoordinateInBlocks(0, -1, 2), frontBlockID, BlockInfo() };
 	}
 	else if (playerLocation.Y < blockPositionCm.Y - 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
 		this->digDirection = 3;
@@ -95,18 +73,41 @@ TunnelBlock::TunnelBlock(CoordinateInBlocks blockPosition)
 
 		this->buttonBlocks[18] = { CoordinateInBlocks(1, 0, 0), oresBlockID, BlockInfo() };
 
-		this->buttonBlocks[8] = { CoordinateInBlocks(-3, 0, 1), leftBlockID, BlockInfo() };
-		this->buttonBlocks[9] = { CoordinateInBlocks(3, 0, 1), rightBlockID, BlockInfo() };
-		this->buttonBlocks[10] = { CoordinateInBlocks(1, 0, 3), backBlockID, BlockInfo() };
-		this->buttonBlocks[11] = { CoordinateInBlocks(1, 0, -3), frontBlockID, BlockInfo() };
+		this->buttonBlocks[8] = { CoordinateInBlocks(-2, 0, 1), leftBlockID, BlockInfo() };
+		this->buttonBlocks[9] = { CoordinateInBlocks(2, 0, 1), rightBlockID, BlockInfo() };
+		this->buttonBlocks[10] = { CoordinateInBlocks(1, 0, 2), backBlockID, BlockInfo() };
+		this->buttonBlocks[11] = { CoordinateInBlocks(1, 0, -2), frontBlockID, BlockInfo() };
 
-		this->buttonBlocks[14] = { CoordinateInBlocks(3, 0, -1), leftBlockID, BlockInfo() };
-		this->buttonBlocks[15] = { CoordinateInBlocks(-3, 0, -1), rightBlockID, BlockInfo() };
-		this->buttonBlocks[16] = { CoordinateInBlocks(-1, 0, -3), backBlockID, BlockInfo() };
-		this->buttonBlocks[17] = { CoordinateInBlocks(-1, 0, 3), frontBlockID, BlockInfo() };
+		this->buttonBlocks[14] = { CoordinateInBlocks(2, 0, -1), leftBlockID, BlockInfo() };
+		this->buttonBlocks[15] = { CoordinateInBlocks(-2, 0, -1), rightBlockID, BlockInfo() };
+		this->buttonBlocks[16] = { CoordinateInBlocks(-1, 0, -2), backBlockID, BlockInfo() };
+		this->buttonBlocks[17] = { CoordinateInBlocks(-1, 0, 2), frontBlockID, BlockInfo() };
+	}
+	else if (playerLocation.Y > blockPositionCm.Y + 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
+		this->digDirection = 4;
+		this->buttonBlocks[1] = { CoordinateInBlocks(-1, 0, 0), upBlockID, BlockInfo() };
+		this->buttonBlocks[2] = { CoordinateInBlocks(1, 0, 0), downBlockID, BlockInfo() };
+
+		this->buttonBlocks[3] = { CoordinateInBlocks(-1, 0, 0), inBlockID, BlockInfo() };
+		this->buttonBlocks[4] = { CoordinateInBlocks(1, 0, 0), outBlockID, BlockInfo() };
+
+		this->buttonBlocks[12] = { buttonBlocks[0].position + CoordinateInBlocks(1, 0, 0), nextBlockID, BlockInfo() };
+		this->buttonBlocks[13] = { buttonBlocks[0].position + CoordinateInBlocks(-1, 0, 0), prevBlockID, BlockInfo() };
+
+		this->buttonBlocks[18] = { CoordinateInBlocks(-1, 0, 0), oresBlockID, BlockInfo() };
+
+		this->buttonBlocks[8] = { CoordinateInBlocks(-2, 0, 1), leftBlockID, BlockInfo() };
+		this->buttonBlocks[9] = { CoordinateInBlocks(2, 0, 1), rightBlockID, BlockInfo() };
+		this->buttonBlocks[10] = { CoordinateInBlocks(1, 0, 2), backBlockID, BlockInfo() };
+		this->buttonBlocks[11] = { CoordinateInBlocks(1, 0, -2), frontBlockID, BlockInfo() };
+
+		this->buttonBlocks[14] = { CoordinateInBlocks(2, 0, -1), leftBlockID, BlockInfo() };
+		this->buttonBlocks[15] = { CoordinateInBlocks(-2, 0, -1), rightBlockID, BlockInfo() };
+		this->buttonBlocks[16] = { CoordinateInBlocks(-1, 0, -2), backBlockID, BlockInfo() };
+		this->buttonBlocks[17] = { CoordinateInBlocks(-1, 0, 2), frontBlockID, BlockInfo() };
 	}
 
-	updateCornerBlocksLocations();
+	updateCornerBlocks();
 	resetDigBlock();
 	showNormal(true);
 }
@@ -118,21 +119,31 @@ TunnelBlock::TunnelBlock(int length, int width, int depth, CoordinateInBlocks bl
 
 }
 
-void TunnelBlock::updateCornerBlocksLocations() {
+void TunnelBlock::updateCornerBlocks() {
 	switch (digDirection) {
 	case 1: 
+		cornerBlocks[0] = { CoordinateInBlocks(0, -2, 2),  tMark11BlockID, BlockInfo() };
+		cornerBlocks[1] = { CoordinateInBlocks(0, 2, 2),   tMark12BlockID, BlockInfo() };
+		cornerBlocks[2] = { CoordinateInBlocks(0, -2, -2), tMark13BlockID, BlockInfo() };
+		cornerBlocks[3] = { CoordinateInBlocks(0, 2, -2),  tMark14BlockID, BlockInfo() };
+		break;
 	case 2:
-		cornerBlocks[0] = { CoordinateInBlocks(0, -2, 2), mark1BlockID, BlockInfo() };
-		cornerBlocks[1] = { CoordinateInBlocks(0, 2, 2), mark2BlockID, BlockInfo() };
-		cornerBlocks[2] = { CoordinateInBlocks(0, -2, -2), mark3BlockID, BlockInfo() };
-		cornerBlocks[3] = { CoordinateInBlocks(0, 2, -2), mark4BlockID, BlockInfo() };
+		cornerBlocks[0] = { CoordinateInBlocks(0, 2, 2),   tMark21BlockID, BlockInfo() };
+		cornerBlocks[1] = { CoordinateInBlocks(0, -2, 2),  tMark22BlockID, BlockInfo() };
+		cornerBlocks[2] = { CoordinateInBlocks(0, 2, -2),  tMark23BlockID, BlockInfo() };
+		cornerBlocks[3] = { CoordinateInBlocks(0, -2, -2), tMark24BlockID, BlockInfo() };
 		break;
 	case 3:
+		cornerBlocks[0] = { CoordinateInBlocks(2, 0, 2),   tMark31BlockID, BlockInfo() };
+		cornerBlocks[1] = { CoordinateInBlocks(-2, 0, 2),  tMark32BlockID, BlockInfo() };
+		cornerBlocks[2] = { CoordinateInBlocks(2, 0, -2),  tMark33BlockID, BlockInfo() };
+		cornerBlocks[3] = { CoordinateInBlocks(-2, 0, -2), tMark34BlockID, BlockInfo() };
+		break;
 	case 4:
-		cornerBlocks[0] = { CoordinateInBlocks(-2, 0, 2), mark1BlockID, BlockInfo() };
-		cornerBlocks[1] = { CoordinateInBlocks(2, 0, 2), mark2BlockID, BlockInfo() };
-		cornerBlocks[2] = { CoordinateInBlocks(-2, 0, -2), mark3BlockID, BlockInfo() };
-		cornerBlocks[3] = { CoordinateInBlocks(2, 0, -2), mark4BlockID, BlockInfo() };
+		cornerBlocks[0] = { CoordinateInBlocks(-2, 0, 2),  tMark41BlockID, BlockInfo() };
+		cornerBlocks[1] = { CoordinateInBlocks(2, 0, 2),   tMark42BlockID, BlockInfo() };
+		cornerBlocks[2] = { CoordinateInBlocks(-2, 0, -2), tMark43BlockID, BlockInfo() };
+		cornerBlocks[3] = { CoordinateInBlocks(2, 0, -2),  tMark44BlockID, BlockInfo() };
 		break;
 	}
 }
@@ -261,12 +272,20 @@ void TunnelBlock::incrementWidth(char block) {
 		if (block == 'r') {
 			switch (digDirection) {
 			case 1:
-			case 2:
 				cornerBlocks[1].position.Y++;
 				cornerBlocks[3].position.Y++;
 				width++;
 				break;
+			case 2:
+				cornerBlocks[0].position.Y++;
+				cornerBlocks[2].position.Y++;
+				width++;
+				break;
 			case 3:
+				cornerBlocks[0].position.X++;
+				cornerBlocks[2].position.X++;
+				width++;
+				break;
 			case 4:
 				cornerBlocks[1].position.X++;
 				cornerBlocks[3].position.X++;
@@ -277,12 +296,20 @@ void TunnelBlock::incrementWidth(char block) {
 		else if (block == 'l') {
 			switch (digDirection) {
 			case 1:
-			case 2:
 				cornerBlocks[0].position.Y--;
 				cornerBlocks[2].position.Y--;
 				width++;
 				break;
+			case 2:
+				cornerBlocks[1].position.Y--;
+				cornerBlocks[3].position.Y--;
+				width++;
+				break;
 			case 3:
+				cornerBlocks[1].position.X--;
+				cornerBlocks[3].position.X--;
+				width++;
+				break;
 			case 4:
 				cornerBlocks[0].position.X--;
 				cornerBlocks[2].position.X--;
@@ -301,14 +328,26 @@ void TunnelBlock::decrementWidth(char block) {
 		if (block == 'l') {
 			switch (digDirection) {
 			case 1:
-			case 2:
 				if (cornerBlocks[1].position.Y > 2) {
 					cornerBlocks[1].position.Y--;
 					cornerBlocks[3].position.Y--;
 					width--;
 				}
 				break;
+			case 2:
+				if (cornerBlocks[0].position.Y > 2) {
+					cornerBlocks[0].position.Y--;
+					cornerBlocks[2].position.Y--;
+					width--;
+				}
+				break;
 			case 3:
+				if (cornerBlocks[0].position.X > 2) {
+					cornerBlocks[0].position.X--;
+					cornerBlocks[2].position.X--;
+					width--;
+				}
+				break;
 			case 4:
 				if (cornerBlocks[1].position.X > 2) {
 					cornerBlocks[1].position.X--;
@@ -321,14 +360,26 @@ void TunnelBlock::decrementWidth(char block) {
 		else if (block == 'r') {
 			switch (digDirection) {
 			case 1:
-			case 2:
 				if (cornerBlocks[0].position.Y < -2) {
 					cornerBlocks[0].position.Y++;
 					cornerBlocks[2].position.Y++;
 					width--;
 				}
 				break;
+			case 2:
+				if (cornerBlocks[1].position.Y < -2) {
+					cornerBlocks[1].position.Y++;
+					cornerBlocks[3].position.Y++;
+					width--;
+				}
+				break;
 			case 3:
+				if (cornerBlocks[1].position.X < -2) {
+					cornerBlocks[1].position.X++;
+					cornerBlocks[3].position.X++;
+					width--;
+				}
+				break;
 			case 4:
 				if (cornerBlocks[0].position.X < -2) {
 					cornerBlocks[0].position.X++;

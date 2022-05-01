@@ -4,9 +4,12 @@
 #include <fstream>
 #include <iostream>
 
+
 /************************************************************
 	Custom Variables for the mod
 *************************************************************/
+
+void location() {}
 
 // Stores all Quarry blocks currently in the world
 std::vector<QuarryBlock> quarryBlocks;
@@ -15,6 +18,8 @@ std::vector<TunnelBlock> tunnelBlocks;
 
 // The name of the world
 std::wstring worldName;
+// The path of the DLL file.
+std::wstring path = getModulePath(location);
 
 // All blocks with possible interactions
 const int quarryBlockID = 1473066952;
@@ -519,7 +524,7 @@ void Event_OnLoad()
 	worldName = GetWorldName();
 	
 	// Loads all Quarry blocks previously placed in the world into the quarryBlocks vector.
-	quarryBlocks = readBlocks<QuarryBlock>(std::ifstream{worldName + L"-QuarryBlocks.txt"});
+	quarryBlocks = readBlocks<QuarryBlock>(std::ifstream{ path + L"\\BlockInstances\\" + worldName + L"-QuarryBlocks.txt"});
 
 	auto itQ = quarryBlocks.begin();
 	while (itQ != quarryBlocks.end()) {
@@ -533,7 +538,7 @@ void Event_OnLoad()
 	}
 
 	// Loads all Tunnel blocks previously placed in the world into the quarryBlocks vector.
-	tunnelBlocks = readBlocks<TunnelBlock>(std::ifstream{ worldName + L"-TunnelBlocks.txt" });
+	tunnelBlocks = readBlocks<TunnelBlock>(std::ifstream{ path + L"\\BlockInstances\\" + worldName + L"-TunnelBlocks.txt" });
 
 	auto itT = tunnelBlocks.begin();
 	while (itT != tunnelBlocks.end()) {
@@ -552,10 +557,10 @@ void Event_OnExit()
 {
 
 	// Saves all Quarry blocks to a file for later loading.
-	writeBlocks<QuarryBlock>(std::ofstream{worldName + L"-QuarryBlocks.txt"}, quarryBlocks);
+	writeBlocks<QuarryBlock>(std::ofstream{ path + L"\\BlockInstances\\" + worldName + L"-QuarryBlocks.txt"}, quarryBlocks);
 
 	// Saves all Tunnel blocks to a file for later loading.
-	writeBlocks<TunnelBlock>(std::ofstream{ worldName + L"-TunnelBlocks.txt" }, tunnelBlocks);
+	writeBlocks<TunnelBlock>(std::ofstream{ path + L"\\BlockInstances\\" + worldName + L"-TunnelBlocks.txt" }, tunnelBlocks);
 }
 
 

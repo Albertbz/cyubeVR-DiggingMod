@@ -30,8 +30,8 @@ public:
 		std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres, 
 		int digDirection);
 
-	// Updates the locations of the corner blocks.
-	void updateCornerBlocksLocations();
+	// Updates the corner blocks to match with digDirection.
+	void updateCornerBlocks();
 	
 	// Digs/mines a single block if the Tunnel block is digging at that moment.
 	void dig();

@@ -199,10 +199,11 @@ std::wstring DiggingBlock::timeToDig() {
 bool DiggingBlock::diggableBlock(BlockInfo block) {
 	bool diggable = false;
 	if (block.Type != EBlockType::ModBlock) {
-		diggable = block.Type == EBlockType::Stone || block.Type == EBlockType::Dirt || block.Type == EBlockType::Grass || block.Type == EBlockType::Sand;
+		diggable = block.Type == EBlockType::Stone || block.Type == EBlockType::Dirt || block.Type == EBlockType::Grass || 
+				   block.Type == EBlockType::Sand;
 		if (!diggable && digOres) {
 			diggable = block.Type == EBlockType::Ore_Coal || block.Type == EBlockType::Ore_Copper || block.Type == EBlockType::Ore_Gold ||
-				block.Type == EBlockType::Ore_Iron || block.Type == EBlockType::CrystalBlock;
+					   block.Type == EBlockType::Ore_Iron || block.Type == EBlockType::CrystalBlock;
 		}
 	}
 	return diggable;
@@ -245,7 +246,7 @@ void DiggingBlock::toggleDigOres() {
 }
 
 void DiggingBlock::printDigOres() {
-	wString message = L"The Quarry will now\n";
+	wString message = L"The block will now\n";
 	if (digOres) {
 		message.append(L"dig ores!");
 	}

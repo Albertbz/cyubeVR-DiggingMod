@@ -136,3 +136,5 @@ template <typename T>
 auto readBlocks(std::istream&& file) -> std::vector<T> {
 	return readBlocks<T>(file);
 }
+
+std::wstring getModulePath(void* address);
