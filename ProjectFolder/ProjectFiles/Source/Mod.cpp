@@ -43,6 +43,22 @@ const int nextBlockID = 527579106;
 const int prevBlockID = 527579107;
 const int oresBlockID = 527579108;
 const int tunBlockID = 894654498;
+const int tMark11BlockID = 633982711;
+const int tMark12BlockID = 633982712;
+const int tMark13BlockID = 633982713;
+const int tMark14BlockID = 633982714;
+const int tMark21BlockID = 633982721;
+const int tMark22BlockID = 633982722;
+const int tMark23BlockID = 633982723;
+const int tMark24BlockID = 633982724;
+const int tMark31BlockID = 633982731;
+const int tMark32BlockID = 633982732;
+const int tMark33BlockID = 633982733;
+const int tMark34BlockID = 633982734;
+const int tMark41BlockID = 633982741;
+const int tMark42BlockID = 633982742;
+const int tMark43BlockID = 633982743;
+const int tMark44BlockID = 633982744;
 
 /************************************************************
 	Config Variables (Set these to whatever you need. They are automatically read by the game.)
@@ -50,7 +66,10 @@ const int tunBlockID = 894654498;
 
 UniqueID ThisModUniqueIDs[] = { quarryBlockID, outBlockID, downBlockID, upBlockID, inBlockID, setBlockID, exclBlockID, checkBlockID, 
 								crossBlockID, leftBlockID, rightBlockID, backBlockID, frontBlockID, nextBlockID, prevBlockID,
-								mark1BlockID, mark2BlockID, mark3BlockID, mark4BlockID, oresBlockID, tunBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
+								mark1BlockID, mark2BlockID, mark3BlockID, mark4BlockID, oresBlockID, tunBlockID, tMark11BlockID,
+								tMark12BlockID, tMark13BlockID, tMark14BlockID, tMark21BlockID, tMark22BlockID, tMark23BlockID,
+								tMark24BlockID, tMark31BlockID, tMark32BlockID, tMark33BlockID, tMark34BlockID, tMark41BlockID,
+								tMark42BlockID, tMark43BlockID, tMark44BlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
 float TickRate = 5;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
 
@@ -257,61 +276,82 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 			}
 		}
 	}
-	else if (CustomBlockID == mark1BlockID) {
-		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
-				isLeftover = false;
-				break;
+	else if (CustomBlockID == mark1BlockID || CustomBlockID == tMark11BlockID || CustomBlockID == tMark21BlockID || 
+			CustomBlockID == tMark31BlockID || CustomBlockID == tMark41BlockID) {
+			if (CustomBlockID == mark1BlockID) {
+				for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+					if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
+						isLeftover = false;
+						break;
+					}
+				}
 			}
-		}
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
-				isLeftover = false;
-				break;
+			else {
+				for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+					if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
+						isLeftover = false;
+						break;
+					}
+				}
 			}
-		}
 	}
-	else if (CustomBlockID == mark2BlockID) {
-		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
-				isLeftover = false;
-				break;
+	else if (CustomBlockID == mark2BlockID || CustomBlockID == tMark12BlockID || CustomBlockID == tMark22BlockID ||
+			CustomBlockID == tMark32BlockID || CustomBlockID == tMark42BlockID) {
+			if (CustomBlockID == mark2BlockID) {
+				for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+					if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
+						isLeftover = false;
+						break;
+					}
+				}
 			}
-		}
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
-				isLeftover = false;
-				break;
+			else {
+				for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+					if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
+						isLeftover = false;
+						break;
+					}
+				}
 			}
-		}
 	}
-	else if (CustomBlockID == mark3BlockID) {
-		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
-				isLeftover = false;
-				break;
+	else if (CustomBlockID == mark3BlockID || CustomBlockID == tMark13BlockID || CustomBlockID == tMark23BlockID ||
+			CustomBlockID == tMark33BlockID || CustomBlockID == tMark43BlockID) {
+			if (CustomBlockID == mark3BlockID) {
+				for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+					if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
+						isLeftover = false;
+						break;
+					}
+				}
 			}
-		}
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
-				isLeftover = false;
-				break;
+			else {
+				for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+					if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
+						isLeftover = false;
+						break;
+					}
+				}
 			}
-		}
 	}
-	else if (CustomBlockID == mark4BlockID) {
-		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
-				isLeftover = false;
-				break;
+	else if (CustomBlockID == mark4BlockID || CustomBlockID == tMark14BlockID || CustomBlockID == tMark24BlockID ||
+			CustomBlockID == tMark34BlockID || CustomBlockID == tMark44BlockID) {
+			if (CustomBlockID == mark4BlockID) {
+				for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+					if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
+						isLeftover = false;
+						break;
+
+					}
+				}
 			}
-		}
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
-				isLeftover = false;
-				break;
+			else {
+				for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+					if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
+						isLeftover = false;
+						break;
+					}
+				}
 			}
-		}
 	}
 	else if (CustomBlockID == nextBlockID) {
 

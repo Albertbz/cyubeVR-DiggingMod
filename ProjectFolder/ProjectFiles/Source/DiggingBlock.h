@@ -69,7 +69,9 @@ public:
 		tMark41BlockID = 633982741,
 		tMark42BlockID = 633982742,
 		tMark43BlockID = 633982743,
-		tMark44BlockID = 633982744
+		tMark44BlockID = 633982744,
+		tArrowUpBlockID = 1205720236,
+		tArrowUpBlockID = 1205720237
 	};
 public:
 	/**

@@ -5,7 +5,7 @@
 
 std::wstring getModulePath(void* address)
 {
-	char path[FILENAME_MAX];
+	wchar_t path[FILENAME_MAX];
 	HMODULE hm = NULL;
 
 	if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
@@ -13,14 +13,15 @@ std::wstring getModulePath(void* address)
 		(LPCSTR)address,
 		&hm))
 	{
-
 	}
-	GetModuleFileNameA(hm, path, sizeof(path));
 
-	std::string p = path;
-	size_t found = p.find_last_of("/\\");
-	std::string p1 = p.substr(0, found);
-	std::wstring p2 = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(p1);
+#pragma warning(disable:6386)
+	GetModuleFileNameW(hm, path, sizeof(path));
+#pragma warning(default:6386)
 
-	return p2;
+	std::wstring p = path;
+	size_t found = p.find_last_of(L"/\\");
+	std::wstring p1 = p.substr(0, found);
+
+	return p1;
 }
