@@ -23,7 +23,7 @@ public:
 	// An array of all of the Button blocks. 
 	// 0=set, 1=-depth, 2=+depth, 3=-size, 4=+size, 5=excl, 6=check, 
 	// 7=cross, 8=+W1, 9=+W2, 10=+L1, 11=+L2, 12=next, 13=prev, 
-	// 14=-W1, 15=-W2, 16=-L1, 17=-L2, 18=ores.
+	// 14=-W2, 15=-W1, 16=-L2, 17=-L1, 18=ores.
 	std::array<Block, buttonBlocksAmount> buttonBlocks;
 	// The current page of the settings. 
 	// 1=depth, 2=simple size, 3=advanced size, 4=dig ores.
@@ -71,7 +71,9 @@ public:
 		tMark43BlockID = 633982743,
 		tMark44BlockID = 633982744,
 		tArrowUpBlockID = 1205720236,
-		tArrowUpBlockID = 1205720237
+		tArrowDownBlockID = 1205720237,
+		tArrowLeftBlockID = 1205720238,
+		tArrowRightBlockID = 1205720239
 	};
 public:
 	/**

@@ -59,6 +59,10 @@ const int tMark41BlockID = 633982741;
 const int tMark42BlockID = 633982742;
 const int tMark43BlockID = 633982743;
 const int tMark44BlockID = 633982744;
+const int tArrowUpBlockID = 1205720236;
+const int tArrowDownBlockID = 1205720237;
+const int tArrowLeftBlockID = 1205720238;
+const int tArrowRightBlockID = 1205720239;
 
 /************************************************************
 	Config Variables (Set these to whatever you need. They are automatically read by the game.)
@@ -69,7 +73,8 @@ UniqueID ThisModUniqueIDs[] = { quarryBlockID, outBlockID, downBlockID, upBlockI
 								mark1BlockID, mark2BlockID, mark3BlockID, mark4BlockID, oresBlockID, tunBlockID, tMark11BlockID,
 								tMark12BlockID, tMark13BlockID, tMark14BlockID, tMark21BlockID, tMark22BlockID, tMark23BlockID,
 								tMark24BlockID, tMark31BlockID, tMark32BlockID, tMark33BlockID, tMark34BlockID, tMark41BlockID,
-								tMark42BlockID, tMark43BlockID, tMark44BlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
+								tMark42BlockID, tMark43BlockID, tMark44BlockID, tArrowUpBlockID, tArrowDownBlockID, 
+								tArrowLeftBlockID, tArrowRightBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
 float TickRate = 5;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
 
@@ -145,11 +150,13 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 {
 	bool isLeftover = true; // Keeps track of whether the block is leftover (from bug or something else), i.e., it doesn't belong to a Digging Block.
 
-	if (CustomBlockID == quarryBlockID || CustomBlockID == tunBlockID) {
+	switch (CustomBlockID) {
+	case quarryBlockID:
+	case tunBlockID:
 		isLeftover = false;
-	}
-	else if (CustomBlockID == checkBlockID || CustomBlockID == crossBlockID) {
-
+		break;
+	case checkBlockID:
+	case crossBlockID:
 		// Goes through all Quarry blocks, toggles the digging of the one the Check/Cross Mark block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[6].position)) { // Specifically checks the Check Mark block (should always be the same as Cross Mark).
@@ -167,9 +174,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-	}
-	else if (CustomBlockID == setBlockID) {
-
+		break;
+	case setBlockID:
 		// Goes through all Quarry blocks, toggles the settings of the one the Settings block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[0].position)) {
@@ -187,9 +193,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-	}
-	else if (CustomBlockID == outBlockID) {
-		
+		break;
+	case outBlockID:
 		// Goes through all Quarry blocks, increments the size of the one the Outwards block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[4].position)) {
@@ -209,9 +214,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-	}
-	else if (CustomBlockID == inBlockID) {
-
+		break;
+	case inBlockID:
 		// Goes through all Quarry blocks, decrements the size of the one the Inwards block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[3].position)) {
@@ -231,9 +235,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-	}
-	else if (CustomBlockID == upBlockID) {
-
+		break;
+	case upBlockID:
 		// Goes through all Quarry blocks, decrements the depth of the one the Up block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[1].position)) {
@@ -253,9 +256,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-	}
-	else if (CustomBlockID == downBlockID) {
-
+		break;
+	case downBlockID:
 		// Goes through all Quarry blocks, increments the depth of the one the Down block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[2].position)) {
@@ -275,86 +277,84 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-	}
-	else if (CustomBlockID == mark1BlockID || CustomBlockID == tMark11BlockID || CustomBlockID == tMark21BlockID || 
-			CustomBlockID == tMark31BlockID || CustomBlockID == tMark41BlockID) {
-			if (CustomBlockID == mark1BlockID) {
-				for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-					if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
-						isLeftover = false;
-						break;
-					}
-				}
+		break;
+	case mark1BlockID:
+		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
+				isLeftover = false;
+				break;
 			}
-			else {
-				for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-					if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
-						isLeftover = false;
-						break;
-					}
-				}
+		}
+		break;
+	case mark2BlockID:
+		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
+				isLeftover = false;
+				break;
 			}
-	}
-	else if (CustomBlockID == mark2BlockID || CustomBlockID == tMark12BlockID || CustomBlockID == tMark22BlockID ||
-			CustomBlockID == tMark32BlockID || CustomBlockID == tMark42BlockID) {
-			if (CustomBlockID == mark2BlockID) {
-				for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-					if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
-						isLeftover = false;
-						break;
-					}
-				}
+		}
+		break;
+	case mark3BlockID:
+		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
+				isLeftover = false;
+				break;
 			}
-			else {
-				for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-					if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
-						isLeftover = false;
-						break;
-					}
-				}
+		}
+		break;
+	case mark4BlockID:
+		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
+				isLeftover = false;
+				break;
 			}
-	}
-	else if (CustomBlockID == mark3BlockID || CustomBlockID == tMark13BlockID || CustomBlockID == tMark23BlockID ||
-			CustomBlockID == tMark33BlockID || CustomBlockID == tMark43BlockID) {
-			if (CustomBlockID == mark3BlockID) {
-				for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-					if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
-						isLeftover = false;
-						break;
-					}
-				}
+		}
+		break;
+	case tMark11BlockID:
+	case tMark21BlockID:
+	case tMark31BlockID:
+	case tMark41BlockID:
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
+				isLeftover = false;
+				break;
 			}
-			else {
-				for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-					if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
-						isLeftover = false;
-						break;
-					}
-				}
+		}
+		break;
+	case tMark12BlockID:
+	case tMark22BlockID:
+	case tMark32BlockID:
+	case tMark42BlockID:
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
+				isLeftover = false;
+				break;
 			}
-	}
-	else if (CustomBlockID == mark4BlockID || CustomBlockID == tMark14BlockID || CustomBlockID == tMark24BlockID ||
-			CustomBlockID == tMark34BlockID || CustomBlockID == tMark44BlockID) {
-			if (CustomBlockID == mark4BlockID) {
-				for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-					if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
-						isLeftover = false;
-						break;
-
-					}
-				}
+		}
+		break;
+	case tMark13BlockID:
+	case tMark23BlockID:
+	case tMark33BlockID:
+	case tMark43BlockID:
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
+				isLeftover = false;
+				break;
 			}
-			else {
-				for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-					if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
-						isLeftover = false;
-						break;
-					}
-				}
+		}
+		break;
+	case tMark14BlockID:
+	case tMark24BlockID:
+	case tMark34BlockID:
+	case tMark44BlockID:
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
+				isLeftover = false;
+				break;
 			}
-	}
-	else if (CustomBlockID == nextBlockID) {
-
+		}
+		break;
+	case nextBlockID:
 		// Goes through all Quarry blocks, goes to the next page of the settings of the one the Next block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[12].position)) {
@@ -372,9 +372,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-	}
-	else if (CustomBlockID == prevBlockID) {
-
+		break;
+	case prevBlockID:
 		// Goes through all Quarry blocks, goes to the previous page of the settings of the one the Previous block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[13].position)) {
@@ -392,9 +391,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-	}
-	else if (CustomBlockID == leftBlockID) {
-
+		break;
+	case leftBlockID:
 		// Goes through all Quarry blocks, increments or decrements width of the one the Left block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[8].position)) {
@@ -408,23 +406,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-
-		// Goes through all Tunnel blocks, increments or decrements width of the one the Left block belongs to.
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->buttonBlocks[8].position)) {
-				it->incrementWidth('l');
-				isLeftover = false;
-				break;
-			}
-			else if (it->blockPosition == (At - it->buttonBlocks[14].position)) {
-				it->decrementWidth('l');
-				isLeftover = false;
-				break;
-			}
-		}
-	}
-	else if (CustomBlockID == rightBlockID) {
-
+		break;
+	case rightBlockID:
 		// Goes through all Quarry blocks, increments or decrements width of the one the Right block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[9].position)) {
@@ -438,23 +421,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-
-		// Goes through all Tunnel blocks, increments or decrements width of the one the Right block belongs to.
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->buttonBlocks[9].position)) {
-				it->incrementWidth('r');
-				isLeftover = false;
-				break;
-			}
-			else if (it->blockPosition == (At - it->buttonBlocks[15].position)) {
-				it->decrementWidth('r');
-				isLeftover = false;
-				break;
-			}
-		}
-	}
-	else if (CustomBlockID == backBlockID) {
-
+		break;
+	case backBlockID:
 		// Goes through all Quarry blocks, increments back or decrements front width of the one the Back block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[10].position)) {
@@ -468,23 +436,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-
-		// Goes through all Tunnel blocks, increments back or decrements front width of the one the Back block belongs to.
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->buttonBlocks[10].position)) {
-				it->incrementLength('b');
-				isLeftover = false;
-				break;
-			}
-			else if (it->blockPosition == (At - it->buttonBlocks[16].position)) {
-				it->decrementLength('b');
-				isLeftover = false;
-				break;
-			}
-		}
-	}
-	else if (CustomBlockID == frontBlockID) {
-
+		break;
+	case frontBlockID:
 		// Goes through all Quarry blocks, increments front or decrements back width of the one the Front block belongs to.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[11].position)) {
@@ -498,7 +451,53 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-
+		break;
+	case tArrowLeftBlockID:
+		// Goes through all Tunnel blocks, increments or decrements width of the one the Left block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[8].position)) {
+				it->incrementWidth('l');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[14].position)) {
+				it->decrementWidth('l');
+				isLeftover = false;
+				break;
+			}
+		}
+		break;
+	case tArrowRightBlockID:
+		// Goes through all Tunnel blocks, increments or decrements width of the one the Right block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[9].position)) {
+				it->incrementWidth('r');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[15].position)) {
+				it->decrementWidth('r');
+				isLeftover = false;
+				break;
+			}
+		}
+		break;
+	case tArrowUpBlockID:
+		// Goes through all Tunnel blocks, increments back or decrements front width of the one the Back block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[10].position)) {
+				it->incrementLength('b');
+				isLeftover = false;
+				break;
+			}
+			else if (it->blockPosition == (At - it->buttonBlocks[16].position)) {
+				it->decrementLength('b');
+				isLeftover = false;
+				break;
+			}
+		}
+		break;
+	case tArrowDownBlockID:
 		// Goes through all Tunnel blocks, increments front or decrements back width of the one the Front block belongs to.
 		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[11].position)) {
@@ -512,9 +511,8 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-	}
-	else if (CustomBlockID == oresBlockID) {
-
+		break;
+	case oresBlockID:
 		// Goes through all Quarry blocks, toggles whether to dig ores for the corresponding Quarry block.
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[18].position)) {
@@ -534,7 +532,9 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
+		break;
 	}
+
 
 	if (isLeftover) {
 		SetBlock(At, EBlockType::Air);
