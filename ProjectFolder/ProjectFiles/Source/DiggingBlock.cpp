@@ -86,15 +86,15 @@ void DiggingBlock::decrementDepth() {
 void DiggingBlock::printDepth() {
 	std::wstring message = L"Depth: ";
 	message.append(std::to_wstring(depth));
-	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 75), message, 0.5f, 1.5f);
+	SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), message, 0.5f, 1);
 }
 
 void DiggingBlock::printSize() {
 	std::wstring message = L"Size (LxWxD)\n---------------\n" + getSize();
-	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 75), message, 1, 1.5f);
+	SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), message, 1, 1);
 }
 
-wString DiggingBlock::getSize() {
+std::wstring DiggingBlock::getSize() {
 	return std::to_wstring(length) + L"x" + std::to_wstring(width) + L"x" + std::to_wstring(depth);
 }
 
@@ -120,7 +120,7 @@ void DiggingBlock::toggleSettings() {
 	}
 	else if (currentMode == 2) {
 		showSettings(false);
-		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 75), L"Settings saved!\nIt will take\n" + timeToDig() + L"\nto dig out the " + getSize() + L" hole.", 5, 2.0f);
+		SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), L"Settings saved!\nIt will take\n" + timeToDig() + L"\nto dig out the " + getSize() + L" hole.", 5, 1, 2);
 		showNormal(true);
 		currentMode = 1;
 	}
@@ -253,20 +253,42 @@ void DiggingBlock::printDigOres() {
 	else {
 		message.append(L"not dig ores!");
 	}
-	SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 75), message, 1, 1.5f);
+	SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), message, 1, 1);
 }
 
 void DiggingBlock::printSettingsPage() {
 	if (settingsPage == 1) {
-		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), L"Change depth", 2);
+		SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), L"Change depth", 2);
 	}
 	else if (settingsPage == 2) {
-		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), L"Change size (simple)", 2);
+		SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), L"Change size (simple)", 2);
 	}
 	else if (settingsPage == 3) {
-		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), L"Change size (advanced)", 2);
+		SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), L"Change size (advanced)", 2);
 	}
 	else if (settingsPage == 4) {
-		SpawnHintText(blockPosition + CoordinateInCentimeters(0, 0, 125), L"Toggle digging of\nores", 2);
+		SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), L"Toggle digging of\nores", 2);
 	}
+}
+
+CoordinateInBlocks DiggingBlock::getPlayerDirection()
+{
+	CoordinateInCentimeters playerLocation = GetPlayerLocation();
+	CoordinateInCentimeters blockPositionCm = CoordinateInCentimeters(blockPosition);
+	int64_t xDifference = std::abs(playerLocation.X - blockPositionCm.X);
+	int64_t yDifference = std::abs(playerLocation.Y - blockPositionCm.Y);
+	if (playerLocation.X > blockPositionCm.X + 25 && playerLocation.Y < blockPositionCm.Y + xDifference && playerLocation.Y > blockPositionCm.Y - xDifference) {
+		return CoordinateInBlocks(1, 0, 0);
+	}
+	else if (playerLocation.X < blockPositionCm.X - 25 && playerLocation.Y < blockPositionCm.Y + xDifference && playerLocation.Y > blockPositionCm.Y - xDifference) {
+		return CoordinateInBlocks(-1, 0, 0);
+	}
+	else if (playerLocation.Y > blockPositionCm.Y + 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
+		return CoordinateInBlocks(0, 1, 0);
+	}
+	else if (playerLocation.Y < blockPositionCm.Y - 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
+		return CoordinateInBlocks(0, -1, 0);
+	}
+
+
 }

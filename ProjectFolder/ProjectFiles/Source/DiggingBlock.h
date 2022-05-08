@@ -73,7 +73,9 @@ public:
 		tArrowUpBlockID = 1205720236,
 		tArrowDownBlockID = 1205720237,
 		tArrowLeftBlockID = 1205720238,
-		tArrowRightBlockID = 1205720239
+		tArrowRightBlockID = 1205720239,
+		tDepthInBlockID = 867089596,
+		tDepthOutBlockID = 867089597
 	};
 public:
 	/**
@@ -264,4 +266,12 @@ public:
 
 	// Prints a message saying what settings you are changing.
 	void printSettingsPage();
+
+	/**
+	* Computes what direction the player is compared to the block.
+	* 
+	* @return The direction the player is compared to the block (so if 
+	*		  +x, then will give CoordinateInBlocks(1, 0, 0)).
+	*/
+	CoordinateInBlocks getPlayerDirection();
 };

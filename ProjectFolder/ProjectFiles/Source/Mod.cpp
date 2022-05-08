@@ -63,6 +63,8 @@ const int tArrowUpBlockID = 1205720236;
 const int tArrowDownBlockID = 1205720237;
 const int tArrowLeftBlockID = 1205720238;
 const int tArrowRightBlockID = 1205720239;
+const int tDepthInBlockID = 867089596;
+const int tDepthOutBlockID = 867089597;
 
 /************************************************************
 	Config Variables (Set these to whatever you need. They are automatically read by the game.)
@@ -74,7 +76,7 @@ UniqueID ThisModUniqueIDs[] = { quarryBlockID, outBlockID, downBlockID, upBlockI
 								tMark12BlockID, tMark13BlockID, tMark14BlockID, tMark21BlockID, tMark22BlockID, tMark23BlockID,
 								tMark24BlockID, tMark31BlockID, tMark32BlockID, tMark33BlockID, tMark34BlockID, tMark41BlockID,
 								tMark42BlockID, tMark43BlockID, tMark44BlockID, tArrowUpBlockID, tArrowDownBlockID, 
-								tArrowLeftBlockID, tArrowRightBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
+								tArrowLeftBlockID, tArrowRightBlockID, tDepthInBlockID, tDepthOutBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
 float TickRate = 5;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
 
@@ -246,16 +248,6 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-
-		// Goes through all Tunnel blocks, decrements the depth of the one the Up block belongs to.
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->buttonBlocks[1].position)) {
-				it->decrementDepth();
-				it->printDepth();
-				isLeftover = false;
-				break;
-			}
-		}
 		break;
 	case downBlockID:
 		// Goes through all Quarry blocks, increments the depth of the one the Down block belongs to.
@@ -267,7 +259,19 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 				break;
 			}
 		}
-
+		break;
+	case tDepthInBlockID:
+		// Goes through all Tunnel blocks, decrements the depth of the one the Up block belongs to.
+		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
+			if (it->blockPosition == (At - it->buttonBlocks[1].position)) {
+				it->decrementDepth();
+				it->printDepth();
+				isLeftover = false;
+				break;
+			}
+		}
+		break;
+	case tDepthOutBlockID:
 		// Goes through all Tunnel blocks, increments the depth of the one the Down block belongs to.
 		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 			if (it->blockPosition == (At - it->buttonBlocks[2].position)) {

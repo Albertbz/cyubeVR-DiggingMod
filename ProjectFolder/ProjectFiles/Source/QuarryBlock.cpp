@@ -14,14 +14,14 @@ QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition)
 	this->cornerBlocks[2] = { CoordinateInBlocks(-2, -2, 0), mark3BlockID, BlockInfo() };
 	this->cornerBlocks[3] = { CoordinateInBlocks(-2, 2, 0), mark4BlockID, BlockInfo() };
 
-	this->buttonBlocks[0] = { CoordinateInBlocks(0, 0, 4), setBlockID, BlockInfo() };
+	this->buttonBlocks[0] = { CoordinateInBlocks(0, 0, 3), setBlockID, BlockInfo() };
 	this->buttonBlocks[1] = { CoordinateInBlocks(0, 0, 0), upBlockID ,BlockInfo() };
 	this->buttonBlocks[2] = { CoordinateInBlocks(0, 0, 0), downBlockID, BlockInfo() };
 	this->buttonBlocks[3] = { CoordinateInBlocks(0, 0, 0), inBlockID, BlockInfo() };
 	this->buttonBlocks[4] = { CoordinateInBlocks(0, 0, 0), outBlockID, BlockInfo() };
-	this->buttonBlocks[5] = { CoordinateInBlocks(0, 0, 6), exclBlockID, BlockInfo() };
-	this->buttonBlocks[6] = { CoordinateInBlocks(0, 0, 6), checkBlockID, BlockInfo() };
-	this->buttonBlocks[7] = { CoordinateInBlocks(0, 0, 6), crossBlockID, BlockInfo() };
+	this->buttonBlocks[5] = { CoordinateInBlocks(0, 0, 4), exclBlockID, BlockInfo() };
+	this->buttonBlocks[6] = { CoordinateInBlocks(0, 0, 4), checkBlockID, BlockInfo() };
+	this->buttonBlocks[7] = { CoordinateInBlocks(0, 0, 4), crossBlockID, BlockInfo() };
 	this->buttonBlocks[8] = { CoordinateInBlocks(0, -5, 0), leftBlockID, BlockInfo() };
 	this->buttonBlocks[9] = { CoordinateInBlocks(0, 5, 0), rightBlockID, BlockInfo() };
 	this->buttonBlocks[10] = { CoordinateInBlocks(5, 0, 0), backBlockID, BlockInfo() };
