@@ -9,8 +9,8 @@
 	Custom Variables for the mod
 *************************************************************/
 
-void location() {}
-
+// Tick tracker to take care of saving blocks
+int tickNum = 0;
 // Stores all Quarry blocks currently in the world
 std::vector<QuarryBlock> quarryBlocks;
 // Stores all Tunnel blocks currently in the world
@@ -19,7 +19,7 @@ std::vector<TunnelBlock> tunnelBlocks;
 // The name of the world
 std::wstring worldName;
 // The path of the DLL file.
-std::wstring path = getModulePath(location);
+std::wstring path = GetThisModFolderPath();
 
 // All blocks with possible interactions
 const int quarryBlockID = 1473066952;
@@ -559,6 +559,20 @@ void Event_Tick()
 	for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
 		it->dig();
 	}
+
+	switch (tickNum) {
+	case 100: 
+		// Saves all Quarry blocks to a file for later loading.
+		writeBlocks<QuarryBlock>(std::ofstream{ path + L"\\BlockInstances\\" + worldName + L"-QuarryBlocks.txt" }, quarryBlocks);
+
+		// Saves all Tunnel blocks to a file for later loading.
+		writeBlocks<TunnelBlock>(std::ofstream{ path + L"\\BlockInstances\\" + worldName + L"-TunnelBlocks.txt" }, tunnelBlocks);
+		tickNum = 0;
+		break;
+	default:
+		tickNum++;
+		break;
+	}
 }
 
 
@@ -599,7 +613,6 @@ void Event_OnLoad()
 // Run once when the world is exited
 void Event_OnExit()
 {
-
 	// Saves all Quarry blocks to a file for later loading.
 	writeBlocks<QuarryBlock>(std::ofstream{ path + L"\\BlockInstances\\" + worldName + L"-QuarryBlocks.txt"}, quarryBlocks);
 
