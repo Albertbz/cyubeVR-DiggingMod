@@ -1,0 +1,18 @@
+{    
+    "Name": "tMarker2.3",
+    "CreatorName": "Albertbz",
+    "UniqueID": 633982723,
+    "Recipe": {
+      "Array" : [],
+      "SizeX": 0,
+      "SizeY": 0,
+      "SizeZ": 0
+    },
+    "Yield": 0,
+    "SimilarTo": 4,
+    "Textures": {
+        "Mode": 4,
+        "WithNormals" : false,
+		"WithGlowMap" : true
+      }
+  }

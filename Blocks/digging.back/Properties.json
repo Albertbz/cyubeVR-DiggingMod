@@ -1,0 +1,18 @@
+{    
+    "Name": "Back",
+    "CreatorName": "Albertbz",
+    "UniqueID": 577305856,
+    "Recipe": {
+      "Array" : [],
+      "SizeX": 0,
+      "SizeY": 0,
+      "SizeZ": 0
+    },
+    "Yield": 1,
+    "SimilarTo": 4,
+    "Textures": {
+        "Mode": 4,
+        "WithNormals" : false,
+		"WithGlowMap" : false
+      }
+  }

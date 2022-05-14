@@ -1,0 +1,18 @@
+{    
+    "Name": "tDepthIn",
+    "CreatorName": "Albertbz",
+    "UniqueID": 867089596,
+    "Recipe": {
+      "Array" : [],
+      "SizeX": 0,
+      "SizeY": 0,
+      "SizeZ": 0
+    },
+    "Yield": 0,
+    "SimilarTo": 4,
+    "Textures": {
+        "Mode": 2,
+        "WithNormals" : false,
+		"WithGlowMap" : false
+      }
+  }
