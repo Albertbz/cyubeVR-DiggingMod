@@ -16,10 +16,8 @@ std::vector<QuarryBlock> quarryBlocks;
 // Stores all Tunnel blocks currently in the world
 std::vector<TunnelBlock> tunnelBlocks;
 
-// The name of the world
-std::wstring worldName;
-// The path of the DLL file.
-std::wstring path = GetThisModFolderPath();
+// The path of the save folder.
+std::wstring path;
 
 // All blocks with possible interactions
 const int quarryBlockID = 1473066952;
@@ -148,7 +146,7 @@ void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID, bool Mo
 
 
 // Run every time a block is hit by a tool
-void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString ToolName)
+void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString ToolName, CoordinateInCentimeters ExactHitLocation, bool ToolHeldByHandLeft)
 {
 	bool isLeftover = true; // Keeps track of whether the block is leftover (from bug or something else), i.e., it doesn't belong to a Digging Block.
 
@@ -563,10 +561,10 @@ void Event_Tick()
 	switch (tickNum) {
 	case 100: 
 		// Saves all Quarry blocks to a file for later loading.
-		writeBlocks<QuarryBlock>(std::ofstream{ path + L"\\BlockInstances\\" + worldName + L"-QuarryBlocks.txt" }, quarryBlocks);
+		writeBlocks<QuarryBlock>(std::ofstream{ path + L"\\QuarryBlocks.txt" }, quarryBlocks);
 
 		// Saves all Tunnel blocks to a file for later loading.
-		writeBlocks<TunnelBlock>(std::ofstream{ path + L"\\BlockInstances\\" + worldName + L"-TunnelBlocks.txt" }, tunnelBlocks);
+		writeBlocks<TunnelBlock>(std::ofstream{ path + L"\\TunnelBlocks.txt" }, tunnelBlocks);
 		tickNum = 0;
 		break;
 	default:
@@ -579,10 +577,11 @@ void Event_Tick()
 // Run once when the world is loaded
 void Event_OnLoad()
 {
-	worldName = GetWorldName();
+	path = GetThisModSaveFolderPath(L"DiggingMod");
+	CreateDirectoryW(path.c_str(), NULL);
 	
 	// Loads all Quarry blocks previously placed in the world into the quarryBlocks vector.
-	quarryBlocks = readBlocks<QuarryBlock>(std::ifstream{ path + L"\\BlockInstances\\" + worldName + L"-QuarryBlocks.txt"});
+	quarryBlocks = readBlocks<QuarryBlock>(std::ifstream{ path + L"\\QuarryBlocks.txt" });
 
 	auto itQ = quarryBlocks.begin();
 	while (itQ != quarryBlocks.end()) {
@@ -596,7 +595,7 @@ void Event_OnLoad()
 	}
 
 	// Loads all Tunnel blocks previously placed in the world into the quarryBlocks vector.
-	tunnelBlocks = readBlocks<TunnelBlock>(std::ifstream{ path + L"\\BlockInstances\\" + worldName + L"-TunnelBlocks.txt" });
+	tunnelBlocks = readBlocks<TunnelBlock>(std::ifstream{ path + L"\\TunnelBlocks.txt" });
 
 	auto itT = tunnelBlocks.begin();
 	while (itT != tunnelBlocks.end()) {
@@ -614,10 +613,10 @@ void Event_OnLoad()
 void Event_OnExit()
 {
 	// Saves all Quarry blocks to a file for later loading.
-	writeBlocks<QuarryBlock>(std::ofstream{ path + L"\\BlockInstances\\" + worldName + L"-QuarryBlocks.txt"}, quarryBlocks);
+	writeBlocks<QuarryBlock>(std::ofstream{ path + L"\\QuarryBlocks.txt"}, quarryBlocks);
 
 	// Saves all Tunnel blocks to a file for later loading.
-	writeBlocks<TunnelBlock>(std::ofstream{ path + L"\\BlockInstances\\" + worldName + L"-TunnelBlocks.txt" }, tunnelBlocks);
+	writeBlocks<TunnelBlock>(std::ofstream{ path + L"\\TunnelBlocks.txt" }, tunnelBlocks);
 }
 
 
@@ -641,7 +640,7 @@ void Event_AnyBlockDestroyed(CoordinateInBlocks At, BlockInfo Type, bool Moved)
 }
 
 // Run every time any block is hit by a tool
-void Event_AnyBlockHitByTool(CoordinateInBlocks At, BlockInfo Type, wString ToolName)
+void Event_AnyBlockHitByTool(CoordinateInBlocks At, BlockInfo Type, wString ToolName, CoordinateInCentimeters ExactHitLocation, bool ToolHeldByHandLeft)
 {
 
 }
