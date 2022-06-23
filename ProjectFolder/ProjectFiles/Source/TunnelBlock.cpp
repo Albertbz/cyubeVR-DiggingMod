@@ -122,28 +122,28 @@ TunnelBlock::TunnelBlock(int length, int width, int depth, CoordinateInBlocks bl
 void TunnelBlock::updateCornerBlocks() {
 	switch (digDirection) {
 	case 1: 
-		cornerBlocks[0] = { CoordinateInBlocks(0, -2, 3),  tMark11BlockID, BlockInfo() };
-		cornerBlocks[1] = { CoordinateInBlocks(0, 2, 3),   tMark12BlockID, BlockInfo() };
-		cornerBlocks[2] = { CoordinateInBlocks(0, -2, -1), tMark13BlockID, BlockInfo() };
-		cornerBlocks[3] = { CoordinateInBlocks(0, 2, -1),  tMark14BlockID, BlockInfo() };
+		cornerBlocks[0] = { CoordinateInBlocks(0, -2, 3),  markerBlockID, BlockInfo() };
+		cornerBlocks[1] = { CoordinateInBlocks(0, 2, 3),   markerBlockID, BlockInfo() };
+		cornerBlocks[2] = { CoordinateInBlocks(0, -2, -1), markerBlockID, BlockInfo() };
+		cornerBlocks[3] = { CoordinateInBlocks(0, 2, -1),  markerBlockID, BlockInfo() };
 		break;
 	case 2:
-		cornerBlocks[0] = { CoordinateInBlocks(0, 2, 3),   tMark21BlockID, BlockInfo() };
-		cornerBlocks[1] = { CoordinateInBlocks(0, -2, 3),  tMark22BlockID, BlockInfo() };
-		cornerBlocks[2] = { CoordinateInBlocks(0, 2, -1),  tMark23BlockID, BlockInfo() };
-		cornerBlocks[3] = { CoordinateInBlocks(0, -2, -1), tMark24BlockID, BlockInfo() };
+		cornerBlocks[0] = { CoordinateInBlocks(0, 2, 3),   markerBlockID, BlockInfo() };
+		cornerBlocks[1] = { CoordinateInBlocks(0, -2, 3),  markerBlockID, BlockInfo() };
+		cornerBlocks[2] = { CoordinateInBlocks(0, 2, -1),  markerBlockID, BlockInfo() };
+		cornerBlocks[3] = { CoordinateInBlocks(0, -2, -1), markerBlockID, BlockInfo() };
 		break;
 	case 3:
-		cornerBlocks[0] = { CoordinateInBlocks(2, 0, 3),   tMark31BlockID, BlockInfo() };
-		cornerBlocks[1] = { CoordinateInBlocks(-2, 0, 3),  tMark32BlockID, BlockInfo() };
-		cornerBlocks[2] = { CoordinateInBlocks(2, 0, -1),  tMark33BlockID, BlockInfo() };
-		cornerBlocks[3] = { CoordinateInBlocks(-2, 0, -1), tMark34BlockID, BlockInfo() };
+		cornerBlocks[0] = { CoordinateInBlocks(2, 0, 3),   markerBlockID, BlockInfo() };
+		cornerBlocks[1] = { CoordinateInBlocks(-2, 0, 3),  markerBlockID, BlockInfo() };
+		cornerBlocks[2] = { CoordinateInBlocks(2, 0, -1),  markerBlockID, BlockInfo() };
+		cornerBlocks[3] = { CoordinateInBlocks(-2, 0, -1), markerBlockID, BlockInfo() };
 		break;
 	case 4:
-		cornerBlocks[0] = { CoordinateInBlocks(-2, 0, 3),  tMark41BlockID, BlockInfo() };
-		cornerBlocks[1] = { CoordinateInBlocks(2, 0, 3),   tMark42BlockID, BlockInfo() };
-		cornerBlocks[2] = { CoordinateInBlocks(-2, 0, -1), tMark43BlockID, BlockInfo() };
-		cornerBlocks[3] = { CoordinateInBlocks(2, 0, -1),  tMark44BlockID, BlockInfo() };
+		cornerBlocks[0] = { CoordinateInBlocks(-2, 0, 3),  markerBlockID, BlockInfo() };
+		cornerBlocks[1] = { CoordinateInBlocks(2, 0, 3),   markerBlockID, BlockInfo() };
+		cornerBlocks[2] = { CoordinateInBlocks(-2, 0, -1), markerBlockID, BlockInfo() };
+		cornerBlocks[3] = { CoordinateInBlocks(2, 0, -1),  markerBlockID, BlockInfo() };
 		break;
 	}
 }

@@ -21,10 +21,7 @@ std::wstring path;
 
 // All blocks with possible interactions
 const int quarryBlockID = 1473066952;
-const int mark1BlockID = 430459851;
-const int mark2BlockID = 430459852;
-const int mark3BlockID = 430459853;
-const int mark4BlockID = 430459854;
+const int markerBlockID = 430459851;
 const int outBlockID = 1473066954;
 const int downBlockID = 1473066955;
 const int upBlockID = 1473066956;
@@ -41,22 +38,6 @@ const int nextBlockID = 527579106;
 const int prevBlockID = 527579107;
 const int oresBlockID = 527579108;
 const int tunBlockID = 894654498;
-const int tMark11BlockID = 633982711;
-const int tMark12BlockID = 633982712;
-const int tMark13BlockID = 633982713;
-const int tMark14BlockID = 633982714;
-const int tMark21BlockID = 633982721;
-const int tMark22BlockID = 633982722;
-const int tMark23BlockID = 633982723;
-const int tMark24BlockID = 633982724;
-const int tMark31BlockID = 633982731;
-const int tMark32BlockID = 633982732;
-const int tMark33BlockID = 633982733;
-const int tMark34BlockID = 633982734;
-const int tMark41BlockID = 633982741;
-const int tMark42BlockID = 633982742;
-const int tMark43BlockID = 633982743;
-const int tMark44BlockID = 633982744;
 const int tArrowUpBlockID = 1205720236;
 const int tArrowDownBlockID = 1205720237;
 const int tArrowLeftBlockID = 1205720238;
@@ -70,10 +51,7 @@ const int tDepthOutBlockID = 867089597;
 
 UniqueID ThisModUniqueIDs[] = { quarryBlockID, outBlockID, downBlockID, upBlockID, inBlockID, setBlockID, exclBlockID, checkBlockID, 
 								crossBlockID, leftBlockID, rightBlockID, backBlockID, frontBlockID, nextBlockID, prevBlockID,
-								mark1BlockID, mark2BlockID, mark3BlockID, mark4BlockID, oresBlockID, tunBlockID, tMark11BlockID,
-								tMark12BlockID, tMark13BlockID, tMark14BlockID, tMark21BlockID, tMark22BlockID, tMark23BlockID,
-								tMark24BlockID, tMark31BlockID, tMark32BlockID, tMark33BlockID, tMark34BlockID, tMark41BlockID,
-								tMark42BlockID, tMark43BlockID, tMark44BlockID, tArrowUpBlockID, tArrowDownBlockID, 
+								markerBlockID, oresBlockID, tunBlockID, tArrowUpBlockID, tArrowDownBlockID, 
 								tArrowLeftBlockID, tArrowRightBlockID, tDepthInBlockID, tDepthOutBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
 float TickRate = 5;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
@@ -280,77 +258,9 @@ void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString
 			}
 		}
 		break;
-	case mark1BlockID:
+	case markerBlockID:
 		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
-				isLeftover = false;
-				break;
-			}
-		}
-		break;
-	case mark2BlockID:
-		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
-				isLeftover = false;
-				break;
-			}
-		}
-		break;
-	case mark3BlockID:
-		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
-				isLeftover = false;
-				break;
-			}
-		}
-		break;
-	case mark4BlockID:
-		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
-				isLeftover = false;
-				break;
-			}
-		}
-		break;
-	case tMark11BlockID:
-	case tMark21BlockID:
-	case tMark31BlockID:
-	case tMark41BlockID:
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[0].position)) {
-				isLeftover = false;
-				break;
-			}
-		}
-		break;
-	case tMark12BlockID:
-	case tMark22BlockID:
-	case tMark32BlockID:
-	case tMark42BlockID:
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[1].position)) {
-				isLeftover = false;
-				break;
-			}
-		}
-		break;
-	case tMark13BlockID:
-	case tMark23BlockID:
-	case tMark33BlockID:
-	case tMark43BlockID:
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[2].position)) {
-				isLeftover = false;
-				break;
-			}
-		}
-		break;
-	case tMark14BlockID:
-	case tMark24BlockID:
-	case tMark34BlockID:
-	case tMark44BlockID:
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->blockPosition == (At - it->cornerBlocks[3].position)) {
+			if (it->isCornerBlock(At)) {
 				isLeftover = false;
 				break;
 			}
@@ -561,10 +471,10 @@ void Event_Tick()
 	switch (tickNum) {
 	case 100: 
 		// Saves all Quarry blocks to a file for later loading.
-		writeBlocks<QuarryBlock>(std::ofstream{ path + L"\\QuarryBlocks.txt" }, quarryBlocks);
+		writeBlocks<QuarryBlock>(std::ofstream{ path + L"QuarryBlocks.txt" }, quarryBlocks);
 
 		// Saves all Tunnel blocks to a file for later loading.
-		writeBlocks<TunnelBlock>(std::ofstream{ path + L"\\TunnelBlocks.txt" }, tunnelBlocks);
+		writeBlocks<TunnelBlock>(std::ofstream{ path + L"TunnelBlocks.txt" }, tunnelBlocks);
 		tickNum = 0;
 		break;
 	default:
@@ -575,13 +485,12 @@ void Event_Tick()
 
 
 // Run once when the world is loaded
-void Event_OnLoad()
+void Event_OnLoad(bool CreatedNewWorld)
 {
 	path = GetThisModSaveFolderPath(L"DiggingMod");
-	CreateDirectoryW(path.c_str(), NULL);
 	
 	// Loads all Quarry blocks previously placed in the world into the quarryBlocks vector.
-	quarryBlocks = readBlocks<QuarryBlock>(std::ifstream{ path + L"\\QuarryBlocks.txt" });
+	quarryBlocks = readBlocks<QuarryBlock>(std::ifstream{ path + L"QuarryBlocks.txt" });
 
 	auto itQ = quarryBlocks.begin();
 	while (itQ != quarryBlocks.end()) {
@@ -595,7 +504,7 @@ void Event_OnLoad()
 	}
 
 	// Loads all Tunnel blocks previously placed in the world into the quarryBlocks vector.
-	tunnelBlocks = readBlocks<TunnelBlock>(std::ifstream{ path + L"\\TunnelBlocks.txt" });
+	tunnelBlocks = readBlocks<TunnelBlock>(std::ifstream{ path + L"TunnelBlocks.txt" });
 
 	auto itT = tunnelBlocks.begin();
 	while (itT != tunnelBlocks.end()) {
@@ -613,10 +522,10 @@ void Event_OnLoad()
 void Event_OnExit()
 {
 	// Saves all Quarry blocks to a file for later loading.
-	writeBlocks<QuarryBlock>(std::ofstream{ path + L"\\QuarryBlocks.txt"}, quarryBlocks);
+	writeBlocks<QuarryBlock>(std::ofstream{ path + L"QuarryBlocks.txt"}, quarryBlocks);
 
 	// Saves all Tunnel blocks to a file for later loading.
-	writeBlocks<TunnelBlock>(std::ofstream{ path + L"\\TunnelBlocks.txt" }, tunnelBlocks);
+	writeBlocks<TunnelBlock>(std::ofstream{ path + L"TunnelBlocks.txt" }, tunnelBlocks);
 }
 
 

@@ -9,10 +9,10 @@ QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition)
 	: DiggingBlock(blockPosition) {
 	this->digDirection = 6;
 
-	this->cornerBlocks[0] = { CoordinateInBlocks(2, -2, 0), mark1BlockID, BlockInfo() };
-	this->cornerBlocks[1] = { CoordinateInBlocks(2, 2, 0), mark2BlockID, BlockInfo() };
-	this->cornerBlocks[2] = { CoordinateInBlocks(-2, -2, 0), mark3BlockID, BlockInfo() };
-	this->cornerBlocks[3] = { CoordinateInBlocks(-2, 2, 0), mark4BlockID, BlockInfo() };
+	this->cornerBlocks[0] = { CoordinateInBlocks(2, -2, 0), markerBlockID, BlockInfo() };
+	this->cornerBlocks[1] = { CoordinateInBlocks(2, 2, 0), markerBlockID, BlockInfo() };
+	this->cornerBlocks[2] = { CoordinateInBlocks(-2, -2, 0), markerBlockID, BlockInfo() };
+	this->cornerBlocks[3] = { CoordinateInBlocks(-2, 2, 0), markerBlockID, BlockInfo() };
 
 	this->buttonBlocks[0] = { CoordinateInBlocks(0, 0, 3), setBlockID, BlockInfo() };
 	this->buttonBlocks[1] = { CoordinateInBlocks(0, 0, 0), upBlockID ,BlockInfo() };

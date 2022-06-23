@@ -24,19 +24,13 @@
     <ClCompile Include="Source\GameFunctions.cpp">
       <Filter>Source Files\InternalFiles</Filter>
     </ClCompile>
-    <ClCompile Include="Source\QuarryBlock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\DiggingBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\CornerBlock.cpp">
+    <ClCompile Include="Source\QuarryBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\TunnelBlock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Misc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,13 +50,10 @@
     <ClInclude Include="Source\GameAPI.cpp">
       <Filter>Source Files\InternalFiles</Filter>
     </ClInclude>
-    <ClInclude Include="Source\QuarryBlock.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\DiggingBlock.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Misc.h">
+    <ClInclude Include="Source\QuarryBlock.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\TunnelBlock.h">

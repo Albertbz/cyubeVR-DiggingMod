@@ -36,14 +36,10 @@ DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks 
 }
 
 void DiggingBlock::setCorners() {
-	cornerBlocks[0].infoPrev = GetBlock(blockPosition + cornerBlocks[0].position);
-	cornerBlocks[1].infoPrev = GetBlock(blockPosition + cornerBlocks[1].position);
-	cornerBlocks[2].infoPrev = GetBlock(blockPosition + cornerBlocks[2].position);
-	cornerBlocks[3].infoPrev = GetBlock(blockPosition + cornerBlocks[3].position);
-	SetBlock(blockPosition + cornerBlocks[0].position, cornerBlocks[0].infoBlock);
-	SetBlock(blockPosition + cornerBlocks[1].position, cornerBlocks[1].infoBlock);
-	SetBlock(blockPosition + cornerBlocks[2].position, cornerBlocks[2].infoBlock);
-	SetBlock(blockPosition + cornerBlocks[3].position, cornerBlocks[3].infoBlock);
+	cornerBlocks[0].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[0].position, cornerBlocks[0].infoBlock);
+	cornerBlocks[1].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[1].position, cornerBlocks[1].infoBlock);
+	cornerBlocks[2].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[2].position, cornerBlocks[2].infoBlock);
+	cornerBlocks[3].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[3].position, cornerBlocks[3].infoBlock);
 }
 
 void DiggingBlock::removeCorners() {
@@ -289,6 +285,12 @@ CoordinateInBlocks DiggingBlock::getPlayerDirection()
 	else if (playerLocation.Y < blockPositionCm.Y - 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
 		return CoordinateInBlocks(0, -1, 0);
 	}
+}
 
-
+bool DiggingBlock::isCornerBlock(CoordinateInBlocks blockPos)
+{
+	return blockPosition == blockPos - cornerBlocks[0].position || 
+		   blockPosition == blockPos - cornerBlocks[1].position ||
+		   blockPosition == blockPos - cornerBlocks[2].position ||
+		   blockPosition == blockPos - cornerBlocks[3].position;
 }

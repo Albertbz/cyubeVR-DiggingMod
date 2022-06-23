@@ -35,10 +35,7 @@ public:
 	int digDirection;
 	// Enum with all of the blocks used for methods.
 	enum {
-		mark1BlockID = 430459851,
-		mark2BlockID = 430459852,
-		mark3BlockID = 430459853,
-		mark4BlockID = 430459854,
+		markerBlockID = 430459851,
 		setBlockID = 1473066958,
 		upBlockID = 1473066956,
 		downBlockID = 1473066955,
@@ -54,22 +51,6 @@ public:
 		nextBlockID = 527579106,
 		prevBlockID = 527579107,
 		oresBlockID = 527579108,
-		tMark11BlockID = 633982711,
-		tMark12BlockID = 633982712,
-		tMark13BlockID = 633982713,
-		tMark14BlockID = 633982714,
-		tMark21BlockID = 633982721,
-		tMark22BlockID = 633982722,
-		tMark23BlockID = 633982723,
-		tMark24BlockID = 633982724,
-		tMark31BlockID = 633982731,
-		tMark32BlockID = 633982732,
-		tMark33BlockID = 633982733,
-		tMark34BlockID = 633982734,
-		tMark41BlockID = 633982741,
-		tMark42BlockID = 633982742,
-		tMark43BlockID = 633982743,
-		tMark44BlockID = 633982744,
 		tArrowUpBlockID = 1205720236,
 		tArrowDownBlockID = 1205720237,
 		tArrowLeftBlockID = 1205720238,
@@ -274,4 +255,13 @@ public:
 	*		  +x, then will give CoordinateInBlocks(1, 0, 0)).
 	*/
 	CoordinateInBlocks getPlayerDirection();
+
+	/**
+	* Computes whether the given block is a corner block of this Digging Block.
+	* 
+	* @param blockPos The position of the possible corner block.
+	* 
+	* @return Whether the given block is a corner block of this Digging Block.
+	*/
+	bool isCornerBlock(CoordinateInBlocks blockPos);
 };
