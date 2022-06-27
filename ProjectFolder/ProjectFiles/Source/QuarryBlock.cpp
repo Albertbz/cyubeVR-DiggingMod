@@ -14,35 +14,16 @@ QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition)
 	this->cornerBlocks[2] = { CoordinateInBlocks(-2, -2, 0), markerBlockID, BlockInfo() };
 	this->cornerBlocks[3] = { CoordinateInBlocks(-2, 2, 0), markerBlockID, BlockInfo() };
 
-	this->buttonBlocks[0] = { CoordinateInBlocks(0, 0, 3), setBlockID, BlockInfo() };
-	this->buttonBlocks[1] = { CoordinateInBlocks(0, 0, 0), upBlockID ,BlockInfo() };
-	this->buttonBlocks[2] = { CoordinateInBlocks(0, 0, 0), downBlockID, BlockInfo() };
-	this->buttonBlocks[3] = { CoordinateInBlocks(0, 0, 0), inBlockID, BlockInfo() };
-	this->buttonBlocks[4] = { CoordinateInBlocks(0, 0, 0), outBlockID, BlockInfo() };
-	this->buttonBlocks[5] = { CoordinateInBlocks(0, 0, 4), exclBlockID, BlockInfo() };
-	this->buttonBlocks[6] = { CoordinateInBlocks(0, 0, 4), checkBlockID, BlockInfo() };
-	this->buttonBlocks[7] = { CoordinateInBlocks(0, 0, 4), crossBlockID, BlockInfo() };
-	this->buttonBlocks[8] = { CoordinateInBlocks(0, -5, 0), leftBlockID, BlockInfo() };
-	this->buttonBlocks[9] = { CoordinateInBlocks(0, 5, 0), rightBlockID, BlockInfo() };
-	this->buttonBlocks[10] = { CoordinateInBlocks(5, 0, 0), backBlockID, BlockInfo() };
-	this->buttonBlocks[11] = { CoordinateInBlocks(-5, 0, 0), frontBlockID, BlockInfo() };
-	this->buttonBlocks[12] = { CoordinateInBlocks(0, 0, 0), nextBlockID, BlockInfo() };
-	this->buttonBlocks[13] = { CoordinateInBlocks(0, 0, 0), prevBlockID, BlockInfo() };
-	this->buttonBlocks[14] = { CoordinateInBlocks(0, 4, 0), leftBlockID, BlockInfo() };
-	this->buttonBlocks[15] = { CoordinateInBlocks(0, -4, 0), rightBlockID, BlockInfo() };
-	this->buttonBlocks[16] = { CoordinateInBlocks(-4, 0, 0), backBlockID, BlockInfo() };
-	this->buttonBlocks[17] = { CoordinateInBlocks(4, 0, 0), frontBlockID, BlockInfo() };
-	this->buttonBlocks[18] = { CoordinateInBlocks(0, 0, 0), oresBlockID, BlockInfo() };
+	this->textPlacement = CoordinateInCentimeters(0, 0, 40);
 
 	resetDigBlock();
-	showNormal(true);
+	toggleSettings();
 }
 
 QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-						 std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres,
-						 int digDirection)
-	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, buttonBlocks, settingsPage, digOres, digDirection) {
-	
+						 std::array<Block, 4> cornerBlocks, bool digOres, int digDirection)
+	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, digOres, digDirection) {
+	this->textPlacement = CoordinateInCentimeters(0, 0, 40);
 }
 
 void QuarryBlock::dig() {
@@ -82,11 +63,11 @@ void QuarryBlock::incrementLength(char block) {
 	if (currentMode == 2) {
 		removeCorners();
 		length++;
-		if (block == 'b') {
+		if (block == 'u') {
 			cornerBlocks[0].position.X++;
 			cornerBlocks[1].position.X++;
 		}
-		else if (block == 'f') {
+		else if (block == 'd') {
 			cornerBlocks[2].position.X--;
 			cornerBlocks[3].position.X--;
 		}
@@ -99,14 +80,14 @@ void QuarryBlock::incrementLength(char block) {
 }
 
 void QuarryBlock::decrementLength(char block) {
-	if (currentMode == 2 && length > 5) {
+	if (currentMode == 2 && length > 3) {
 		removeCorners();
 		length--;
-		if (block == 'f' && cornerBlocks[0].position.X > 2) {
+		if (block == 'u' && cornerBlocks[0].position.X > 1) {
 			cornerBlocks[0].position.X--;
 			cornerBlocks[1].position.X--;
 		}
-		else if (block == 'b' && cornerBlocks[2].position.X < -2) {
+		else if (block == 'd' && cornerBlocks[2].position.X < -1) {
 			cornerBlocks[2].position.X++;
 			cornerBlocks[3].position.X++;
 		}
@@ -139,14 +120,14 @@ void QuarryBlock::incrementWidth(char block) {
 }
 
 void QuarryBlock::decrementWidth(char block) {
-	if (currentMode == 2 && width > 5) {
+	if (currentMode == 2 && width > 3) {
 		removeCorners();
 		width--;
-		if (block == 'l' && cornerBlocks[1].position.Y > 2) {
+		if (block == 'r' && cornerBlocks[1].position.Y > 1) {
 			cornerBlocks[1].position.Y--;
 			cornerBlocks[3].position.Y--;
 		}
-		else if (block == 'r' && cornerBlocks[0].position.Y < -2) {
+		else if (block == 'l' && cornerBlocks[0].position.Y < -1) {
 			cornerBlocks[0].position.Y++;
 			cornerBlocks[2].position.Y++;
 		}
@@ -158,163 +139,50 @@ void QuarryBlock::decrementWidth(char block) {
 	}
 }
 
-void QuarryBlock::showSettings(bool show) {
-	if (show) {
-		setCorners();
-		updateSettingsBlockLocations();
-		setSettingsBlocks();
-	}
-	else {
-		removeCorners();
-		removeSettingsBlocks();
-	}
-}
-
-void QuarryBlock::showNormal(bool show) {
-	if (show) {
-		setCorners();
-		setButtonBlock(0); // Set Settings block
-		setButtonBlock(6); // Set Check Mark block
-	}
-	else {
-		removeCorners();
-		removeButtonBlock(0);
-		removeButtonBlock(6);
-	}
-}
-
-void QuarryBlock::showFinished(bool show) {
-	if (show) {
-		setButtonBlock(5); // Set Exclamation Mark block
-	}
-	else {
-		removeButtonBlock(5);
-	}
-}
-
-void QuarryBlock::showDigging(bool show) {
-	if (show) {
-		setButtonBlock(7); // Set Cross Mark block
-	}
-	else {
-		removeButtonBlock(7);
-	}
-}
-
 void QuarryBlock::resetDigBlock() {
 	currentDigBlock.X = cornerBlocks[0].position.X;
 	currentDigBlock.Y = cornerBlocks[1].position.Y;
 	currentDigBlock.Z = -1;
 }
 
-void QuarryBlock::updateSettingsBlockLocations() {
-	CoordinateInCentimeters playerLocation = GetPlayerLocation();
-	CoordinateInCentimeters blockPositionCm = CoordinateInCentimeters(blockPosition);
-	int64_t xDifference = std::abs(playerLocation.X - blockPositionCm.X); 
-	int64_t yDifference = std::abs(playerLocation.Y - blockPositionCm.Y);
-
-	if (playerLocation.X > blockPositionCm.X + 25 && playerLocation.Y < blockPositionCm.Y + xDifference && playerLocation.Y > blockPositionCm.Y - xDifference) {
-		buttonBlocks[1].position = CoordinateInBlocks(0, 1, 0);
-		buttonBlocks[2].position = CoordinateInBlocks(0, -1, 0);
-		buttonBlocks[3].position = CoordinateInBlocks(0, 1, 0);
-		buttonBlocks[4].position = CoordinateInBlocks(0, -1, 0);
-		buttonBlocks[12].position = buttonBlocks[0].position + CoordinateInBlocks(0, -1, 0);
-		buttonBlocks[13].position = buttonBlocks[0].position + CoordinateInBlocks(0, 1, 0);
-		buttonBlocks[18].position = CoordinateInBlocks(0, 1, 0);
+void QuarryBlock::clickCheck(CoordinateInCentimeters fingerLocation, bool& canClick, CoordinateInCentimeters positionCm, bool leftHand)
+{
+	if (canClick) {
+		if (fingerLocation.Z < positionCm.Z + 25) {
+			clickRegister(fingerLocation, leftHand);
+			canClick = false;
+		}
 	}
-	else if (playerLocation.X < blockPositionCm.X - 25 && playerLocation.Y < blockPositionCm.Y + xDifference && playerLocation.Y > blockPositionCm.Y - xDifference) {
-		buttonBlocks[1].position = CoordinateInBlocks(0, -1, 0);
-		buttonBlocks[2].position = CoordinateInBlocks(0, 1, 0);
-		buttonBlocks[3].position = CoordinateInBlocks(0, -1, 0);
-		buttonBlocks[4].position = CoordinateInBlocks(0, 1, 0);
-		buttonBlocks[12].position = buttonBlocks[0].position + CoordinateInBlocks(0, 1, 0);
-		buttonBlocks[13].position = buttonBlocks[0].position + CoordinateInBlocks(0, -1, 0);
-		buttonBlocks[18].position = CoordinateInBlocks(0, -1, 0);
-	}
-	else if (playerLocation.Y > blockPositionCm.Y + 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
-		buttonBlocks[1].position = CoordinateInBlocks(-1, 0, 0);
-		buttonBlocks[2].position = CoordinateInBlocks(1, 0, 0);
-		buttonBlocks[3].position = CoordinateInBlocks(-1, 0, 0);
-		buttonBlocks[4].position = CoordinateInBlocks(1, 0, 0);
-		buttonBlocks[12].position = buttonBlocks[0].position + CoordinateInBlocks(1, 0, 0);
-		buttonBlocks[13].position = buttonBlocks[0].position + CoordinateInBlocks(-1, 0, 0);
-		buttonBlocks[18].position = CoordinateInBlocks(-1, 0, 0);
-	}
-	else if (playerLocation.Y < blockPositionCm.Y - 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
-		buttonBlocks[1].position = CoordinateInBlocks(1, 0, 0);
-		buttonBlocks[2].position = CoordinateInBlocks(-1, 0, 0);
-		buttonBlocks[3].position = CoordinateInBlocks(1, 0, 0);
-		buttonBlocks[4].position = CoordinateInBlocks(-1, 0, 0);
-		buttonBlocks[12].position = buttonBlocks[0].position + CoordinateInBlocks(-1, 0, 0);
-		buttonBlocks[13].position = buttonBlocks[0].position + CoordinateInBlocks(1, 0, 0);
-		buttonBlocks[18].position = CoordinateInBlocks(1, 0, 0);
+	else {
+		if (fingerLocation.Z >= positionCm.Z + 25) {
+			canClick = true;
+		}
 	}
 }
 
-void QuarryBlock::setSettingsBlocks() {
-	setButtonBlock(0); // Set Settings block
-
-	if (settingsPage != 1) {
-		setButtonBlock(13); // Set Previous block
-	}
-	if (settingsPage != 4) {
-		setButtonBlock(12); // Set Next block
-	}
-
-
-	if (settingsPage == 1) {
-		setButtonBlock(1); // Set Up block
-		setButtonBlock(2); // Set Down block
-	}
-	else if (settingsPage == 2) {
-		setButtonBlock(3); // Set In block
-		setButtonBlock(4); // Set Out block
-	}
-	else if (settingsPage == 3) {
-		setButtonBlock(8); // Set Left block (increment)
-		setButtonBlock(9); // Set Right block (increment)
-		setButtonBlock(10); // Set Back block (increment)
-		setButtonBlock(11); // Set Front block (increment)
-		setButtonBlock(14); // Set Left block (decrement)
-		setButtonBlock(15); // Set Right block (decrement)
-		setButtonBlock(16); // Set Back block (decrement)
-		setButtonBlock(17); // Set Front block (decrement)
-	}
-	else if (settingsPage == 4) {
-		setButtonBlock(18); // Set Ores block
-	}
+CoordinateInCentimeters QuarryBlock::getCorner()
+{
+	return blockPosition + CoordinateInCentimeters(-25, -25, 25);
 }
 
-void QuarryBlock::removeSettingsBlocks() {
-	removeButtonBlock(0);
+bool QuarryBlock::isBetween(std::pair<int, int> bottomLeft, std::pair<int, int> topRight, CoordinateInCentimeters fingerPos)
+{
+	CoordinateInCentimeters corner = getCorner();
 
-	if (settingsPage != 1) {
-		removeButtonBlock(13);
-	}
-	if (settingsPage != 4) {
-		removeButtonBlock(12);
-	}
+	return fingerPos.X >= corner.X + bottomLeft.first - 1 && fingerPos.X <= corner.X + topRight.first - 1 && fingerPos.Y >= corner.Y + bottomLeft.second && fingerPos.Y <= corner.Y + topRight.second;
+}
 
+void QuarryBlock::setOffBlock()
+{
+	SetBlock(blockPosition, quarryOffBlockID);
+}
 
-	if (settingsPage == 1) {
-		removeButtonBlock(1);
-		removeButtonBlock(2);
-	}
-	else if (settingsPage == 2) {
-		removeButtonBlock(3);
-		removeButtonBlock(4);
-	}
-	else if (settingsPage == 3) {
-		removeButtonBlock(8);
-		removeButtonBlock(9);
-		removeButtonBlock(10);
-		removeButtonBlock(11);
-		removeButtonBlock(14);
-		removeButtonBlock(15);
-		removeButtonBlock(16);
-		removeButtonBlock(17);
-	}
-	else if (settingsPage == 4) {
-		removeButtonBlock(18);
-	}
+void QuarryBlock::setOnBlock()
+{
+	SetBlock(blockPosition, quarryOnBlockID);
+}
+
+void QuarryBlock::setSettingsBlock()
+{
+	SetBlock(blockPosition, quarrySetBlockID);
 }

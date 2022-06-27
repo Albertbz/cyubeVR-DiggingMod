@@ -1,8 +1,6 @@
 #pragma once
 #include "GameAPI.h"
 
-const int buttonBlocksAmount = 19;
-
 struct Block {
 	CoordinateInBlocks position = CoordinateInBlocks(0, 0, 0);	// The position of the block (possibly in relation to another block).
 	BlockInfo infoBlock = BlockInfo();							// The BlockInfo for the block.
@@ -23,16 +21,7 @@ void writeBlocks(std::ostream& file, const std::vector<T>& blocks) {
 				file << 'N' << ';' << (int)i.infoPrev.Type << ';';
 			}
 		}
-		for (const auto& i : b.buttonBlocks) {
-			file << i.position.X << ';' << i.position.Y << ';' << i.position.Z << ';' << i.infoBlock.CustomBlockID << ';';
-			if (i.infoPrev.Type == EBlockType::ModBlock) {
-				file << 'C' << ';' << (int)i.infoPrev.CustomBlockID << ';';
-			}
-			else {
-				file << 'N' << ';' << (int)i.infoPrev.Type << ';';
-			}
-		}
-		file << b.settingsPage << ';' << b.digOres << ';' << b.digDirection << ';';
+		file << b.digOres << ';' << b.digDirection << ';';
 		file << '\n';
 	}
 }
@@ -96,37 +85,13 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 			}
 		}
 
-		std::array<Block, buttonBlocksAmount> buttonBlocks;
-		for (auto &i : buttonBlocks) {
-			pos = line.find_first_of(';', pos + 1);
-			i.position.X = std::stoi(std::string{ line, pos + 1 });
-			pos = line.find_first_of(';', pos + 1);
-			i.position.Y = std::stoi(std::string{ line, pos + 1 });
-			pos = line.find_first_of(';', pos + 1);
-			i.position.Z = std::stoi(std::string{ line, pos + 1 });
-			pos = line.find_first_of(';', pos + 1);
-			i.infoBlock = std::stoi(std::string{ line, pos + 1 });
-			pos = line.find_first_of(';', pos + 1);
-			if (std::string{ line, pos + 1 } == "C") {
-				pos = line.find_first_of(';', pos + 1);
-				i.infoPrev = std::stoi(std::string{ line, pos + 1 });
-			}
-			else {
-				pos = line.find_first_of(';', pos + 1);
-				i.infoPrev = (EBlockType)std::stoi(std::string{ line, pos + 1 });
-			}
-		}
-
-		pos = line.find_first_of(';', pos + 1);
-		int settingsPage = std::stoi(std::string{ line, pos + 1 });
-
 		pos = line.find_first_of(';', pos + 1);
 		bool digOres = std::stoi(std::string{ line, pos + 1 });
 
 		pos = line.find_first_of(';', pos + 1);
 		int digDirection = std::stoi(std::string{ line, pos + 1 });
 
-		blocks.push_back(T(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, buttonBlocks, settingsPage, digOres, digDirection));
+		blocks.push_back(T(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, digOres, digDirection));
 	}
 
 	return blocks;

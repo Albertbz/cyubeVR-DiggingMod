@@ -13,15 +13,16 @@ DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition) {
 	this->currentMode = 1;
 	this->currentDigBlock = CoordinateInBlocks(0, 0, 0);
 	this->cornerBlocks = {};
-	this->buttonBlocks = {};
-	this->settingsPage = 1;
 	this->digOres = false;
-	this->digDirection = 1;
+	this->digDirection = 0;
+	this->justReplaced = false;
+	this->canClickLeft = true;
+	this->canClickRight = true;
+	this->textPlacement = {};
 }
 
 DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-						   std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres,
-						   int digDirection) {
+						   std::array<Block, 4> cornerBlocks, bool digOres, int digDirection) {
 	this->length = length;
 	this->width = width;
 	this->depth = depth;
@@ -29,10 +30,13 @@ DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks 
 	this->currentMode = currentMode;
 	this->currentDigBlock = currentDigBlock;
 	this->cornerBlocks = cornerBlocks;
-	this->buttonBlocks = buttonBlocks;
-	this->settingsPage = settingsPage;
 	this->digOres = digOres;
 	this->digDirection = digDirection;
+	
+	this->justReplaced = false;
+	this->canClickLeft = true;
+	this->canClickRight = true;
+	this->textPlacement = {};
 }
 
 void DiggingBlock::setCorners() {
@@ -51,8 +55,8 @@ void DiggingBlock::removeCorners() {
 
 void DiggingBlock::incrementSize() {
 	if (currentMode == 2) {
-		incrementLength('b');
-		incrementLength('f');
+		incrementLength('u');
+		incrementLength('d');
 		incrementWidth('l');
 		incrementWidth('r');
 	}
@@ -60,8 +64,8 @@ void DiggingBlock::incrementSize() {
 
 void DiggingBlock::decrementSize() {
 	if (currentMode == 2) {
-		decrementLength('b');
-		decrementLength('f');
+		decrementLength('u');
+		decrementLength('d');
 		decrementWidth('l');
 		decrementWidth('r');
 	}
@@ -82,12 +86,12 @@ void DiggingBlock::decrementDepth() {
 void DiggingBlock::printDepth() {
 	std::wstring message = L"Depth: ";
 	message.append(std::to_wstring(depth));
-	SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), message, 0.5f, 1);
+	SpawnHintText(blockPosition + textPlacement, message, 0.5f, 1);
 }
 
 void DiggingBlock::printSize() {
 	std::wstring message = L"Size (LxWxD)\n---------------\n" + getSize();
-	SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), message, 1, 1);
+	SpawnHintText(blockPosition + textPlacement, message, 1, 1);
 }
 
 std::wstring DiggingBlock::getSize() {
@@ -96,55 +100,43 @@ std::wstring DiggingBlock::getSize() {
 
 void DiggingBlock::toggleDigging() {
 	if (currentMode == 1) {
-		showNormal(false);
-		showDigging(true);
+		justReplaced = true;
+		setOnBlock();
 		currentMode = 3;
 	}
 	else if (currentMode == 3) {
-		showDigging(false);
-		showNormal(true);
+		justReplaced = true;
+		setOffBlock();
 		currentMode = 1;
 	}
 }
 
 void DiggingBlock::toggleSettings() {
 	if (currentMode == 1) {
-		showNormal(false);
-		showSettings(true);
+		justReplaced = true;
+		setSettingsBlock();
+		setCorners();
 		currentMode = 2;
-		printSettingsPage();
 	}
 	else if (currentMode == 2) {
-		showSettings(false);
-		SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), L"Settings saved!\nIt will take\n" + timeToDig() + L"\nto dig out the " + getSize() + L" hole.", 5, 1, 2);
-		showNormal(true);
+		removeCorners();
+		justReplaced = true;
+		setOffBlock();
+		SpawnHintText(blockPosition + textPlacement, L"Settings saved!\nIt will take\n" + timeToDig() + L"\nto dig out the " + getSize() + L" hole.", 5, 1, 2);
 		currentMode = 1;
 	}
 }
 
 void DiggingBlock::finishedDigging() {
 	if (currentMode == 3) {
-		showDigging(false);
-		showFinished(true);
 		currentMode = 4;
 	}
 }
 
 void DiggingBlock::destroy() {
-	switch (currentMode) {
-	case 1:
-		showNormal(false);
-		break;
-	case 2:
-		showSettings(false);
-		break;
-	case 3:
-		showDigging(false);
-		break;
-	case 4:
-		showFinished(false);
-		break;
-	};
+	if (currentMode == 2) {
+		removeCorners();
+	}
 	currentMode = 0;
 }
 
@@ -205,33 +197,6 @@ bool DiggingBlock::diggableBlock(BlockInfo block) {
 	return diggable;
 }
 
-void DiggingBlock::nextSettingsPage() {
-	if (settingsPage < 4) {
-		removeSettingsBlocks();
-		settingsPage++;
-		printSettingsPage();
-		setSettingsBlocks();
-	}
-}
-
-void DiggingBlock::prevSettingsPage() {
-	if (settingsPage > 1) {
-		removeSettingsBlocks();
-		settingsPage--;
-		printSettingsPage();
-		setSettingsBlocks();
-	}
-}
-
-void DiggingBlock::setButtonBlock(int i) {
-	buttonBlocks[i].infoPrev = GetBlock(blockPosition + buttonBlocks[i].position);
-	SetBlock(blockPosition + buttonBlocks[i].position, buttonBlocks[i].infoBlock);
-}
-
-void DiggingBlock::removeButtonBlock(int i) {
-	SetBlock(blockPosition + buttonBlocks[i].position, buttonBlocks[i].infoPrev);
-}
-
 void DiggingBlock::toggleDigOres() {
 	if (digOres) {
 		digOres = false;
@@ -249,22 +214,7 @@ void DiggingBlock::printDigOres() {
 	else {
 		message.append(L"not dig ores!");
 	}
-	SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), message, 1, 1);
-}
-
-void DiggingBlock::printSettingsPage() {
-	if (settingsPage == 1) {
-		SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), L"Change depth", 2);
-	}
-	else if (settingsPage == 2) {
-		SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), L"Change size (simple)", 2);
-	}
-	else if (settingsPage == 3) {
-		SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), L"Change size (advanced)", 2);
-	}
-	else if (settingsPage == 4) {
-		SpawnHintText(blockPosition + buttonBlocks[0].position - CoordinateInCentimeters(0, 0, 70), L"Toggle digging of\nores", 2);
-	}
+	SpawnHintText(blockPosition + textPlacement, message, 1, 1);
 }
 
 CoordinateInBlocks DiggingBlock::getPlayerDirection()
@@ -293,4 +243,113 @@ bool DiggingBlock::isCornerBlock(CoordinateInBlocks blockPos)
 		   blockPosition == blockPos - cornerBlocks[1].position ||
 		   blockPosition == blockPos - cornerBlocks[2].position ||
 		   blockPosition == blockPos - cornerBlocks[3].position;
+}
+
+void DiggingBlock::runCheck()
+{
+	CoordinateInCentimeters fingerTipLocationLeft = GetIndexFingerTipLocation(true);
+	CoordinateInCentimeters fingerTipLocationRight = GetIndexFingerTipLocation(false);
+	CoordinateInCentimeters positionCm = CoordinateInCentimeters(blockPosition);
+
+	clickCheck(fingerTipLocationLeft, canClickLeft, positionCm, true);
+	clickCheck(fingerTipLocationRight, canClickRight, positionCm, false);
+}
+
+void DiggingBlock::clickRegister(CoordinateInCentimeters fingerLocation, bool leftHand)
+{
+	switch (currentMode) {
+	case 1:
+		if (isBetween(std::pair(20, 20), std::pair(31, 31), fingerLocation)) {
+			toggleDigging();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(8, 21), std::pair(17, 30), fingerLocation) || 
+				 isBetween(std::pair(21, 8), std::pair(30, 17), fingerLocation) ||
+				 isBetween(std::pair(21, 34), std::pair(30, 43), fingerLocation) ||
+				 isBetween(std::pair(34, 21), std::pair(43, 30), fingerLocation)) {
+			
+			toggleSettings();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		break;
+	case 2:
+		if (isBetween(std::pair(20, 20), std::pair(31, 31), fingerLocation)) {
+			toggleSettings();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(35, 7), std::pair(42, 14), fingerLocation)) {
+			incrementSize();
+			printSize();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(35, 16), std::pair(42, 23), fingerLocation)) {
+			decrementSize();
+			printSize();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(35, 28), std::pair(42, 35), fingerLocation)) {
+			incrementDepth();
+			printDepth();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(35, 37), std::pair(42, 43), fingerLocation)) {
+			decrementDepth();
+			printDepth();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(9, 37), std::pair(16, 43), fingerLocation)) {
+			toggleDigOres();
+			printDigOres();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(13, 7), std::pair(15, 12), fingerLocation)) {
+			incrementWidth('l');
+			printSize();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(16, 7), std::pair(18, 12), fingerLocation)) {
+			decrementWidth('l');
+			printSize();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(16, 19), std::pair(18, 24), fingerLocation)) {
+			incrementWidth('r');
+			printSize();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(13, 19), std::pair(15, 24), fingerLocation)) {
+			decrementWidth('r');
+			printSize();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(19, 13), std::pair(24, 15), fingerLocation)) {
+			incrementLength('u');
+			printSize();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(19, 16), std::pair(24, 18), fingerLocation)) {
+			decrementLength('u');
+			printSize();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(7, 16), std::pair(12, 18), fingerLocation)) {
+			incrementLength('d');
+			printSize();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(7, 13), std::pair(12, 15), fingerLocation)) {
+			decrementLength('d');
+			printSize();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		break;
+	case 3:
+		if (isBetween(std::pair(20, 20), std::pair(31, 31), fingerLocation)) {
+			toggleDigging();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		break;
+	default:
+		break;
+	}
 }

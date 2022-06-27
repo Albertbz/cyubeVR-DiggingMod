@@ -13,50 +13,37 @@ public:
 	int depth;
 	// The position of the block.
 	CoordinateInBlocks blockPosition;
-	// The current mode the Quarry block is in. 
+	// The current mode the Digging block is in. 
 	// 0 = destroyed, 1 = normal, 2 = settings, 3 = digging, 4 = finished digging.
 	int currentMode;
 	// The current block that is being dug out, relative to blockPosition.
 	CoordinateInBlocks currentDigBlock;
 	// An array of all of the Corner blocks.
 	std::array<Block, 4> cornerBlocks;
-	// An array of all of the Button blocks. 
-	// 0=set, 1=-depth, 2=+depth, 3=-size, 4=+size, 5=excl, 6=check, 
-	// 7=cross, 8=+W1, 9=+W2, 10=+L1, 11=+L2, 12=next, 13=prev, 
-	// 14=-W2, 15=-W1, 16=-L2, 17=-L1, 18=ores.
-	std::array<Block, buttonBlocksAmount> buttonBlocks;
-	// The current page of the settings. 
-	// 1=depth, 2=simple size, 3=advanced size, 4=dig ores.
-	int settingsPage;
 	// Keeps track of whether to dig ores as well.
 	bool digOres;
 	// Keeps track of what direction to dig in. 
-	// 1=+x, 2=-x, 3=+y, 4=-y, 5=+z, 6=-z.
+	// 0=N/A, 1=+x, 2=-x, 3=+y, 4=-y, 5=+z, 6=-z.
 	int digDirection;
+	// A boolean to keep track of whether the digging block was just replaced.
+	bool justReplaced;
+	// A bool to keep track of whether the player can click the interface with the left hand.
+	bool canClickLeft;
+	// A bool to keep track of whether the player can click the interface with the right hand.
+	bool canClickRight;
+	// The placement of the text that appears - relative to blockPosition.
+	CoordinateInCentimeters textPlacement;
+
 	// Enum with all of the blocks used for methods.
 	enum {
-		markerBlockID = 430459851,
-		setBlockID = 1473066958,
-		upBlockID = 1473066956,
-		downBlockID = 1473066955,
-		inBlockID = 1473066957,
-		outBlockID = 1473066954,
-		checkBlockID = 1473066960,
-		exclBlockID = 1473066959,
-		crossBlockID = 1473066961,
-		leftBlockID = 577305854,
-		rightBlockID = 577305855,
-		backBlockID = 577305856,
-		frontBlockID = 577305857,
-		nextBlockID = 527579106,
-		prevBlockID = 527579107,
-		oresBlockID = 527579108,
-		tArrowUpBlockID = 1205720236,
-		tArrowDownBlockID = 1205720237,
-		tArrowLeftBlockID = 1205720238,
-		tArrowRightBlockID = 1205720239,
-		tDepthInBlockID = 867089596,
-		tDepthOutBlockID = 867089597
+		quarryBlockID = 1473066952,
+		quarryOffBlockID = 380980661,
+		quarryOnBlockID = 380980662,
+		quarrySetBlockID = 380980663,
+		tunOffBlockID = 1244240001,
+		tunOnBlockID = 1244240002,
+		tunSetBlockID = 1244240003,
+		markerBlockID = 430459851
 	};
 public:
 	/**
@@ -71,19 +58,18 @@ public:
 	* Constructor for when loading in the file containing 
 	* all currently placed blocks.
 	* 
-	* @param size The size of the area to be dug out.
+	* @param length The length of the area to be dug out.
+	* @param width The width of the area to be dug out.
 	* @param depth How deep the hole will be.
 	* @param blockPosition The position of the block.
 	* @param currentMode The current mode of the block.
 	* @param currentDigBlock The coordinates for the block currently being dug out.
 	* @param cornerBlocks The corner blocks.
-	* @param buttonBlocks The button blocks.
-	* @param settingsPage The current settings page.
 	* @param digOres Whether to dig ores.
+	* @param digDirection The direction the block is digging.
 	*/
 	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-			     std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres,
-				 int digDirection);
+			     std::array<Block, 4> cornerBlocks, bool digOres, int digDirection);
 
 	// Adds the corners of the area that is to be dug out.
 	void setCorners();
@@ -94,30 +80,30 @@ public:
 	/**
 	* Increments the length of the area that is to be dug out.
 	* 
-	* @param block The block that is hit - b/f.
+	* @param direction The direction that the button is - u/d.
 	*/
-	virtual void incrementLength(char block) = 0;
+	virtual void incrementLength(char direction) = 0;
 
 	/**
 	* Decrements the length of the area that is to be dug out.
 	*
-	* @param block The block that is hit - b/f.
+	* @param direction The direction that the button is - u/d.
 	*/
-	virtual void decrementLength(char block) = 0;
+	virtual void decrementLength(char direction) = 0;
 
 	/**
 	* Increments the width of the area that is to be dug out.
 	*
-	* @param block The block that is hit - l/r.
+	* @param direction The direction that the button is - l/r.
 	*/
-	virtual void incrementWidth(char block) = 0;
+	virtual void incrementWidth(char direction) = 0;
 
 	/**
 	* Decrements the width of the area that is to be dug out.
 	*
-	* @param block The block that is hit - l/r.
+	* @param direction The direction that the button is - l/r.
 	*/
-	virtual void decrementWidth(char block) = 0;
+	virtual void decrementWidth(char direction) = 0;
 
 	// Increments the size of the area that is to be dug out.
 	void incrementSize();
@@ -125,7 +111,7 @@ public:
 	// Decrement the size of the area that is to be dug out.
 	void decrementSize();
 
-	//Increments the depth of the hole to be dug out.
+	// Increments the depth of the hole to be dug out.
 	void incrementDepth();
 
 	// Decrements the depth of the hole to be dug out.
@@ -156,33 +142,14 @@ public:
 	// Goes to the finished mode.
 	void finishedDigging();
 
-	/**
-	* Sets or removes all of the blocks needed for the settings mode.
-	*
-	* @param show Whether to show the blocks.
-	*/
-	virtual void showSettings(bool show) = 0;
+	// Sets the specific Off block.
+	virtual void setOffBlock() = 0;
 
-	/**
-	* Sets or removes all of the blocks needed for the normal mode.
-	*
-	* @param show Whether to show the blocks.
-	*/
-	virtual void showNormal(bool show) = 0;
+	// Sets the specific On block.
+	virtual void setOnBlock() = 0;
 
-	/**
-	* Sets or removes all of the blocks needed for the finished mode.
-	*
-	* @param show Whether to show the blocks.
-	*/
-	virtual void showFinished(bool show) = 0;
-
-	/**
-	* Sets or removes all of the blocks needed for the digging mode.
-	*
-	* @param show Whether to show the blocks.
-	*/
-	virtual void showDigging(bool show) = 0;
+	// Sets the specific Settings block.
+	virtual void setSettingsBlock() = 0;
 
 	// Removes and stops everything.
 	void destroy();
@@ -219,35 +186,6 @@ public:
 	// Prints what digOres is set to.
 	void printDigOres();
 
-	// Turns to the next page in the settings mode.
-	void nextSettingsPage();
-
-	// Turns to the previous page in the settings mode.
-	void prevSettingsPage();
-
-	// Sets the blocks corresponding to the current settings page.
-	virtual void setSettingsBlocks() = 0;
-
-	// Removes the blocks corresponding to the current settings page.
-	virtual void removeSettingsBlocks() = 0;
-
-	/**
-	* Updates infoPrev and sets the button block specified.
-	* 
-	* @param i The index of the button block to place.
-	*/
-	void setButtonBlock(int i);
-
-	/**
-	* Removes the button block specified.
-	*
-	* @param i The index of the button block to place.
-	*/
-	void removeButtonBlock(int i);
-
-	// Prints a message saying what settings you are changing.
-	void printSettingsPage();
-
 	/**
 	* Computes what direction the player is compared to the block.
 	* 
@@ -264,4 +202,44 @@ public:
 	* @return Whether the given block is a corner block of this Digging Block.
 	*/
 	bool isCornerBlock(CoordinateInBlocks blockPos);
+
+	// Checks for any action by the player.
+	void runCheck();
+
+	/**
+	* Checks if anything on the interface is being clicked and acts on it
+	* if need be.
+	*
+	* @param fingerLocation The location of the given finger.
+	* @param canClick The canClick field that corresponds to given finger.
+	* @param positionCm The position of the main block in centimeters.
+	*/
+	virtual void clickCheck(CoordinateInCentimeters fingerLocation, bool& canClick, CoordinateInCentimeters positionCm, bool leftHand) = 0;
+
+	/**
+	* Acts on a click, i.e., checks what is being clicked and does what
+	* is supposed to happen in accordance with chosen functionality.
+	*
+	* @param fingerLocation The location of the given finger.
+	*/
+	void clickRegister(CoordinateInCentimeters fingerLocation, bool leftHand);
+
+	/**
+	* Gets the corner of the interface to be used for isBetween.
+	* 
+	* @return The corner of the interface.
+	*/
+	virtual CoordinateInCentimeters getCorner() = 0;
+
+	/**
+	* Computes whether the finger is between the two points given.
+	* 
+	* @param bottomLeft The coordinates for the top left corner in centimeters.
+	* @param topRight The coordinates for the bottom right corner in centimeters.
+	* @param fingerPos The position of the finger.
+	* 
+	* @return Whether the given finger is between the two given corners.
+	* 
+	*/
+	virtual bool isBetween(std::pair<int, int> bottomLeft, std::pair<int, int> topRight, CoordinateInCentimeters fingerPos) = 0;
 };

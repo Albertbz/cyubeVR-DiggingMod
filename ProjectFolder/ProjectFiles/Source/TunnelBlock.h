@@ -16,19 +16,18 @@ public:
 	* the file containing all currently placed Tunnel
 	* blocks.
 	*
-	* @param size The size of the area to be dug out.
+	* @param length The length of the area to be dug out.
+	* @param width The width of the area to be dug out.
 	* @param depth How deep the hole will be.
 	* @param blockPosition The position of the Tunnel block.
 	* @param currentMode The current mode of the Tunnel block.
 	* @param currentDigBlock The coordinates for the block currently being dug out.
 	* @param cornerBlocks The corner blocks.
-	* @param buttonBlocks The button blocks.
-	* @param settingsPage The current settings page.
 	* @param digOres Whether to dig ores.
+	* @param digDirection The direction the block is digging.
 	*/
 	TunnelBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock,
-		std::array<Block, 4> cornerBlocks, std::array<Block, buttonBlocksAmount> buttonBlocks, int settingsPage, bool digOres, 
-		int digDirection);
+		std::array<Block, 4> cornerBlocks, bool digOres, int digDirection);
 
 	// Updates the corner blocks to match with digDirection.
 	void updateCornerBlocks();
@@ -39,65 +38,69 @@ public:
 	/**
 	* Increments the length of the area that is to be dug out.
 	*
-	* @param block The block that is hit - b/f.
+	* @param direction The direction that the button is - u/d.
 	*/
-	void incrementLength(char block);
+	void incrementLength(char direction);
 
 	/**
 	* Decrements the length of the area that is to be dug out.
 	*
-	* @param block The block that is hit - b/f.
+	* @param direction The direction that the button is - u/d.
 	*/
-	void decrementLength(char block);
+	void decrementLength(char direction);
 
 	/**
 	* Increments the width of the area that is to be dug out.
 	*
-	* @param block The block that is hit - l/r.
+	* @param direction The direction that the button is - l/r.
 	*/
-	void incrementWidth(char block);
+	void incrementWidth(char direction);
 
 	/**
 	* Decrements the width of the area that is to be dug out.
 	*
-	* @param block The block that is hit - l/r.
+	* @param direction The direction that the button is - l/r.
 	*/
-	void decrementWidth(char block);
-
-	/**
-	* Sets or removes all of the blocks needed for the settings mode.
-	*
-	* @param show Whether to show the blocks.
-	*/
-	void showSettings(bool show);
-
-	/**
-	* Sets or removes all of the blocks needed for the normal mode.
-	*
-	* @param show Whether to show the blocks.
-	*/
-	void showNormal(bool show);
-
-	/**
-	* Sets or removes all of the blocks needed for the finished mode.
-	*
-	* @param show Whether to show the blocks.
-	*/
-	void showFinished(bool show);
-
-	/**
-	* Sets or removes all of the blocks needed for the digging mode.
-	*
-	* @param show Whether to show the blocks.
-	*/
-	void showDigging(bool show);
+	void decrementWidth(char direction);
 
 	// Resets the currentDigBlock to fit with length & width.
 	void resetDigBlock();
 
-	// Sets the settings blocks to match the current settings page.
-	void setSettingsBlocks();
+	/**
+	* Checks if anything on the interface is being clicked and acts on it
+	* if need be.
+	*
+	* @param fingerLocation The location of the given finger.
+	* @param canClick The canClick field that corresponds to given finger.
+	* @param positionCm The position of the main block in centimeters.
+	*/
+	void clickCheck(CoordinateInCentimeters fingerLocation, bool& canClick, CoordinateInCentimeters positionCm, bool leftHand);
 
-	// Removes the settings blocks matching the current settings page.
-	void removeSettingsBlocks();
+	/**
+	* Gets the corner of the interface to be used for isBetween.
+	*
+	* @return The corner of the interface.
+	*/
+	CoordinateInCentimeters getCorner();
+
+	/**
+	* Computes whether the finger is between the two points given.
+	*
+	* @param bottomLeft The coordinates for the top left corner in centimeters.
+	* @param topRight The coordinates for the bottom right corner in centimeters.
+	* @param fingerPos The position of the finger.
+	*
+	* @return Whether the given finger is between the two given corners.
+	*
+	*/
+	bool isBetween(std::pair<int, int> bottomLeft, std::pair<int, int> topRight, CoordinateInCentimeters fingerPos);
+
+	// Sets the specific Off block.
+	void setOffBlock();
+
+	// Sets the specific On block.
+	void setOnBlock();
+
+	// Sets the specific Settings block.
+	void setSettingsBlock();
 };
