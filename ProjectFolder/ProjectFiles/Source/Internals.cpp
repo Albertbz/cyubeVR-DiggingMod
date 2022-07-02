@@ -4,7 +4,7 @@
 
 #include "GameAPI.cpp"
 
-#define RegisterFunction(FunctionName)  InternalFunctions::I_##FunctionName = (##FunctionName##_T) GetProcAddress(app, #FunctionName);		\
+#define RegisterFunction(FunctionName)  InternalFunctions::I_##FunctionName = (FunctionName##_T) GetProcAddress(app, #FunctionName);		\
 										if (!InternalFunctions::I_##FunctionName) {															\
 											std::string ErrorString = GetLastErrorAsString();												\
 											__debugbreak();																					\

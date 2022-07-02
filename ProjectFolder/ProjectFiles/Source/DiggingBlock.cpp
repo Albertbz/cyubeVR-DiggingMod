@@ -188,7 +188,7 @@ bool DiggingBlock::diggableBlock(BlockInfo block) {
 	bool diggable = false;
 	if (block.Type != EBlockType::ModBlock) {
 		diggable = block.Type == EBlockType::Stone || block.Type == EBlockType::Dirt || block.Type == EBlockType::Grass || 
-				   block.Type == EBlockType::Sand;
+				   block.Type == EBlockType::Sand || block.Type == EBlockType::StoneMined;
 		if (!diggable && digOres) {
 			diggable = block.Type == EBlockType::Ore_Coal || block.Type == EBlockType::Ore_Copper || block.Type == EBlockType::Ore_Gold ||
 					   block.Type == EBlockType::Ore_Iron || block.Type == EBlockType::CrystalBlock;

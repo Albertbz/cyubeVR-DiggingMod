@@ -205,7 +205,7 @@ void Event_Tick()
 void Event_OnLoad(bool CreatedNewWorld)
 {
 	path = GetThisModSaveFolderPath(L"DiggingMod");
-	
+
 	// Loads all Quarry blocks previously placed in the world into the quarryBlocks vector.
 	quarryBlocks = readBlocks<QuarryBlock>(std::ifstream{ path + L"QuarryBlocks.txt" });
 
