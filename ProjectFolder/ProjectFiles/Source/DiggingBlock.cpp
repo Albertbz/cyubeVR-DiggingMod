@@ -73,7 +73,9 @@ void DiggingBlock::decrementSize() {
 
 void DiggingBlock::incrementDepth() {
 	if (currentMode == 2) {
-		depth++;
+		if (digDirection != 6 || (digDirection == 6 && blockPosition.Z - depth > 1)) {
+			depth++;
+		}
 	}
 }
 
@@ -86,6 +88,9 @@ void DiggingBlock::decrementDepth() {
 void DiggingBlock::printDepth() {
 	std::wstring message = L"Depth: ";
 	message.append(std::to_wstring(depth));
+	if (digDirection == 6 && blockPosition.Z - depth == 1) {
+		message.append(L"\nMax depth reached.");
+	}
 	SpawnHintText(blockPosition + textPlacement, message, 0.5f, 1);
 }
 
@@ -96,6 +101,33 @@ void DiggingBlock::printSize() {
 
 std::wstring DiggingBlock::getSize() {
 	return std::to_wstring(length) + L"x" + std::to_wstring(width) + L"x" + std::to_wstring(depth);
+}
+
+bool DiggingBlock::digSuccess()
+{
+	BlockInfo currentBlock = GetBlock(blockPosition + currentDigBlock);
+	if (diggableBlock(currentBlock)) {
+		bool setCorrect = SetBlock(blockPosition + currentDigBlock, EBlockType::Air);
+
+		// If out of loaded chunk and the block therefore is not set (SetBlock returns false), do not continue digging.
+		if (!setCorrect) {
+			return false;
+		}
+
+		// If block was Grass, remove possible flower/foliage on top.
+		if (currentBlock.Type == EBlockType::Grass) {
+			BlockInfo blockAbove = GetBlock(blockPosition + currentDigBlock + CoordinateInBlocks(0, 0, 1));
+			if (blockAbove.Type != EBlockType::ModBlock && (blockAbove.Type == EBlockType::Flower1 || blockAbove.Type == EBlockType::Flower2 ||
+				blockAbove.Type == EBlockType::Flower3 || blockAbove.Type == EBlockType::Flower4 || blockAbove.Type == EBlockType::FlowerRainbow ||
+				blockAbove.Type == EBlockType::GrassFoliage)) {
+				SetBlock(blockPosition + currentDigBlock + CoordinateInBlocks(0, 0, 1), EBlockType::Air);
+			}
+		}
+	}
+	else if (!currentBlock.IsValid()) {
+		return false;
+	}
+	return true;
 }
 
 void DiggingBlock::toggleDigging() {
@@ -129,6 +161,9 @@ void DiggingBlock::toggleSettings() {
 
 void DiggingBlock::finishedDigging() {
 	if (currentMode == 3) {
+		justReplaced = true;
+		setNormalBlock();
+		SpawnHintText(GetPlayerLocationHead() + GetPlayerViewDirection() * 50 - CoordinateInCentimeters(0, 0, 25), L"A Digging Block at the location\nX=" + std::to_wstring(blockPosition.X / 2) + L", Y=" + std::to_wstring(blockPosition.Y / 2) + L", Z=" + std::to_wstring(blockPosition.Z / 2) + L"\nhas finished digging.", 10);
 		currentMode = 4;
 	}
 }

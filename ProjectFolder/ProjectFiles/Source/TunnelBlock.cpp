@@ -23,6 +23,12 @@ TunnelBlock::TunnelBlock(CoordinateInBlocks blockPosition)
 
 	this->textPlacement = CoordinateInCentimeters(0, 0, 30);
 
+	if (blockPosition.Z < 3 || blockPosition.Z > 797) {
+		destroy();
+		SpawnHintText(blockPosition + CoordinateInBlocks(0, 0, 1), L"Cannot place block here.", 3);
+		return;
+	}
+
 	updateCornerBlocks();
 	resetDigBlock();
 	toggleSettings();
@@ -65,82 +71,69 @@ void TunnelBlock::updateCornerBlocks() {
 
 void TunnelBlock::dig() {
 	if (currentMode == 3) {
-		BlockInfo currentBlock = GetBlock(blockPosition + currentDigBlock);
-		if (diggableBlock(currentBlock)) {
-			SetBlock(blockPosition + currentDigBlock, EBlockType::Air);
-
-			// If block was Grass, remove possible flower/foliage on top.
-			if (currentBlock.Type == EBlockType::Grass) {
-				BlockInfo blockAbove = GetBlock(blockPosition + currentDigBlock + CoordinateInBlocks(0, 0, 1));
-				if (blockAbove.Type != EBlockType::ModBlock && (blockAbove.Type == EBlockType::Flower1 || blockAbove.Type == EBlockType::Flower2 ||
-					blockAbove.Type == EBlockType::Flower3 || blockAbove.Type == EBlockType::Flower4 || blockAbove.Type == EBlockType::FlowerRainbow ||
-					blockAbove.Type == EBlockType::GrassFoliage)) {
-					SetBlock(blockPosition + currentDigBlock + CoordinateInBlocks(0, 0, 1), EBlockType::Air);
-				}
-			}
-		}
-
-		switch (digDirection) {
-		case 1:
-			currentDigBlock.Y++;
-			if (currentDigBlock.Y > cornerBlocks[1].position.Y) {
-				currentDigBlock.Y = cornerBlocks[0].position.Y;
-				currentDigBlock.Z--;
-				if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
-					currentDigBlock.Z = cornerBlocks[1].position.Z;
-					currentDigBlock.X++;
-					if (currentDigBlock.X > depth) {
-						currentDigBlock.X = 1;
-						finishedDigging();
+		if (digSuccess()) {
+			switch (digDirection) {
+			case 1:
+				currentDigBlock.Y++;
+				if (currentDigBlock.Y > cornerBlocks[1].position.Y) {
+					currentDigBlock.Y = cornerBlocks[0].position.Y;
+					currentDigBlock.Z--;
+					if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
+						currentDigBlock.Z = cornerBlocks[1].position.Z;
+						currentDigBlock.X++;
+						if (currentDigBlock.X > depth) {
+							currentDigBlock.X = 1;
+							finishedDigging();
+						}
 					}
 				}
-			}
-			break;
-		case 2:
-			currentDigBlock.Y--;
-			if (currentDigBlock.Y < cornerBlocks[1].position.Y) {
-				currentDigBlock.Y = cornerBlocks[0].position.Y;
-				currentDigBlock.Z--;
-				if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
-					currentDigBlock.Z = cornerBlocks[1].position.Z;
-					currentDigBlock.X--;
-					if (currentDigBlock.X < -depth) {
-						currentDigBlock.X = -1;
-						finishedDigging();
+				break;
+			case 2:
+				currentDigBlock.Y--;
+				if (currentDigBlock.Y < cornerBlocks[1].position.Y) {
+					currentDigBlock.Y = cornerBlocks[0].position.Y;
+					currentDigBlock.Z--;
+					if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
+						currentDigBlock.Z = cornerBlocks[1].position.Z;
+						currentDigBlock.X--;
+						if (currentDigBlock.X < -depth) {
+							currentDigBlock.X = -1;
+							finishedDigging();
+						}
 					}
 				}
-			}
-			break;
-		case 3:
-			currentDigBlock.X--;
-			if (currentDigBlock.X < cornerBlocks[1].position.X) {
-				currentDigBlock.X = cornerBlocks[0].position.X;
-				currentDigBlock.Z--;
-				if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
-					currentDigBlock.Z = cornerBlocks[1].position.Z;
-					currentDigBlock.Y++;
-					if (currentDigBlock.Y > depth) {
-						currentDigBlock.Y = 1;
-						finishedDigging();
+				break;
+			case 3:
+				currentDigBlock.X--;
+				if (currentDigBlock.X < cornerBlocks[1].position.X) {
+					currentDigBlock.X = cornerBlocks[0].position.X;
+					currentDigBlock.Z--;
+					if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
+						currentDigBlock.Z = cornerBlocks[1].position.Z;
+						currentDigBlock.Y++;
+						if (currentDigBlock.Y > depth) {
+							currentDigBlock.Y = 1;
+							finishedDigging();
+						}
 					}
 				}
-			}
-			break;
-		case 4:
-			currentDigBlock.X++;
-			if (currentDigBlock.X > cornerBlocks[1].position.X) {
-				currentDigBlock.X = cornerBlocks[0].position.X;
-				currentDigBlock.Z--;
-				if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
-					currentDigBlock.Z = cornerBlocks[1].position.Z;
-					currentDigBlock.Y--;
-					if (currentDigBlock.Y < -depth) {
-						currentDigBlock.Y = -1;
-						finishedDigging();
+				break;
+			case 4:
+				currentDigBlock.X++;
+				if (currentDigBlock.X > cornerBlocks[1].position.X) {
+					currentDigBlock.X = cornerBlocks[0].position.X;
+					currentDigBlock.Z--;
+					if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
+						currentDigBlock.Z = cornerBlocks[1].position.Z;
+						currentDigBlock.Y--;
+						if (currentDigBlock.Y < -depth) {
+							currentDigBlock.Y = -1;
+							finishedDigging();
+						}
 					}
 				}
+				break;
 			}
-			break;
 		}
 	}
 }
@@ -148,12 +141,12 @@ void TunnelBlock::dig() {
 void TunnelBlock::incrementLength(char direction) {
 	if (currentMode == 2) {
 		removeCorners();
-		if (direction == 'u') {
+		if (direction == 'u' && blockPosition.Z + cornerBlocks[0].position.Z < 798) {
 			cornerBlocks[0].position.Z++;
 			cornerBlocks[1].position.Z++;
 			length++;
 		}
-		else if (direction == 'd') {
+		else if (direction == 'd' && blockPosition.Z + cornerBlocks[2].position.Z > 1) {
 			cornerBlocks[2].position.Z--;
 			cornerBlocks[3].position.Z--;
 			length++;
@@ -446,4 +439,9 @@ void TunnelBlock::setOnBlock()
 void TunnelBlock::setSettingsBlock()
 {
 	SetBlock(blockPosition, tunSetBlockID);
+}
+
+void TunnelBlock::setNormalBlock()
+{
+	SetBlock(blockPosition, tunBlockID);
 }

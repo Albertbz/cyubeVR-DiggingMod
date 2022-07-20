@@ -40,6 +40,7 @@ public:
 		quarryOffBlockID = 380980661,
 		quarryOnBlockID = 380980662,
 		quarrySetBlockID = 380980663,
+		tunBlockID = 894654498,
 		tunOffBlockID = 1244240001,
 		tunOnBlockID = 1244240002,
 		tunSetBlockID = 1244240003,
@@ -133,6 +134,15 @@ public:
 	// Digs/mines a single block if the DiggingBlock is digging at that moment.
 	virtual void dig() = 0;
 
+	/**
+	* Tries to dig and returns whether the digging was a success. If any error
+	* is encountered (such as trying to dig in unloaded chunks), will return
+	* false.
+	* 
+	* @return Whether the digging was a success.
+	*/
+	bool digSuccess();
+
 	// Toggles digging mode.
 	void toggleDigging();
 
@@ -150,6 +160,9 @@ public:
 
 	// Sets the specific Settings block.
 	virtual void setSettingsBlock() = 0;
+
+	// Sets the specific normal block.
+	virtual void setNormalBlock() = 0;
 
 	// Removes and stops everything.
 	void destroy();

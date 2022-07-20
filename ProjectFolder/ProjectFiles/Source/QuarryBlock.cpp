@@ -16,6 +16,15 @@ QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition)
 
 	this->textPlacement = CoordinateInCentimeters(0, 0, 40);
 
+	if (blockPosition.Z < 6) {
+		if (blockPosition.Z == 1) {
+			destroy();
+			SpawnHintText(blockPosition + CoordinateInBlocks(0, 0, 1), L"Cannot place block here.", 3);
+			return;
+		}
+		this->depth = blockPosition.Z - 1;
+	}
+
 	resetDigBlock();
 	toggleSettings();
 }
@@ -24,35 +33,28 @@ QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks bl
 						 std::array<Block, 4> cornerBlocks, bool digOres, int digDirection)
 	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, digOres, digDirection) {
 	this->textPlacement = CoordinateInCentimeters(0, 0, 40);
+	if (this->blockPosition.Z - this->depth < 1) {
+		this->depth = this->blockPosition.Z - 1;
+		if (this->currentDigBlock.Z < -this->depth) {
+			this->currentDigBlock.Z = -this->depth;
+		}
+	}
 }
 
 void QuarryBlock::dig() {
 	if (currentMode == 3) {
-		BlockInfo currentBlock = GetBlock(blockPosition + currentDigBlock);
-		if (diggableBlock(currentBlock)) {
-			SetBlock(blockPosition + currentDigBlock, EBlockType::Air);
-
-			// If block was Grass, remove possible flower/foliage on top.
-			if (currentBlock.Type == EBlockType::Grass) {
-				BlockInfo blockAbove = GetBlock(blockPosition + currentDigBlock + CoordinateInBlocks(0, 0, 1));
-				if (blockAbove.Type != EBlockType::ModBlock && (blockAbove.Type == EBlockType::Flower1 || blockAbove.Type == EBlockType::Flower2 || 
-					blockAbove.Type == EBlockType::Flower3 || blockAbove.Type == EBlockType::Flower4 || blockAbove.Type == EBlockType::FlowerRainbow || 
-					blockAbove.Type == EBlockType::GrassFoliage)) {
-					SetBlock(blockPosition + currentDigBlock + CoordinateInBlocks(0, 0, 1), EBlockType::Air);
-				}
-			}
-		}
-
-		currentDigBlock.X--;
-		if (currentDigBlock.X < cornerBlocks[2].position.X) {
-			currentDigBlock.X = cornerBlocks[0].position.X;
-			currentDigBlock.Y--;
-			if (currentDigBlock.Y < cornerBlocks[0].position.Y) {
-				currentDigBlock.Y = cornerBlocks[1].position.Y;
-				currentDigBlock.Z--;
-				if (currentDigBlock.Z < -depth) {
-					currentDigBlock.Z = -1;
-					finishedDigging();
+		if (digSuccess()) {
+			currentDigBlock.X--;
+			if (currentDigBlock.X < cornerBlocks[2].position.X) {
+				currentDigBlock.X = cornerBlocks[0].position.X;
+				currentDigBlock.Y--;
+				if (currentDigBlock.Y < cornerBlocks[0].position.Y) {
+					currentDigBlock.Y = cornerBlocks[1].position.Y;
+					currentDigBlock.Z--;
+					if (currentDigBlock.Z < -depth) {
+						currentDigBlock.Z = -1;
+						finishedDigging();
+					}
 				}
 			}
 		}
@@ -185,4 +187,9 @@ void QuarryBlock::setOnBlock()
 void QuarryBlock::setSettingsBlock()
 {
 	SetBlock(blockPosition, quarrySetBlockID);
+}
+
+void QuarryBlock::setNormalBlock()
+{
+	SetBlock(blockPosition, quarryBlockID);
 }

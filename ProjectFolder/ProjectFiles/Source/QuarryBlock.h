@@ -102,4 +102,7 @@ public:
 
 	// Sets the specific Settings block.
 	void setSettingsBlock();
+
+	// Sets the specific normal block.
+	void setNormalBlock();
 };
