@@ -212,7 +212,8 @@ void Event_OnLoad(bool CreatedNewWorld)
 	auto itQ = quarryBlocks.begin();
 	while (itQ != quarryBlocks.end()) {
 		UniqueID blockID = GetBlock(itQ->blockPosition).CustomBlockID;
-		if (blockID != quarryOffBlockID && 
+		if (blockID != quarryBlockID &&
+			blockID != quarryOffBlockID && 
 			blockID != quarryOnBlockID &&
 			blockID != quarrySetBlockID) {
 			itQ->destroy();
@@ -229,7 +230,8 @@ void Event_OnLoad(bool CreatedNewWorld)
 	auto itT = tunnelBlocks.begin();
 	while (itT != tunnelBlocks.end()) {
 		UniqueID blockID = GetBlock(itT->blockPosition).CustomBlockID;
-		if (blockID != tunOffBlockID &&
+		if (blockID != tunBlockID &&
+			blockID != tunOffBlockID &&
 			blockID != tunOnBlockID &&
 			blockID != tunSetBlockID) {
 			itT->destroy();

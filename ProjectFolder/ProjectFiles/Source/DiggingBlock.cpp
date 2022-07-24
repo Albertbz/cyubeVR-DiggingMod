@@ -293,7 +293,7 @@ void DiggingBlock::runCheck()
 void DiggingBlock::clickRegister(CoordinateInCentimeters fingerLocation, bool leftHand)
 {
 	switch (currentMode) {
-	case 1:
+	case 1: // Normal/Off
 		if (isBetween(std::pair(20, 20), std::pair(31, 31), fingerLocation)) {
 			toggleDigging();
 			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
@@ -307,7 +307,7 @@ void DiggingBlock::clickRegister(CoordinateInCentimeters fingerLocation, bool le
 			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
 		}
 		break;
-	case 2:
+	case 2: // Settings
 		if (isBetween(std::pair(20, 20), std::pair(31, 31), fingerLocation)) {
 			toggleSettings();
 			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
@@ -322,13 +322,41 @@ void DiggingBlock::clickRegister(CoordinateInCentimeters fingerLocation, bool le
 			printSize();
 			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
 		}
-		else if (isBetween(std::pair(35, 28), std::pair(42, 35), fingerLocation)) {
+		else if (isBetween(std::pair(39, 28), std::pair(42, 35), fingerLocation)) {
 			incrementDepth();
 			printDepth();
 			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
 		}
-		else if (isBetween(std::pair(35, 37), std::pair(42, 43), fingerLocation)) {
+		else if (isBetween(std::pair(35, 28), std::pair(38, 31), fingerLocation)) {
+			for (int i = 0; i < 5; i++) {
+				incrementDepth();
+			}
+			printDepth();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(35, 32), std::pair(38, 35), fingerLocation)) {
+			for (int i = 0; i < 10; i++) {
+				incrementDepth();
+			}
+			printDepth();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(39, 37), std::pair(42, 44), fingerLocation)) {
 			decrementDepth();
+			printDepth();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(35, 37), std::pair(38, 40), fingerLocation)) {
+			for (int i = 0; i < 5; i++) {
+				decrementDepth();
+			}
+			printDepth();
+			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
+		}
+		else if (isBetween(std::pair(35, 41), std::pair(38, 44), fingerLocation)) {
+			for (int i = 0; i < 10; i++) {
+				decrementDepth();
+			}
 			printDepth();
 			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
 		}
@@ -378,7 +406,7 @@ void DiggingBlock::clickRegister(CoordinateInCentimeters fingerLocation, bool le
 			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
 		}
 		break;
-	case 3:
+	case 3: // Digging/On
 		if (isBetween(std::pair(20, 20), std::pair(31, 31), fingerLocation)) {
 			toggleDigging();
 			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
