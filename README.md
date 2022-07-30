@@ -1,3 +1,6 @@
-This is the GitHub page for my Digging mod!
+# Digging Mod
+A mod for [cyubeVR](https://store.steampowered.com/app/619500/cyubeVR/) that adds two automatic digging blocks.
 
-Also, none of the .zips here work because they follow the old folder structure. So you should just subscribe to it on the workshop if you want it xD
+[Go to source folder](https://github.com/Albertbz/cyubeVR-DiggingMod/tree/master/ProjectFolder/ProjectFiles/Source).
+
+[This mod on the Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=2824194168).
