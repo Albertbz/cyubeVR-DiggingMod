@@ -106,4 +106,11 @@ public:
 
 	// Sets the specific normal block.
 	void setNormalBlock();
+
+	/*
+	* Gets the location that hint texts are to be spawned at.
+	*
+	* @return The location that hint texts are to be spawned at.
+	*/
+	CoordinateInCentimeters getHintTextLocation();
 };

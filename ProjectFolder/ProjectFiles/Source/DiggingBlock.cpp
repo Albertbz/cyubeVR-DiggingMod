@@ -5,7 +5,8 @@
 #include <string>
 #include <algorithm>
 
-DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition) {
+DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition) 
+{
 	this->length = 5;
 	this->width = 5;
 	this->depth = 5;
@@ -18,11 +19,12 @@ DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition) {
 	this->justReplaced = false;
 	this->canClickLeft = true;
 	this->canClickRight = true;
-	this->textPlacement = {};
+	this->currentHintTextHandle = nullptr;
 }
 
 DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-						   std::array<Block, 4> cornerBlocks, bool digOres, int digDirection) {
+						   std::array<Block, 4> cornerBlocks, bool digOres, int digDirection) 
+{
 	this->length = length;
 	this->width = width;
 	this->depth = depth;
@@ -36,24 +38,27 @@ DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks 
 	this->justReplaced = false;
 	this->canClickLeft = true;
 	this->canClickRight = true;
-	this->textPlacement = {};
+	this->currentHintTextHandle = nullptr;
 }
 
-void DiggingBlock::setCorners() {
+void DiggingBlock::setCorners() 
+{
 	cornerBlocks[0].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[0].position, cornerBlocks[0].infoBlock);
 	cornerBlocks[1].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[1].position, cornerBlocks[1].infoBlock);
 	cornerBlocks[2].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[2].position, cornerBlocks[2].infoBlock);
 	cornerBlocks[3].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[3].position, cornerBlocks[3].infoBlock);
 }
 
-void DiggingBlock::removeCorners() {
+void DiggingBlock::removeCorners() 
+{
 	SetBlock(blockPosition + cornerBlocks[0].position, cornerBlocks[0].infoPrev);
 	SetBlock(blockPosition + cornerBlocks[1].position, cornerBlocks[1].infoPrev);
 	SetBlock(blockPosition + cornerBlocks[2].position, cornerBlocks[2].infoPrev);
 	SetBlock(blockPosition + cornerBlocks[3].position, cornerBlocks[3].infoPrev);
 }
 
-void DiggingBlock::incrementSize() {
+void DiggingBlock::incrementSize() 
+{
 	if (currentMode == 2) {
 		incrementLength('u');
 		incrementLength('d');
@@ -62,7 +67,8 @@ void DiggingBlock::incrementSize() {
 	}
 }
 
-void DiggingBlock::decrementSize() {
+void DiggingBlock::decrementSize() 
+{
 	if (currentMode == 2) {
 		decrementLength('u');
 		decrementLength('d');
@@ -71,7 +77,8 @@ void DiggingBlock::decrementSize() {
 	}
 }
 
-void DiggingBlock::incrementDepth() {
+void DiggingBlock::incrementDepth() 
+{
 	if (currentMode == 2) {
 		if (digDirection != 6 || (digDirection == 6 && blockPosition.Z - depth > 1)) {
 			depth++;
@@ -79,27 +86,31 @@ void DiggingBlock::incrementDepth() {
 	}
 }
 
-void DiggingBlock::decrementDepth() {
+void DiggingBlock::decrementDepth() 
+{
 	if (currentMode == 2 && depth > 1) {
 		depth--;
 	}
 }
 
-void DiggingBlock::printDepth() {
+void DiggingBlock::printDepth() 
+{
 	std::wstring message = L"Depth: ";
 	message.append(std::to_wstring(depth));
 	if (digDirection == 6 && blockPosition.Z - depth == 1) {
 		message.append(L"\nMax depth reached.");
 	}
-	SpawnHintText(blockPosition + textPlacement, message, 0.5f, 1);
+	printHintText(getHintTextLocation(), message, 1);
 }
 
-void DiggingBlock::printSize() {
+void DiggingBlock::printSize() 
+{
 	std::wstring message = L"Size (LxWxD)\n---------------\n" + getSize();
-	SpawnHintText(blockPosition + textPlacement, message, 1, 1);
+	printHintText(getHintTextLocation(), message, 2);
 }
 
-std::wstring DiggingBlock::getSize() {
+std::wstring DiggingBlock::getSize() 
+{
 	return std::to_wstring(length) + L"x" + std::to_wstring(width) + L"x" + std::to_wstring(depth);
 }
 
@@ -130,7 +141,8 @@ bool DiggingBlock::digSuccess()
 	return true;
 }
 
-void DiggingBlock::toggleDigging() {
+void DiggingBlock::toggleDigging() 
+{
 	if (currentMode == 1) {
 		justReplaced = true;
 		setOnBlock();
@@ -143,7 +155,8 @@ void DiggingBlock::toggleDigging() {
 	}
 }
 
-void DiggingBlock::toggleSettings() {
+void DiggingBlock::toggleSettings() 
+{
 	if (currentMode == 1) {
 		justReplaced = true;
 		setSettingsBlock();
@@ -154,28 +167,31 @@ void DiggingBlock::toggleSettings() {
 		removeCorners();
 		justReplaced = true;
 		setOffBlock();
-		SpawnHintText(blockPosition + textPlacement, L"Settings saved!\nIt will take\n" + timeToDig() + L"\nto dig out the " + getSize() + L" hole.", 5, 1, 2);
+		printHintText(getHintTextLocation(), L"Settings saved!\nIt will take\n" + timeToDig() + L"\nto dig out the " + getSize() + L" hole.", 5, 1, 2);
 		currentMode = 1;
 	}
 }
 
-void DiggingBlock::finishedDigging() {
+void DiggingBlock::finishedDigging() 
+{
 	if (currentMode == 3) {
 		justReplaced = true;
 		setNormalBlock();
-		SpawnHintText(GetPlayerLocationHead() + GetPlayerViewDirection() * 50 - CoordinateInCentimeters(0, 0, 25), L"A Digging Block at the location\nX=" + std::to_wstring(blockPosition.X / 2) + L", Y=" + std::to_wstring(blockPosition.Y / 2) + L", Z=" + std::to_wstring(blockPosition.Z / 2) + L"\nhas finished digging.", 10);
+		SpawnHintTextAdvanced(GetPlayerLocationHead() + GetPlayerViewDirection() * 50, L"A Digging Block at the location\nX=" + std::to_wstring(blockPosition.X / 2) + L", Y=" + std::to_wstring(blockPosition.Y / 2) + L", Z=" + std::to_wstring(blockPosition.Z / 2) + L"\nhas finished digging.", 10);
 		currentMode = 4;
 	}
 }
 
-void DiggingBlock::destroy() {
+void DiggingBlock::destroy() 
+{
 	if (currentMode == 2) {
 		removeCorners();
 	}
 	currentMode = 0;
 }
 
-std::wstring DiggingBlock::timeToDig() {
+std::wstring DiggingBlock::timeToDig() 
+{
 	int totalSeconds = length * width * depth / 5;
 	int seconds = totalSeconds % 60;
 	int totalMinutes = totalSeconds / 60;
@@ -219,7 +235,8 @@ std::wstring DiggingBlock::timeToDig() {
 	return message;
 }
 
-bool DiggingBlock::diggableBlock(BlockInfo block) {
+bool DiggingBlock::diggableBlock(BlockInfo block) 
+{
 	bool diggable = false;
 	if (block.Type != EBlockType::ModBlock) {
 		diggable = block.Type == EBlockType::Stone || block.Type == EBlockType::Dirt || block.Type == EBlockType::Grass || 
@@ -232,7 +249,8 @@ bool DiggingBlock::diggableBlock(BlockInfo block) {
 	return diggable;
 }
 
-void DiggingBlock::toggleDigOres() {
+void DiggingBlock::toggleDigOres() 
+{
 	if (digOres) {
 		digOres = false;
 	}
@@ -241,7 +259,8 @@ void DiggingBlock::toggleDigOres() {
 	}
 }
 
-void DiggingBlock::printDigOres() {
+void DiggingBlock::printDigOres() 
+{
 	wString message = L"The block will now\n";
 	if (digOres) {
 		message.append(L"dig ores!");
@@ -249,7 +268,7 @@ void DiggingBlock::printDigOres() {
 	else {
 		message.append(L"not dig ores!");
 	}
-	SpawnHintText(blockPosition + textPlacement, message, 1, 1);
+	printHintText(getHintTextLocation(), message, 2);
 }
 
 CoordinateInBlocks DiggingBlock::getPlayerDirection()
@@ -360,7 +379,7 @@ void DiggingBlock::clickRegister(CoordinateInCentimeters fingerLocation, bool le
 			printDepth();
 			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
 		}
-		else if (isBetween(std::pair(9, 37), std::pair(16, 43), fingerLocation)) {
+		else if (isBetween(std::pair(9, 37), std::pair(16, 44), fingerLocation)) {
 			toggleDigOres();
 			printDigOres();
 			PlayHapticFeedbackOnHand(leftHand, 0.1, 1, 1);
@@ -415,4 +434,13 @@ void DiggingBlock::clickRegister(CoordinateInCentimeters fingerLocation, bool le
 	default:
 		break;
 	}
+}
+
+void DiggingBlock::printHintText(CoordinateInCentimeters location, std::wstring text, float duration, float sizeMul, float sizeMulVer, float fontMul)
+{
+	// Remove the old hint text with the saved handle, and spawn the
+	// new one as well as save its handle.
+
+	DestroyHintText(currentHintTextHandle);
+	currentHintTextHandle = SpawnHintTextAdvanced(location, text, duration, sizeMul, sizeMulVer, fontMul);
 }

@@ -105,4 +105,23 @@ public:
 
 	// Sets the specific normal block.
 	void setNormalBlock();
+
+	/*
+	* Calculates where on a circle of the given radius from the given location
+	* that a hint text should be spawned.
+	*
+	* @param location The location of the block (center of it).
+	* @param height The height offset for the location.
+	* @param radius	The radius of the circle.
+	*
+	* @return The location that a hint text should be spawned at.
+	*/
+	CoordinateInCentimeters getHintTextLocationHelper(CoordinateInCentimeters location, int height, int radius);
+
+	/*
+	* Gets the location that hint texts are to be spawned at.
+	*
+	* @return The location that hint texts are to be spawned at.
+	*/
+	CoordinateInCentimeters getHintTextLocation();
 };

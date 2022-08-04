@@ -1,6 +1,7 @@
 #pragma once
 #include "GameAPI.h"
 #include "Misc.h"
+#include "ModBlocks.h"
 #include <array>
 
 class DiggingBlock {
@@ -31,22 +32,9 @@ public:
 	bool canClickLeft;
 	// A bool to keep track of whether the player can click the interface with the right hand.
 	bool canClickRight;
-	// The placement of the text that appears - relative to blockPosition.
-	CoordinateInCentimeters textPlacement;
+	// The handle of the currently shown hint text.
+	void* currentHintTextHandle;
 
-	// Enum with all of the blocks used for methods.
-	enum {
-		quarryBlockID = 1473066952,
-		quarryOffBlockID = 380980661,
-		quarryOnBlockID = 380980662,
-		quarrySetBlockID = 380980663,
-		tunBlockID = 894654498,
-		tunOffBlockID = 1244240001,
-		tunOnBlockID = 1244240002,
-		tunSetBlockID = 1244240003,
-		markerBlockID = 430459851
-	};
-public:
 	/**
 	* Constructor for when a new block is
 	* placed down.
@@ -255,4 +243,23 @@ public:
 	* 
 	*/
 	virtual bool isBetween(std::pair<int, int> bottomLeft, std::pair<int, int> topRight, CoordinateInCentimeters fingerPos) = 0;
+
+	/*
+	* Removes old hint text (currentHintTextHandle) and spawns the new one.
+	*
+	* @param location The location to spawn the hint text at.
+	* @param text The text to have on the hint text.
+	* @param duration The duration of the hint text in seconds, default -1 (infinite).
+	* @param sizeMul The size multiplier for the size of the hint text, default 1.
+	* @param sizeMulVer The size multiplier for the vertical size of the hint text, default 1.
+	* @param fontMul The size multiplier for the font of the hint text, default 1.
+	*/
+	void printHintText(CoordinateInCentimeters location, std::wstring text, float duration = -1, float sizeMul = 1, float sizeMulVer = 1, float fontMul = 1);
+
+	/*
+	* Gets the location that hint texts are to be spawned at.
+	* 
+	* @return The location that hint texts are to be spawned at.
+	*/
+	virtual CoordinateInCentimeters getHintTextLocation() = 0;
 };

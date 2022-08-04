@@ -19,19 +19,6 @@ std::vector<TunnelBlock> tunnelBlocks;
 // The path of the save folder.
 std::wstring path;
 
-// All blocks with possible interactions
-const int quarryBlockID = 1473066952;
-const int quarryOffBlockID = 380980661;
-const int quarryOnBlockID = 380980662;
-const int quarrySetBlockID = 380980663;
-
-const int tunBlockID = 894654498;
-const int tunOffBlockID = 1244240001;
-const int tunOnBlockID = 1244240002;
-const int tunSetBlockID = 1244240003;
-
-const int markerBlockID = 430459851;
-
 /************************************************************
 	Config Variables (Set these to whatever you need. They are automatically read by the game.)
 *************************************************************/

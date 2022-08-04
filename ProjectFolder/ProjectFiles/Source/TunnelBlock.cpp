@@ -1,7 +1,8 @@
 #include "TunnelBlock.h"
 
 TunnelBlock::TunnelBlock(CoordinateInBlocks blockPosition)
-	: DiggingBlock(blockPosition) {
+	: DiggingBlock(blockPosition) 
+{
 
 	CoordinateInCentimeters playerLocation = GetPlayerLocation();
 	CoordinateInCentimeters blockPositionCm = CoordinateInCentimeters(blockPosition);
@@ -21,11 +22,9 @@ TunnelBlock::TunnelBlock(CoordinateInBlocks blockPosition)
 		this->digDirection = 4;
 	}
 
-	this->textPlacement = CoordinateInCentimeters(0, 0, 30);
-
 	if (blockPosition.Z < 3 || blockPosition.Z > 797) {
 		destroy();
-		SpawnHintText(blockPosition + CoordinateInBlocks(0, 0, 1), L"Cannot place block here.", 3);
+		SpawnHintTextAdvanced(blockPosition + CoordinateInBlocks(0, 0, 1), L"Cannot place block here.", 3);
 		return;
 	}
 
@@ -36,11 +35,12 @@ TunnelBlock::TunnelBlock(CoordinateInBlocks blockPosition)
 
 TunnelBlock::TunnelBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock,
 	std::array<Block, 4> cornerBlocks, bool digOres, int digDirection)
-	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, digOres, digDirection) {
-	this->textPlacement = CoordinateInCentimeters(0, 0, 30);
+	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, digOres, digDirection) 
+{
 }
 
-void TunnelBlock::updateCornerBlocks() {
+void TunnelBlock::updateCornerBlocks() 
+{
 	switch (digDirection) {
 	case 1: 
 		cornerBlocks[0] = { CoordinateInBlocks(0, -2, 2),  markerBlockID, BlockInfo() };
@@ -69,7 +69,8 @@ void TunnelBlock::updateCornerBlocks() {
 	}
 }
 
-void TunnelBlock::dig() {
+void TunnelBlock::dig() 
+{
 	if (currentMode == 3) {
 		if (digSuccess()) {
 			switch (digDirection) {
@@ -138,7 +139,8 @@ void TunnelBlock::dig() {
 	}
 }
 
-void TunnelBlock::incrementLength(char direction) {
+void TunnelBlock::incrementLength(char direction) 
+{
 	if (currentMode == 2) {
 		removeCorners();
 		if (direction == 'u' && blockPosition.Z + cornerBlocks[0].position.Z < 798) {
@@ -156,7 +158,8 @@ void TunnelBlock::incrementLength(char direction) {
 	}
 }
 
-void TunnelBlock::decrementLength(char direction) {
+void TunnelBlock::decrementLength(char direction) 
+{
 	if (currentMode == 2 && length > 3) {
 		removeCorners();
 		if (direction == 'u' && cornerBlocks[0].position.Z > 1) {
@@ -174,7 +177,8 @@ void TunnelBlock::decrementLength(char direction) {
 	}
 }
 
-void TunnelBlock::incrementWidth(char direction) {
+void TunnelBlock::incrementWidth(char direction) 
+{
 	if (currentMode == 2) {
 		removeCorners();
 		if (direction == 'r') {
@@ -230,7 +234,8 @@ void TunnelBlock::incrementWidth(char direction) {
 	}
 }
 
-void TunnelBlock::decrementWidth(char direction) {
+void TunnelBlock::decrementWidth(char direction) 
+{
 	if (currentMode == 2 && width > 3) {
 		removeCorners();
 		if (direction == 'r') {
@@ -302,7 +307,8 @@ void TunnelBlock::decrementWidth(char direction) {
 	}
 }
 
-void TunnelBlock::resetDigBlock() {
+void TunnelBlock::resetDigBlock() 
+{
 	switch (digDirection) {
 	case 1:
 		currentDigBlock.X = 1;
@@ -444,4 +450,9 @@ void TunnelBlock::setSettingsBlock()
 void TunnelBlock::setNormalBlock()
 {
 	SetBlock(blockPosition, tunBlockID);
+}
+
+CoordinateInCentimeters TunnelBlock::getHintTextLocation()
+{
+	return blockPosition + CoordinateInCentimeters(0, 0, 50);
 }
