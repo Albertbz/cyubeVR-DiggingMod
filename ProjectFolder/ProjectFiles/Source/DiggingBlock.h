@@ -19,8 +19,8 @@ public:
 	int currentMode;
 	// The current block that is being dug out, relative to blockPosition.
 	CoordinateInBlocks currentDigBlock;
-	// An array of all of the Corner blocks.
-	std::array<Block, 4> cornerBlocks;
+	// An array of all of the Corner positions.
+	std::array<CoordinateInBlocks, 4> corners;
 	// Keeps track of whether to dig ores as well.
 	bool digOres;
 	// Keeps track of what direction to dig in. 
@@ -53,18 +53,17 @@ public:
 	* @param blockPosition The position of the block.
 	* @param currentMode The current mode of the block.
 	* @param currentDigBlock The coordinates for the block currently being dug out.
-	* @param cornerBlocks The corner blocks.
+	* @param corners The corner positions.
 	* @param digOres Whether to dig ores.
 	* @param digDirection The direction the block is digging.
 	*/
-	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-			     std::array<Block, 4> cornerBlocks, bool digOres, int digDirection);
+	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<CoordinateInBlocks,4> corners, bool digOres, int digDirection);
 
 	// Adds the corners of the area that is to be dug out.
-	void setCorners();
+	virtual void setAreaSelection() = 0;
 
 	// Removes the corners of the area that is to be dug out.
-	void removeCorners();
+	void removeAreaSelection();
 
 	/**
 	* Increments the length of the area that is to be dug out.
@@ -194,15 +193,6 @@ public:
 	*		  +x, then will give CoordinateInBlocks(1, 0, 0)).
 	*/
 	CoordinateInBlocks getPlayerDirection();
-
-	/**
-	* Computes whether the given block is a corner block of this Digging Block.
-	* 
-	* @param blockPos The position of the possible corner block.
-	* 
-	* @return Whether the given block is a corner block of this Digging Block.
-	*/
-	bool isCornerBlock(CoordinateInBlocks blockPos);
 
 	// Checks for any action by the player.
 	void runCheck();

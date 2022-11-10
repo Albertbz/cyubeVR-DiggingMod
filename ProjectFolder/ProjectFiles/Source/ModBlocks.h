@@ -7,6 +7,5 @@ enum {
 	tunBlockID = 894654498,
 	tunOffBlockID = 1244240001,
 	tunOnBlockID = 1244240002,
-	tunSetBlockID = 1244240003,
-	markerBlockID = 430459851
+	tunSetBlockID = 1244240003
 };

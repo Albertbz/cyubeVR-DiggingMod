@@ -13,7 +13,7 @@ DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition)
 	this->blockPosition = blockPosition;
 	this->currentMode = 1;
 	this->currentDigBlock = CoordinateInBlocks(0, 0, 0);
-	this->cornerBlocks = {};
+	this->corners = {};
 	this->digOres = false;
 	this->digDirection = 0;
 	this->justReplaced = false;
@@ -22,8 +22,7 @@ DiggingBlock::DiggingBlock(CoordinateInBlocks blockPosition)
 	this->currentHintTextHandle = nullptr;
 }
 
-DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-						   std::array<Block, 4> cornerBlocks, bool digOres, int digDirection) 
+DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<CoordinateInBlocks,4> corners, bool digOres, int digDirection) 
 {
 	this->length = length;
 	this->width = width;
@@ -31,7 +30,7 @@ DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks 
 	this->blockPosition = blockPosition;
 	this->currentMode = currentMode;
 	this->currentDigBlock = currentDigBlock;
-	this->cornerBlocks = cornerBlocks;
+	this->corners = corners;
 	this->digOres = digOres;
 	this->digDirection = digDirection;
 	
@@ -41,20 +40,9 @@ DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks 
 	this->currentHintTextHandle = nullptr;
 }
 
-void DiggingBlock::setCorners() 
+void DiggingBlock::removeAreaSelection() 
 {
-	cornerBlocks[0].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[0].position, cornerBlocks[0].infoBlock);
-	cornerBlocks[1].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[1].position, cornerBlocks[1].infoBlock);
-	cornerBlocks[2].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[2].position, cornerBlocks[2].infoBlock);
-	cornerBlocks[3].infoPrev = GetAndSetBlock(blockPosition + cornerBlocks[3].position, cornerBlocks[3].infoBlock);
-}
-
-void DiggingBlock::removeCorners() 
-{
-	SetBlock(blockPosition + cornerBlocks[0].position, cornerBlocks[0].infoPrev);
-	SetBlock(blockPosition + cornerBlocks[1].position, cornerBlocks[1].infoPrev);
-	SetBlock(blockPosition + cornerBlocks[2].position, cornerBlocks[2].infoPrev);
-	SetBlock(blockPosition + cornerBlocks[3].position, cornerBlocks[3].infoPrev);
+	SpawnBPModActor(blockPosition, L"ParticleActors", L"RemoveAreaSelectionParticles");
 }
 
 void DiggingBlock::incrementSize() 
@@ -160,11 +148,11 @@ void DiggingBlock::toggleSettings()
 	if (currentMode == 1) {
 		justReplaced = true;
 		setSettingsBlock();
-		setCorners();
+		setAreaSelection();
 		currentMode = 2;
 	}
 	else if (currentMode == 2) {
-		removeCorners();
+		removeAreaSelection();
 		justReplaced = true;
 		setOffBlock();
 		printHintText(getHintTextLocation(), L"Settings saved!\nIt will take\n" + timeToDig() + L"\nto dig out the " + getSize() + L" hole.", 5, 1, 2);
@@ -185,7 +173,7 @@ void DiggingBlock::finishedDigging()
 void DiggingBlock::destroy() 
 {
 	if (currentMode == 2) {
-		removeCorners();
+		removeAreaSelection();
 	}
 	currentMode = 0;
 }
@@ -289,14 +277,6 @@ CoordinateInBlocks DiggingBlock::getPlayerDirection()
 	else if (playerLocation.Y < blockPositionCm.Y - 25 && playerLocation.X < blockPositionCm.X + yDifference && playerLocation.X > blockPositionCm.X - yDifference) {
 		return CoordinateInBlocks(0, -1, 0);
 	}
-}
-
-bool DiggingBlock::isCornerBlock(CoordinateInBlocks blockPos)
-{
-	return blockPosition == blockPos - cornerBlocks[0].position || 
-		   blockPosition == blockPos - cornerBlocks[1].position ||
-		   blockPosition == blockPos - cornerBlocks[2].position ||
-		   blockPosition == blockPos - cornerBlocks[3].position;
 }
 
 void DiggingBlock::runCheck()

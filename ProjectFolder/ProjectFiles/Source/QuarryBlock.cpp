@@ -10,10 +10,10 @@ QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition)
 {
 	this->digDirection = 6;
 
-	this->cornerBlocks[0] = { CoordinateInBlocks(2, -2, 0), markerBlockID, BlockInfo() };
-	this->cornerBlocks[1] = { CoordinateInBlocks(2, 2, 0), markerBlockID, BlockInfo() };
-	this->cornerBlocks[2] = { CoordinateInBlocks(-2, -2, 0), markerBlockID, BlockInfo() };
-	this->cornerBlocks[3] = { CoordinateInBlocks(-2, 2, 0), markerBlockID, BlockInfo() };
+	this->corners[0] = CoordinateInBlocks(2, -2, 0);
+	this->corners[1] = CoordinateInBlocks(2, 2, 0);
+	this->corners[2] = CoordinateInBlocks(-2, -2, 0);
+	this->corners[3] = CoordinateInBlocks(-2, 2, 0);
 
 	if (blockPosition.Z < 6) {
 		if (blockPosition.Z == 1) {
@@ -28,9 +28,8 @@ QuarryBlock::QuarryBlock(CoordinateInBlocks blockPosition)
 	toggleSettings();
 }
 
-QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-						 std::array<Block, 4> cornerBlocks, bool digOres, int digDirection)
-	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, digOres, digDirection) 
+QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<CoordinateInBlocks,4> corners, bool digOres, int digDirection)
+	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, corners, digOres, digDirection) 
 {
 	if (this->blockPosition.Z - this->depth < 1) {
 		this->depth = this->blockPosition.Z - 1;
@@ -45,11 +44,11 @@ void QuarryBlock::dig()
 	if (currentMode == 3) {
 		if (digSuccess()) {
 			currentDigBlock.X--;
-			if (currentDigBlock.X < cornerBlocks[2].position.X) {
-				currentDigBlock.X = cornerBlocks[0].position.X;
+			if (currentDigBlock.X < corners[2].X) {
+				currentDigBlock.X = corners[0].X;
 				currentDigBlock.Y--;
-				if (currentDigBlock.Y < cornerBlocks[0].position.Y) {
-					currentDigBlock.Y = cornerBlocks[1].position.Y;
+				if (currentDigBlock.Y < corners[0].Y) {
+					currentDigBlock.Y = corners[1].Y;
 					currentDigBlock.Z--;
 					if (currentDigBlock.Z < -depth) {
 						currentDigBlock.Z = -1;
@@ -64,20 +63,20 @@ void QuarryBlock::dig()
 void QuarryBlock::incrementLength(char block) 
 {
 	if (currentMode == 2) {
-		removeCorners();
+		removeAreaSelection();
 		length++;
 		if (block == 'u') {
-			cornerBlocks[0].position.X++;
-			cornerBlocks[1].position.X++;
+			corners[0].X++;
+			corners[1].X++;
 		}
 		else if (block == 'd') {
-			cornerBlocks[2].position.X--;
-			cornerBlocks[3].position.X--;
+			corners[2].X--;
+			corners[3].X--;
 		}
 		else {
 			length--;
 		}
-		setCorners();
+		setAreaSelection();
 		resetDigBlock();
 	}
 }
@@ -85,20 +84,20 @@ void QuarryBlock::incrementLength(char block)
 void QuarryBlock::decrementLength(char block) 
 {
 	if (currentMode == 2 && length > 3) {
-		removeCorners();
+		removeAreaSelection();
 		length--;
-		if (block == 'u' && cornerBlocks[0].position.X > 1) {
-			cornerBlocks[0].position.X--;
-			cornerBlocks[1].position.X--;
+		if (block == 'u' && corners[0].X > 1) {
+			corners[0].X--;
+			corners[1].X--;
 		}
-		else if (block == 'd' && cornerBlocks[2].position.X < -1) {
-			cornerBlocks[2].position.X++;
-			cornerBlocks[3].position.X++;
+		else if (block == 'd' && corners[2].X < -1) {
+			corners[2].X++;
+			corners[3].X++;
 		}
 		else {
 			length++;
 		}
-		setCorners();
+		setAreaSelection();
 		resetDigBlock();
 	}
 }
@@ -106,20 +105,20 @@ void QuarryBlock::decrementLength(char block)
 void QuarryBlock::incrementWidth(char block) 
 {
 	if (currentMode == 2) {
-		removeCorners();
+		removeAreaSelection();
 		width++;
 		if (block == 'r') {
-			cornerBlocks[1].position.Y++;
-			cornerBlocks[3].position.Y++;
+			corners[1].Y++;
+			corners[3].Y++;
 		}
 		else if (block == 'l') {
-			cornerBlocks[0].position.Y--;
-			cornerBlocks[2].position.Y--;
+			corners[0].Y--;
+			corners[2].Y--;
 		}
 		else {
 			width--;
 		}
-		setCorners();
+		setAreaSelection();
 		resetDigBlock();
 	}
 }
@@ -127,28 +126,28 @@ void QuarryBlock::incrementWidth(char block)
 void QuarryBlock::decrementWidth(char block) 
 {
 	if (currentMode == 2 && width > 3) {
-		removeCorners();
+		removeAreaSelection();
 		width--;
-		if (block == 'r' && cornerBlocks[1].position.Y > 1) {
-			cornerBlocks[1].position.Y--;
-			cornerBlocks[3].position.Y--;
+		if (block == 'r' && corners[1].Y > 1) {
+			corners[1].Y--;
+			corners[3].Y--;
 		}
-		else if (block == 'l' && cornerBlocks[0].position.Y < -1) {
-			cornerBlocks[0].position.Y++;
-			cornerBlocks[2].position.Y++;
+		else if (block == 'l' && corners[0].Y < -1) {
+			corners[0].Y++;
+			corners[2].Y++;
 		}
 		else {
 			width++;
 		}
-		setCorners();
+		setAreaSelection();
 		resetDigBlock();
 	}
 }
 
 void QuarryBlock::resetDigBlock() 
 {
-	currentDigBlock.X = cornerBlocks[0].position.X;
-	currentDigBlock.Y = cornerBlocks[1].position.Y;
+	currentDigBlock.X = corners[0].X;
+	currentDigBlock.Y = corners[1].Y;
 	currentDigBlock.Z = -1;
 }
 
@@ -248,4 +247,14 @@ CoordinateInCentimeters QuarryBlock::getHintTextLocationHelper(CoordinateInCenti
 CoordinateInCentimeters QuarryBlock::getHintTextLocation()
 {
 	return getHintTextLocationHelper(CoordinateInCentimeters(blockPosition), 50, 40);
+}
+
+
+void QuarryBlock::setAreaSelection()
+{
+	for (int i = blockPosition.X + corners[2].X; i <= blockPosition.X + corners[1].X; i++) {
+		for (int j = blockPosition.Y + corners[2].Y; j <= blockPosition.Y + corners[1].Y; j++) {
+			SpawnBPModActor(CoordinateInBlocks(i, j, blockPosition.Z), L"ParticleActors", L"AreaSelectionParticle-Z");
+		}
+	}
 }

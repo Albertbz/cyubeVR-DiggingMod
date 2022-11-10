@@ -9,18 +9,18 @@ struct Block {
 
 template <typename T>
 void writeBlocks(std::ostream& file, const std::vector<T>& blocks) {
+	// Go through all blocks
 	for (auto b : blocks) {
+		// Save length, width, depth, block position, current mode, current dig block position
 		file << b.length << ';' << b.width << ';' << b.depth << ';' << b.blockPosition.X << ';' << b.blockPosition.Y << ';' << b.blockPosition.Z << ';'
 			<< b.currentMode << ';' << b.currentDigBlock.X << ';' << b.currentDigBlock.Y << ';' << b.currentDigBlock.Z << ';';
-		for (const auto& i : b.cornerBlocks) {
-			file << i.position.X << ';' << i.position.Y << ';' << i.position.Z << ';' << i.infoBlock.CustomBlockID << ';';;
-			if (i.infoPrev.Type == EBlockType::ModBlock) {
-				file << 'C' << ';' << (int)i.infoPrev.CustomBlockID << ';';
-			}
-			else {
-				file << 'N' << ';' << (int)i.infoPrev.Type << ';';
-			}
+
+		// Save the corner positions
+		for (const auto& i : b.corners) {
+			file << i.X << ';' << i.Y << ';' << i.Z << ';';
 		}
+
+		// Save whether to dig ores, dig direction
 		file << b.digOres << ';' << b.digDirection;
 		file << '\n';
 	}
@@ -37,16 +37,20 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 	auto line = std::string{};
 
 	while (std::getline(file, line)) {
+		// Get the length
 		size_t pos = line.find_first_of(';');
 		if (pos == std::string::npos) goto cancel;
 		int length = std::stoi(std::string{ line, 0, pos });
 
+		// Get the width
 		int width = std::stoi(std::string{ line, pos + 1 });
 
+		// Get the depth
 		pos = line.find_first_of(';', pos + 1);
 		if (pos == std::string::npos) goto cancel;
 		int depth = std::stoi(std::string{ line, pos + 1 });
 
+		// Get the block position
 		CoordinateInBlocks blockPosition;
 		pos = line.find_first_of(';', pos + 1);
 		if (pos == std::string::npos) goto cancel;
@@ -58,10 +62,12 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 		if (pos == std::string::npos) goto cancel;
 		blockPosition.Z = std::stoi(std::string{ line, pos + 1 });
 
+		// Get the current mode
 		pos = line.find_first_of(';', pos + 1);
 		if (pos == std::string::npos) goto cancel;
 		int currentMode = std::stoi(std::string{ line, pos + 1 });
 
+		// Get the current dig block
 		CoordinateInBlocks currentDigBlock;
 		pos = line.find_first_of(';', pos + 1);
 		if (pos == std::string::npos) goto cancel;
@@ -73,45 +79,34 @@ auto readBlocks(std::istream& file)->std::vector<T> {
 		if (pos == std::string::npos) goto cancel;
 		currentDigBlock.Z = std::stoi(std::string{ line, pos + 1 });
 
-		std::array<Block, 4> cornerBlocks;
-		for (auto &i : cornerBlocks) {
+		// Get the corners
+		std::array<CoordinateInBlocks, 4> corners;
+		for (auto &i : corners) {
 			pos = line.find_first_of(';', pos + 1);
 			if (pos == std::string::npos) goto cancel;
-			i.position.X = std::stoi(std::string{ line, pos + 1 });
+			i.X = std::stoi(std::string{ line, pos + 1 });
 			pos = line.find_first_of(';', pos + 1);
 			if (pos == std::string::npos) goto cancel;
-			i.position.Y = std::stoi(std::string{ line, pos + 1 });
+			i.Y = std::stoi(std::string{ line, pos + 1 });
 			pos = line.find_first_of(';', pos + 1);
 			if (pos == std::string::npos) goto cancel;
-			i.position.Z = std::stoi(std::string{ line, pos + 1 });
-			pos = line.find_first_of(';', pos + 1);
-			if (pos == std::string::npos) goto cancel;
-			i.infoBlock = std::stoi(std::string{ line, pos + 1 });
-			pos = line.find_first_of(';', pos + 1);
-			if (pos == std::string::npos) goto cancel;
-			if (std::string{ line, pos + 1 } == "C") {
-				pos = line.find_first_of(';', pos + 1);
-				if (pos == std::string::npos) goto cancel;
-				i.infoPrev = std::stoi(std::string{ line, pos + 1 });
-			}
-			else {
-				pos = line.find_first_of(';', pos + 1);
-				if (pos == std::string::npos) goto cancel;
-				i.infoPrev = (EBlockType)std::stoi(std::string{ line, pos + 1 });
-			}
+			i.Z = std::stoi(std::string{ line, pos + 1 });
 		}
 
+		// Get whether to dig ores
 		pos = line.find_first_of(';', pos + 1);
 		if (pos == std::string::npos) goto cancel;
 		bool digOres = std::stoi(std::string{ line, pos + 1 });
 
+		// Get dig direction
 		pos = line.find_first_of(';', pos + 1);
 		if (pos == std::string::npos) goto cancel;
 		int digDirection = std::stoi(std::string{ line, pos + 1 });
 
+		// Add the digging block to the blocks
 		pos = line.find_first_of(';', pos + 1);
 		if (pos != std::string::npos) goto cancel;
-		blocks.push_back(T(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, digOres, digDirection));
+		blocks.push_back(T(length, width, depth, blockPosition, currentMode, currentDigBlock, corners, digOres, digDirection));
 	}
 	cancel:
 

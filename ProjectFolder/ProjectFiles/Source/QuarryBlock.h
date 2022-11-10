@@ -23,13 +23,12 @@ public:
 	* @param blockPosition The position of the Quarry block.
 	* @param currentMode The current mode of the Quarry block.
 	* @param currentDigBlock The coordinates for the block currently being dug out.
-	* @param cornerBlocks The corner blocks.
+	* @param corners The corner positions.
 	* @param digOres Whether to dig ores.
 	* @param digDirection The direction the block is digging.
 	* 
 	*/
-	QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, 
-				std::array<Block, 4> cornerBlocks, bool digOres, int digDirection);
+	QuarryBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<CoordinateInBlocks,4> corners, bool digOres, int digDirection);
 
 	// Digs/mines a single block if the Quarry block is digging at that moment.
 	void dig();
@@ -124,4 +123,7 @@ public:
 	* @return The location that hint texts are to be spawned at.
 	*/
 	CoordinateInCentimeters getHintTextLocation();
-};
+
+	
+	void setAreaSelection();
+}; 

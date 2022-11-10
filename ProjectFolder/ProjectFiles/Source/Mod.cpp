@@ -24,7 +24,7 @@ std::wstring path;
 *************************************************************/
 
 UniqueID ThisModUniqueIDs[] = { quarryBlockID, quarryOffBlockID, quarryOnBlockID, quarrySetBlockID,
-								tunBlockID, tunOffBlockID, tunOnBlockID, tunSetBlockID, markerBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
+								tunBlockID, tunOffBlockID, tunOnBlockID, tunSetBlockID }; // All the UniqueIDs this mod manages. Functions like Event_BlockPlaced are only called for blocks of IDs mentioned here. 
 
 float TickRate = 10;							 // Set how many times per second Event_Tick() is called. 0 means the Event_Tick() function is never called.
 
@@ -115,40 +115,7 @@ void Event_BlockDestroyed(CoordinateInBlocks At, UniqueID CustomBlockID, bool Mo
 // Run every time a block is hit by a tool
 void Event_BlockHitByTool(CoordinateInBlocks At, UniqueID CustomBlockID, wString ToolName, CoordinateInCentimeters ExactHitLocation, bool ToolHeldByHandLeft)
 {
-	bool isLeftover = true; // Keeps track of whether the block is leftover (from bug or something else), i.e., it doesn't belong to a Digging Block.
-
-	switch (CustomBlockID) {
-	case quarryBlockID:
-	case quarryOffBlockID:
-	case quarryOnBlockID:
-	case quarrySetBlockID:
-	case tunBlockID:
-	case tunOffBlockID:
-	case tunOnBlockID:
-	case tunSetBlockID:
-		isLeftover = false;
-		break;
-	case markerBlockID:
-		for (auto it = quarryBlocks.begin(); it != quarryBlocks.end(); it++) {
-			if (it->isCornerBlock(At)) {
-				isLeftover = false;
-				break;
-			}
-		}
-
-		for (auto it = tunnelBlocks.begin(); it != tunnelBlocks.end(); it++) {
-			if (it->isCornerBlock(At)) {
-				isLeftover = false;
-				break;
-			}
-		}
-		break;
-	}
-
-
-	if (isLeftover) {
-		SetBlock(At, EBlockType::Air);
-	}
+	
 }
 
 

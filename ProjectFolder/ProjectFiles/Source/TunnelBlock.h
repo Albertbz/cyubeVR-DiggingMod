@@ -22,12 +22,11 @@ public:
 	* @param blockPosition The position of the Tunnel block.
 	* @param currentMode The current mode of the Tunnel block.
 	* @param currentDigBlock The coordinates for the block currently being dug out.
-	* @param cornerBlocks The corner blocks.
+	* @param corners The corner positions.
 	* @param digOres Whether to dig ores.
 	* @param digDirection The direction the block is digging.
 	*/
-	TunnelBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock,
-		std::array<Block, 4> cornerBlocks, bool digOres, int digDirection);
+	TunnelBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<CoordinateInBlocks,4> corners, bool digOres, int digDirection);
 
 	// Updates the corner blocks to match with digDirection.
 	void updateCornerBlocks();
@@ -113,4 +112,6 @@ public:
 	* @return The location that hint texts are to be spawned at.
 	*/
 	CoordinateInCentimeters getHintTextLocation();
+
+	void setAreaSelection();
 };

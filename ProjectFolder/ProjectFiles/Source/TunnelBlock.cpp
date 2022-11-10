@@ -33,9 +33,8 @@ TunnelBlock::TunnelBlock(CoordinateInBlocks blockPosition)
 	toggleSettings();
 }
 
-TunnelBlock::TunnelBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock,
-	std::array<Block, 4> cornerBlocks, bool digOres, int digDirection)
-	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, cornerBlocks, digOres, digDirection) 
+TunnelBlock::TunnelBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<CoordinateInBlocks,4> corners, bool digOres, int digDirection)
+	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, corners, digOres, digDirection) 
 {
 }
 
@@ -43,28 +42,28 @@ void TunnelBlock::updateCornerBlocks()
 {
 	switch (digDirection) {
 	case 1: 
-		cornerBlocks[0] = { CoordinateInBlocks(0, -2, 2),  markerBlockID, BlockInfo() };
-		cornerBlocks[1] = { CoordinateInBlocks(0, 2, 2),   markerBlockID, BlockInfo() };
-		cornerBlocks[2] = { CoordinateInBlocks(0, -2, -2), markerBlockID, BlockInfo() };
-		cornerBlocks[3] = { CoordinateInBlocks(0, 2, -2),  markerBlockID, BlockInfo() };
+		corners[0] = CoordinateInBlocks(0, -2, 2);
+		corners[1] = CoordinateInBlocks(0, 2, 2);
+		corners[2] = CoordinateInBlocks(0, -2, -2);
+		corners[3] = CoordinateInBlocks(0, 2, -2);
 		break;
 	case 2:
-		cornerBlocks[0] = { CoordinateInBlocks(0, 2, 2),   markerBlockID, BlockInfo() };
-		cornerBlocks[1] = { CoordinateInBlocks(0, -2, 2),  markerBlockID, BlockInfo() };
-		cornerBlocks[2] = { CoordinateInBlocks(0, 2, -2),  markerBlockID, BlockInfo() };
-		cornerBlocks[3] = { CoordinateInBlocks(0, -2, -2), markerBlockID, BlockInfo() };
+		corners[0] = CoordinateInBlocks(0, 2, 2);
+		corners[1] = CoordinateInBlocks(0, -2, 2);
+		corners[2] = CoordinateInBlocks(0, 2, -2);
+		corners[3] = CoordinateInBlocks(0, -2, -2);
 		break;
 	case 3:
-		cornerBlocks[0] = { CoordinateInBlocks(2, 0, 2),   markerBlockID, BlockInfo() };
-		cornerBlocks[1] = { CoordinateInBlocks(-2, 0, 2),  markerBlockID, BlockInfo() };
-		cornerBlocks[2] = { CoordinateInBlocks(2, 0, -2),  markerBlockID, BlockInfo() };
-		cornerBlocks[3] = { CoordinateInBlocks(-2, 0, -2), markerBlockID, BlockInfo() };
+		corners[0] = CoordinateInBlocks(2, 0, 2);
+		corners[1] = CoordinateInBlocks(-2, 0, 2);
+		corners[2] = CoordinateInBlocks(2, 0, -2);
+		corners[3] = CoordinateInBlocks(-2, 0, -2);
 		break;
 	case 4:
-		cornerBlocks[0] = { CoordinateInBlocks(-2, 0, 2),  markerBlockID, BlockInfo() };
-		cornerBlocks[1] = { CoordinateInBlocks(2, 0, 2),   markerBlockID, BlockInfo() };
-		cornerBlocks[2] = { CoordinateInBlocks(-2, 0, -2), markerBlockID, BlockInfo() };
-		cornerBlocks[3] = { CoordinateInBlocks(2, 0, -2),  markerBlockID, BlockInfo() };
+		corners[0] = CoordinateInBlocks(-2, 0, 2);
+		corners[1] = CoordinateInBlocks(2, 0, 2);
+		corners[2] = CoordinateInBlocks(-2, 0, -2);
+		corners[3] = CoordinateInBlocks(2, 0, -2);
 		break;
 	}
 }
@@ -76,11 +75,11 @@ void TunnelBlock::dig()
 			switch (digDirection) {
 			case 1:
 				currentDigBlock.Y++;
-				if (currentDigBlock.Y > cornerBlocks[1].position.Y) {
-					currentDigBlock.Y = cornerBlocks[0].position.Y;
+				if (currentDigBlock.Y > corners[1].Y) {
+					currentDigBlock.Y = corners[0].Y;
 					currentDigBlock.Z--;
-					if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
-						currentDigBlock.Z = cornerBlocks[1].position.Z;
+					if (currentDigBlock.Z < corners[2].Z) {
+						currentDigBlock.Z = corners[1].Z;
 						currentDigBlock.X++;
 						if (currentDigBlock.X > depth) {
 							currentDigBlock.X = 1;
@@ -91,11 +90,11 @@ void TunnelBlock::dig()
 				break;
 			case 2:
 				currentDigBlock.Y--;
-				if (currentDigBlock.Y < cornerBlocks[1].position.Y) {
-					currentDigBlock.Y = cornerBlocks[0].position.Y;
+				if (currentDigBlock.Y < corners[1].Y) {
+					currentDigBlock.Y = corners[0].Y;
 					currentDigBlock.Z--;
-					if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
-						currentDigBlock.Z = cornerBlocks[1].position.Z;
+					if (currentDigBlock.Z < corners[2].Z) {
+						currentDigBlock.Z = corners[1].Z;
 						currentDigBlock.X--;
 						if (currentDigBlock.X < -depth) {
 							currentDigBlock.X = -1;
@@ -106,11 +105,11 @@ void TunnelBlock::dig()
 				break;
 			case 3:
 				currentDigBlock.X--;
-				if (currentDigBlock.X < cornerBlocks[1].position.X) {
-					currentDigBlock.X = cornerBlocks[0].position.X;
+				if (currentDigBlock.X < corners[1].X) {
+					currentDigBlock.X = corners[0].X;
 					currentDigBlock.Z--;
-					if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
-						currentDigBlock.Z = cornerBlocks[1].position.Z;
+					if (currentDigBlock.Z < corners[2].Z) {
+						currentDigBlock.Z = corners[1].Z;
 						currentDigBlock.Y++;
 						if (currentDigBlock.Y > depth) {
 							currentDigBlock.Y = 1;
@@ -121,11 +120,11 @@ void TunnelBlock::dig()
 				break;
 			case 4:
 				currentDigBlock.X++;
-				if (currentDigBlock.X > cornerBlocks[1].position.X) {
-					currentDigBlock.X = cornerBlocks[0].position.X;
+				if (currentDigBlock.X > corners[1].X) {
+					currentDigBlock.X = corners[0].X;
 					currentDigBlock.Z--;
-					if (currentDigBlock.Z < cornerBlocks[2].position.Z) {
-						currentDigBlock.Z = cornerBlocks[1].position.Z;
+					if (currentDigBlock.Z < corners[2].Z) {
+						currentDigBlock.Z = corners[1].Z;
 						currentDigBlock.Y--;
 						if (currentDigBlock.Y < -depth) {
 							currentDigBlock.Y = -1;
@@ -142,18 +141,18 @@ void TunnelBlock::dig()
 void TunnelBlock::incrementLength(char direction) 
 {
 	if (currentMode == 2) {
-		removeCorners();
-		if (direction == 'u' && blockPosition.Z + cornerBlocks[0].position.Z < 798) {
-			cornerBlocks[0].position.Z++;
-			cornerBlocks[1].position.Z++;
+		removeAreaSelection();
+		if (direction == 'u' && blockPosition.Z + corners[0].Z < 798) {
+			corners[0].Z++;
+			corners[1].Z++;
 			length++;
 		}
-		else if (direction == 'd' && blockPosition.Z + cornerBlocks[2].position.Z > 1) {
-			cornerBlocks[2].position.Z--;
-			cornerBlocks[3].position.Z--;
+		else if (direction == 'd' && blockPosition.Z + corners[2].Z > 1) {
+			corners[2].Z--;
+			corners[3].Z--;
 			length++;
 		}
-		setCorners();
+		setAreaSelection();
 		resetDigBlock();
 	}
 }
@@ -161,18 +160,18 @@ void TunnelBlock::incrementLength(char direction)
 void TunnelBlock::decrementLength(char direction) 
 {
 	if (currentMode == 2 && length > 3) {
-		removeCorners();
-		if (direction == 'u' && cornerBlocks[0].position.Z > 1) {
-			cornerBlocks[0].position.Z--;
-			cornerBlocks[1].position.Z--;
+		removeAreaSelection();
+		if (direction == 'u' && corners[0].Z > 1) {
+			corners[0].Z--;
+			corners[1].Z--;
 			length--;
 		}
-		else if (direction == 'd' && cornerBlocks[2].position.Z < -1) {
-			cornerBlocks[2].position.Z++;
-			cornerBlocks[3].position.Z++;
+		else if (direction == 'd' && corners[2].Z < -1) {
+			corners[2].Z++;
+			corners[3].Z++;
 			length--;
 		}
-		setCorners();
+		setAreaSelection();
 		resetDigBlock();
 	}
 }
@@ -180,27 +179,27 @@ void TunnelBlock::decrementLength(char direction)
 void TunnelBlock::incrementWidth(char direction) 
 {
 	if (currentMode == 2) {
-		removeCorners();
+		removeAreaSelection();
 		if (direction == 'r') {
 			switch (digDirection) {
 			case 1:
-				cornerBlocks[1].position.Y++;
-				cornerBlocks[3].position.Y++;
+				corners[1].Y++;
+				corners[3].Y++;
 				width++;
 				break;
 			case 2:
-				cornerBlocks[1].position.Y--;
-				cornerBlocks[3].position.Y--;
+				corners[1].Y--;
+				corners[3].Y--;
 				width++;
 				break;
 			case 3:
-				cornerBlocks[1].position.X--;
-				cornerBlocks[3].position.X--;
+				corners[1].X--;
+				corners[3].X--;
 				width++;
 				break;
 			case 4:
-				cornerBlocks[1].position.X++;
-				cornerBlocks[3].position.X++;
+				corners[1].X++;
+				corners[3].X++;
 				width++;
 				break;
 			}
@@ -208,28 +207,28 @@ void TunnelBlock::incrementWidth(char direction)
 		else if (direction == 'l') {
 			switch (digDirection) {
 			case 1:
-				cornerBlocks[0].position.Y--;
-				cornerBlocks[2].position.Y--;
+				corners[0].Y--;
+				corners[2].Y--;
 				width++;
 				break;
 			case 2:
-				cornerBlocks[0].position.Y++;
-				cornerBlocks[2].position.Y++;
+				corners[0].Y++;
+				corners[2].Y++;
 				width++;
 				break;
 			case 3:
-				cornerBlocks[0].position.X++;
-				cornerBlocks[2].position.X++;
+				corners[0].X++;
+				corners[2].X++;
 				width++;
 				break;
 			case 4:
-				cornerBlocks[0].position.X--;
-				cornerBlocks[2].position.X--;
+				corners[0].X--;
+				corners[2].X--;
 				width++;
 				break;
 			}
 		}
-		setCorners();
+		setAreaSelection();
 		resetDigBlock();
 	}
 }
@@ -237,34 +236,34 @@ void TunnelBlock::incrementWidth(char direction)
 void TunnelBlock::decrementWidth(char direction) 
 {
 	if (currentMode == 2 && width > 3) {
-		removeCorners();
+		removeAreaSelection();
 		if (direction == 'r') {
 			switch (digDirection) {
 			case 1:
-				if (cornerBlocks[1].position.Y > 1) {
-					cornerBlocks[1].position.Y--;
-					cornerBlocks[3].position.Y--;
+				if (corners[1].Y > 1) {
+					corners[1].Y--;
+					corners[3].Y--;
 					width--;
 				}
 				break;
 			case 2:
-				if (cornerBlocks[1].position.Y < -1) {
-					cornerBlocks[1].position.Y++;
-					cornerBlocks[3].position.Y++;
+				if (corners[1].Y < -1) {
+					corners[1].Y++;
+					corners[3].Y++;
 					width--;
 				}
 				break;
 			case 3:
-				if (cornerBlocks[1].position.X < -1) {
-					cornerBlocks[1].position.X++;
-					cornerBlocks[3].position.X++;
+				if (corners[1].X < -1) {
+					corners[1].X++;
+					corners[3].X++;
 					width--;
 				}
 				break;
 			case 4:
-				if (cornerBlocks[1].position.X > 1) {
-					cornerBlocks[1].position.X--;
-					cornerBlocks[3].position.X--;
+				if (corners[1].X > 1) {
+					corners[1].X--;
+					corners[3].X--;
 					width--;
 				}
 				break;
@@ -273,36 +272,36 @@ void TunnelBlock::decrementWidth(char direction)
 		else if (direction == 'l') {
 			switch (digDirection) {
 			case 1:
-				if (cornerBlocks[0].position.Y < -1) {
-					cornerBlocks[0].position.Y++;
-					cornerBlocks[2].position.Y++;
+				if (corners[0].Y < -1) {
+					corners[0].Y++;
+					corners[2].Y++;
 					width--;
 				}
 				break;
 			case 2:
-				if (cornerBlocks[0].position.Y > 1) {
-					cornerBlocks[0].position.Y--;
-					cornerBlocks[2].position.Y--;
+				if (corners[0].Y > 1) {
+					corners[0].Y--;
+					corners[2].Y--;
 					width--;
 				}
 				break;
 			case 3:
-				if (cornerBlocks[0].position.X > 1) {
-					cornerBlocks[0].position.X--;
-					cornerBlocks[2].position.X--;
+				if (corners[0].X > 1) {
+					corners[0].X--;
+					corners[2].X--;
 					width--;
 				}
 				break;
 			case 4:
-				if (cornerBlocks[0].position.X < -1) {
-					cornerBlocks[0].position.X++;
-					cornerBlocks[2].position.X++;
+				if (corners[0].X < -1) {
+					corners[0].X++;
+					corners[2].X++;
 					width--;
 				}
 				break;
 			}
 		}
-		setCorners();
+		setAreaSelection();
 		resetDigBlock();
 	}
 }
@@ -312,23 +311,23 @@ void TunnelBlock::resetDigBlock()
 	switch (digDirection) {
 	case 1:
 		currentDigBlock.X = 1;
-		currentDigBlock.Y = cornerBlocks[0].position.Y;
-		currentDigBlock.Z = cornerBlocks[0].position.Z;
+		currentDigBlock.Y = corners[0].Y;
+		currentDigBlock.Z = corners[0].Z;
 		break;
 	case 2:
 		currentDigBlock.X = -1;
-		currentDigBlock.Y = cornerBlocks[0].position.Y;
-		currentDigBlock.Z = cornerBlocks[0].position.Z;
+		currentDigBlock.Y = corners[0].Y;
+		currentDigBlock.Z = corners[0].Z;
 		break;
 	case 3:
-		currentDigBlock.X = cornerBlocks[0].position.X;
+		currentDigBlock.X = corners[0].X;
 		currentDigBlock.Y = 1;
-		currentDigBlock.Z = cornerBlocks[0].position.Z;
+		currentDigBlock.Z = corners[0].Z;
 		break;
 	case 4:
-		currentDigBlock.X = cornerBlocks[0].position.X;
+		currentDigBlock.X = corners[0].X;
 		currentDigBlock.Y = -1;
-		currentDigBlock.Z = cornerBlocks[0].position.Z;
+		currentDigBlock.Z = corners[0].Z;
 		break;
 	}
 }
@@ -455,4 +454,38 @@ void TunnelBlock::setNormalBlock()
 CoordinateInCentimeters TunnelBlock::getHintTextLocation()
 {
 	return blockPosition + CoordinateInCentimeters(0, 0, 50);
+}
+
+void TunnelBlock::setAreaSelection()
+{
+	switch (digDirection) {
+	case 1:
+		for (int i = blockPosition.Y + corners[2].Y; i <= blockPosition.Y + corners[1].Y; i++) {
+			for (int j = blockPosition.Z + corners[2].Z; j <= blockPosition.Z + corners[1].Z; j++) {
+				SpawnBPModActor(CoordinateInBlocks(blockPosition.X, i, j), L"ParticleActors", L"AreaSelectionParticle+X");
+			}
+		}
+		break;
+	case 2:
+		for (int i = blockPosition.Y + corners[3].Y; i <= blockPosition.Y + corners[0].Y; i++) {
+			for (int j = blockPosition.Z + corners[3].Z; j <= blockPosition.Z + corners[0].Z; j++) {
+				SpawnBPModActor(CoordinateInBlocks(blockPosition.X, i, j), L"ParticleActors", L"AreaSelectionParticle-X");
+			}
+		}
+		break;
+	case 3:
+		for (int i = blockPosition.X + corners[3].X; i <= blockPosition.X + corners[0].X; i++) {
+			for (int j = blockPosition.Z + corners[3].Z; j <= blockPosition.Z + corners[0].Z; j++) {
+				SpawnBPModActor(CoordinateInBlocks(i, blockPosition.Y, j), L"ParticleActors", L"AreaSelectionParticle+Y");
+			}
+		}
+		break;
+	case 4:
+		for (int i = blockPosition.X + corners[2].X; i <= blockPosition.X + corners[1].X; i++) {
+			for (int j = blockPosition.Z + corners[2].Z; j <= blockPosition.Z + corners[1].Z; j++) {
+				SpawnBPModActor(CoordinateInBlocks(i, blockPosition.Y, j), L"ParticleActors", L"AreaSelectionParticle-Y");
+			}
+		}
+		break;
+	}
 }
