@@ -36,6 +36,11 @@ TunnelBlock::TunnelBlock(CoordinateInBlocks blockPosition)
 TunnelBlock::TunnelBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<CoordinateInBlocks,4> corners, bool digOres, int digDirection)
 	: DiggingBlock(length, width, depth, blockPosition, currentMode, currentDigBlock, corners, digOres, digDirection) 
 {
+	// If settings, set area selection
+	if (currentMode == 2) {
+		setAreaSelection();
+	}
+	setDrill();
 }
 
 void TunnelBlock::updateCornerBlocks() 
@@ -65,76 +70,6 @@ void TunnelBlock::updateCornerBlocks()
 		corners[2] = CoordinateInBlocks(-2, 0, -2);
 		corners[3] = CoordinateInBlocks(2, 0, -2);
 		break;
-	}
-}
-
-void TunnelBlock::dig() 
-{
-	if (currentMode == 3) {
-		if (digSuccess()) {
-			switch (digDirection) {
-			case 1:
-				currentDigBlock.Y++;
-				if (currentDigBlock.Y > corners[1].Y) {
-					currentDigBlock.Y = corners[0].Y;
-					currentDigBlock.Z--;
-					if (currentDigBlock.Z < corners[2].Z) {
-						currentDigBlock.Z = corners[1].Z;
-						currentDigBlock.X++;
-						if (currentDigBlock.X > depth) {
-							currentDigBlock.X = 1;
-							finishedDigging();
-						}
-					}
-				}
-				break;
-			case 2:
-				currentDigBlock.Y--;
-				if (currentDigBlock.Y < corners[1].Y) {
-					currentDigBlock.Y = corners[0].Y;
-					currentDigBlock.Z--;
-					if (currentDigBlock.Z < corners[2].Z) {
-						currentDigBlock.Z = corners[1].Z;
-						currentDigBlock.X--;
-						if (currentDigBlock.X < -depth) {
-							currentDigBlock.X = -1;
-							finishedDigging();
-						}
-					}
-				}
-				break;
-			case 3:
-				currentDigBlock.X--;
-				if (currentDigBlock.X < corners[1].X) {
-					currentDigBlock.X = corners[0].X;
-					currentDigBlock.Z--;
-					if (currentDigBlock.Z < corners[2].Z) {
-						currentDigBlock.Z = corners[1].Z;
-						currentDigBlock.Y++;
-						if (currentDigBlock.Y > depth) {
-							currentDigBlock.Y = 1;
-							finishedDigging();
-						}
-					}
-				}
-				break;
-			case 4:
-				currentDigBlock.X++;
-				if (currentDigBlock.X > corners[1].X) {
-					currentDigBlock.X = corners[0].X;
-					currentDigBlock.Z--;
-					if (currentDigBlock.Z < corners[2].Z) {
-						currentDigBlock.Z = corners[1].Z;
-						currentDigBlock.Y--;
-						if (currentDigBlock.Y < -depth) {
-							currentDigBlock.Y = -1;
-							finishedDigging();
-						}
-					}
-				}
-				break;
-			}
-		}
 	}
 }
 
@@ -388,7 +323,7 @@ void TunnelBlock::clickCheck(CoordinateInCentimeters fingerLocation, bool& canCl
 	}
 }
 
-CoordinateInCentimeters TunnelBlock::getCorner()
+CoordinateInCentimeters TunnelBlock::getCornerOfInterface()
 {
 	CoordinateInCentimeters corner{};
 	switch (digDirection) {
@@ -410,7 +345,7 @@ CoordinateInCentimeters TunnelBlock::getCorner()
 
 bool TunnelBlock::isBetween(std::pair<int, int> bottomLeft, std::pair<int, int> topRight, CoordinateInCentimeters fingerPos)
 {
-	CoordinateInCentimeters corner = getCorner();
+	CoordinateInCentimeters corner = getCornerOfInterface();
 	bool result = false;
 
 	switch (digDirection) {
@@ -458,34 +393,253 @@ CoordinateInCentimeters TunnelBlock::getHintTextLocation()
 
 void TunnelBlock::setAreaSelection()
 {
+	SpawnBPModActor(blockPosition, L"DiggingModActors", L"SetCurrentTag");
 	switch (digDirection) {
 	case 1:
 		for (int i = blockPosition.Y + corners[2].Y; i <= blockPosition.Y + corners[1].Y; i++) {
 			for (int j = blockPosition.Z + corners[2].Z; j <= blockPosition.Z + corners[1].Z; j++) {
-				SpawnBPModActor(CoordinateInBlocks(blockPosition.X, i, j), L"ParticleActors", L"AreaSelectionParticle+X");
+				SpawnBPModActor(CoordinateInBlocks(blockPosition.X, i, j), L"DiggingModActors", L"AreaSelectionParticle+X");
 			}
 		}
 		break;
 	case 2:
 		for (int i = blockPosition.Y + corners[3].Y; i <= blockPosition.Y + corners[0].Y; i++) {
 			for (int j = blockPosition.Z + corners[3].Z; j <= blockPosition.Z + corners[0].Z; j++) {
-				SpawnBPModActor(CoordinateInBlocks(blockPosition.X, i, j), L"ParticleActors", L"AreaSelectionParticle-X");
+				SpawnBPModActor(CoordinateInBlocks(blockPosition.X, i, j), L"DiggingModActors", L"AreaSelectionParticle-X");
 			}
 		}
 		break;
 	case 3:
 		for (int i = blockPosition.X + corners[3].X; i <= blockPosition.X + corners[0].X; i++) {
 			for (int j = blockPosition.Z + corners[3].Z; j <= blockPosition.Z + corners[0].Z; j++) {
-				SpawnBPModActor(CoordinateInBlocks(i, blockPosition.Y, j), L"ParticleActors", L"AreaSelectionParticle+Y");
+				SpawnBPModActor(CoordinateInBlocks(i, blockPosition.Y, j), L"DiggingModActors", L"AreaSelectionParticle+Y");
 			}
 		}
 		break;
 	case 4:
 		for (int i = blockPosition.X + corners[2].X; i <= blockPosition.X + corners[1].X; i++) {
 			for (int j = blockPosition.Z + corners[2].Z; j <= blockPosition.Z + corners[1].Z; j++) {
-				SpawnBPModActor(CoordinateInBlocks(i, blockPosition.Y, j), L"ParticleActors", L"AreaSelectionParticle-Y");
+				SpawnBPModActor(CoordinateInBlocks(i, blockPosition.Y, j), L"DiggingModActors", L"AreaSelectionParticle-Y");
 			}
 		}
 		break;
 	}
+}
+
+void TunnelBlock::setDrill()
+{
+	SpawnBPModActor(blockPosition, L"DiggingModActors", L"SetCurrentTag");
+
+	int currentDepth = 0;
+
+	switch (digDirection) {
+	case 1:
+		currentDepth = currentDigBlock.X - 1;
+		if (currentDepth > 0) {
+			for (int i = 1; i <= currentDepth; i++) {
+				SpawnBPModActor(blockPosition + CoordinateInBlocks(i, 0, 0), L"DiggingModActors", L"DrillPipeX");
+			}
+
+			SpawnBPModActor(blockPosition + CoordinateInBlocks(currentDepth, 0, 0), L"DiggingModActors", L"DrillEnd+X");
+		}
+		break;
+	case 2:
+		currentDepth = -currentDigBlock.X - 1;
+
+		if (currentDepth > 0) {
+			for (int i = 1; i <= currentDepth; i++) {
+				SpawnBPModActor(blockPosition - CoordinateInBlocks(i, 0, 0), L"DiggingModActors", L"DrillPipeX");
+			}
+
+			SpawnBPModActor(blockPosition - CoordinateInBlocks(currentDepth, 0, 0), L"DiggingModActors", L"DrillEnd-X");
+		}
+		break;
+	case 3:
+		currentDepth = currentDigBlock.Y - 1;
+
+		if (currentDepth > 0) {
+			for (int i = 1; i <= currentDepth; i++) {
+				SpawnBPModActor(blockPosition + CoordinateInBlocks(0, i, 0), L"DiggingModActors", L"DrillPipeY");
+			}
+
+			SpawnBPModActor(blockPosition + CoordinateInBlocks(0, currentDepth, 0), L"DiggingModActors", L"DrillEnd+Y");
+		}
+		break;
+	case 4:
+		currentDepth = -currentDigBlock.Y - 1;
+
+		if (currentDepth > 0) {
+			for (int i = 1; i <= currentDepth; i++) {
+				SpawnBPModActor(blockPosition - CoordinateInBlocks(0, i, 0), L"DiggingModActors", L"DrillPipeY");
+			}
+
+			SpawnBPModActor(blockPosition - CoordinateInBlocks(0, currentDepth, 0), L"DiggingModActors", L"DrillEnd-Y");
+		}
+		break;
+	}
+
+	
+}
+
+void TunnelBlock::incrementCurrentDigBlock()
+{
+	switch (digDirection) {
+	case 1:
+		currentDigBlock.Y++;
+		if (currentDigBlock.Y > corners[1].Y) {
+			currentDigBlock.Y = corners[0].Y;
+			currentDigBlock.Z--;
+			if (currentDigBlock.Z < corners[2].Z) {
+				currentDigBlock.Z = corners[1].Z;
+				currentDigBlock.X++;
+				refreshDrill();
+				if (currentDigBlock.X > depth) {
+					currentDigBlock.X = 1;
+					finishedDigging();
+				}
+			}
+		}
+		break;
+	case 2:
+		currentDigBlock.Y--;
+		if (currentDigBlock.Y < corners[1].Y) {
+			currentDigBlock.Y = corners[0].Y;
+			currentDigBlock.Z--;
+			if (currentDigBlock.Z < corners[2].Z) {
+				currentDigBlock.Z = corners[1].Z;
+				currentDigBlock.X--;
+				refreshDrill();
+				if (currentDigBlock.X < -depth) {
+					currentDigBlock.X = -1;
+					finishedDigging();
+				}
+			}
+		}
+		break;
+	case 3:
+		currentDigBlock.X--;
+		if (currentDigBlock.X < corners[1].X) {
+			currentDigBlock.X = corners[0].X;
+			currentDigBlock.Z--;
+			if (currentDigBlock.Z < corners[2].Z) {
+				currentDigBlock.Z = corners[1].Z;
+				currentDigBlock.Y++;
+				refreshDrill();
+				if (currentDigBlock.Y > depth) {
+					currentDigBlock.Y = 1;
+					finishedDigging();
+				}
+			}
+		}
+		break;
+	case 4:
+		currentDigBlock.X++;
+		if (currentDigBlock.X > corners[1].X) {
+			currentDigBlock.X = corners[0].X;
+			currentDigBlock.Z--;
+			if (currentDigBlock.Z < corners[2].Z) {
+				currentDigBlock.Z = corners[1].Z;
+				currentDigBlock.Y--;
+				refreshDrill();
+				if (currentDigBlock.Y < -depth) {
+					currentDigBlock.Y = -1;
+					finishedDigging();
+				}
+			}
+		}
+		break;
+	}
+}
+
+bool TunnelBlock::nextBlockIsLastOnLayer()
+{
+	return currentDigBlock.Z - 1 < corners[2].Z;
+}
+
+int TunnelBlock::getAmountOfAirBlocksInArea()
+{
+	int result = 0;
+
+	bool wasEmptyLayer;
+
+	switch (digDirection) {
+	case 1:
+		for (int x = 1; x <= depth; x++) {
+			wasEmptyLayer = true;
+			for (int y = corners[2].Y; y <= corners[1].Y; y++) {
+				for (int z = corners[2].Z; z <= corners[1].Z; z++) {
+					BlockInfo blockInfo = GetBlock(blockPosition + CoordinateInBlocks(x, y, z));
+					if (blockInfo.Type == EBlockType::Air) {
+						result++;
+					}
+					else {
+						wasEmptyLayer = false;
+					}
+				}
+			}
+			if (wasEmptyLayer) {
+				result -= 5;
+			}
+		}
+		break;
+	case 2:
+		for (int x = 1; x <= depth; x++) {
+			wasEmptyLayer = true;
+			for (int y = corners[3].Y; y <= corners[0].Y; y++) {
+				for (int z = corners[3].Z; z <= corners[0].Z; z++) {
+					BlockInfo blockInfo = GetBlock(blockPosition + CoordinateInBlocks(-x, y, z));
+					if (blockInfo.Type == EBlockType::Air) {
+						result++;
+					}
+					else {
+						wasEmptyLayer = false;
+					}
+				}
+			}
+			if (wasEmptyLayer) {
+				result -= 5;
+			}
+		}
+		break;
+	case 3:
+		for (int y = 1; y <= depth; y++) {
+			wasEmptyLayer = true;
+			for (int x = corners[3].X; x <= corners[0].X; x++) {
+				for (int z = corners[3].Z; z <= corners[0].Z; z++) {
+					BlockInfo blockInfo = GetBlock(blockPosition + CoordinateInBlocks(x, y, z));
+					if (blockInfo.Type == EBlockType::Air) {
+						result++;
+					}
+					else {
+						wasEmptyLayer = false;
+					}
+				}
+			}
+			if (wasEmptyLayer) {
+				result -= 5;
+			}
+		}
+		break;
+	case 4:
+		for (int y = 1; y <= depth; y++) {
+			wasEmptyLayer = true;
+			for (int x = corners[2].X; x <= corners[1].X; x++) {
+				for (int z = corners[2].Z; z <= corners[1].Z; z++) {
+					BlockInfo blockInfo = GetBlock(blockPosition + CoordinateInBlocks(x, -y, z));
+					if (blockInfo.Type == EBlockType::Air) {
+						result++;
+					}
+					else {
+						wasEmptyLayer = false;
+					}
+				}
+			}
+			if (wasEmptyLayer) {
+				result -= 5;
+			}
+		}
+		break;
+	}
+
+	return result;
 }

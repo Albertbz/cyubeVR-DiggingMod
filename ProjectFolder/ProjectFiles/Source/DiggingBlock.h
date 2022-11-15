@@ -19,7 +19,7 @@ public:
 	int currentMode;
 	// The current block that is being dug out, relative to blockPosition.
 	CoordinateInBlocks currentDigBlock;
-	// An array of all of the Corner positions.
+	// An array of all of the Corner positions, relative to blockPosition.
 	std::array<CoordinateInBlocks, 4> corners;
 	// Keeps track of whether to dig ores as well.
 	bool digOres;
@@ -59,10 +59,10 @@ public:
 	*/
 	DiggingBlock(int length, int width, int depth, CoordinateInBlocks blockPosition, int currentMode, CoordinateInBlocks currentDigBlock, std::array<CoordinateInBlocks,4> corners, bool digOres, int digDirection);
 
-	// Adds the corners of the area that is to be dug out.
+	// Adds the particles that show the area that is currently selected.
 	virtual void setAreaSelection() = 0;
 
-	// Removes the corners of the area that is to be dug out.
+	// Removes the particles that show the area that is currently selected.
 	void removeAreaSelection();
 
 	/**
@@ -119,7 +119,7 @@ public:
 	wString getSize();
 
 	// Digs/mines a single block if the DiggingBlock is digging at that moment.
-	virtual void dig() = 0;
+	void dig();
 
 	/**
 	* Tries to dig and returns whether the digging was a success. If any error
@@ -220,7 +220,7 @@ public:
 	* 
 	* @return The corner of the interface.
 	*/
-	virtual CoordinateInCentimeters getCorner() = 0;
+	virtual CoordinateInCentimeters getCornerOfInterface() = 0;
 
 	/**
 	* Computes whether the finger is between the two points given.
@@ -252,4 +252,34 @@ public:
 	* @return The location that hint texts are to be spawned at.
 	*/
 	virtual CoordinateInCentimeters getHintTextLocation() = 0;
+
+
+	// Sets the drill actors.
+	virtual void setDrill() = 0;
+
+	// Removes the drill actors.
+	void removeDrill();
+
+	// Refreshes the drill by removing and setting it again.
+	void refreshDrill();
+
+	/*
+	* Whether the next block is the last on the layer currently
+	* being dug out.
+	* 
+	* @return Whether the next block is the last on the layer.
+	*/
+	virtual bool nextBlockIsLastOnLayer() = 0;
+
+	// Set the current dig block to the next block that it
+	// is going to be.
+	virtual void incrementCurrentDigBlock() = 0;
+
+	/*
+	* Get the amount of air blocks in the area currently
+	* being dug out.
+	* 
+	* @return The amount of air blocks in the area.
+	*/
+	virtual int getAmountOfAirBlocksInArea() = 0;
 };

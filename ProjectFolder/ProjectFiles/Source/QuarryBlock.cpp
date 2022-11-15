@@ -37,27 +37,12 @@ QuarryBlock::QuarryBlock(int length, int width, int depth, CoordinateInBlocks bl
 			this->currentDigBlock.Z = -this->depth;
 		}
 	}
-}
 
-void QuarryBlock::dig() 
-{
-	if (currentMode == 3) {
-		if (digSuccess()) {
-			currentDigBlock.X--;
-			if (currentDigBlock.X < corners[2].X) {
-				currentDigBlock.X = corners[0].X;
-				currentDigBlock.Y--;
-				if (currentDigBlock.Y < corners[0].Y) {
-					currentDigBlock.Y = corners[1].Y;
-					currentDigBlock.Z--;
-					if (currentDigBlock.Z < -depth) {
-						currentDigBlock.Z = -1;
-						finishedDigging();
-					}
-				}
-			}
-		}
+	// If settings, set area selection
+	if (currentMode == 2) {
+		setAreaSelection();
 	}
+	setDrill();
 }
 
 void QuarryBlock::incrementLength(char block) 
@@ -166,14 +151,14 @@ void QuarryBlock::clickCheck(CoordinateInCentimeters fingerLocation, bool& canCl
 	}
 }
 
-CoordinateInCentimeters QuarryBlock::getCorner()
+CoordinateInCentimeters QuarryBlock::getCornerOfInterface()
 {
 	return blockPosition + CoordinateInCentimeters(-25, -25, 25);
 }
 
 bool QuarryBlock::isBetween(std::pair<int, int> bottomLeft, std::pair<int, int> topRight, CoordinateInCentimeters fingerPos)
 {
-	CoordinateInCentimeters corner = getCorner();
+	CoordinateInCentimeters corner = getCornerOfInterface();
 
 	return fingerPos.X >= corner.X + bottomLeft.first - 1 && fingerPos.X <= corner.X + topRight.first - 1 && fingerPos.Y >= corner.Y + bottomLeft.second && fingerPos.Y <= corner.Y + topRight.second;
 }
@@ -252,9 +237,76 @@ CoordinateInCentimeters QuarryBlock::getHintTextLocation()
 
 void QuarryBlock::setAreaSelection()
 {
+	SpawnBPModActor(blockPosition, L"DiggingModActors", L"SetCurrentTag");
 	for (int i = blockPosition.X + corners[2].X; i <= blockPosition.X + corners[1].X; i++) {
 		for (int j = blockPosition.Y + corners[2].Y; j <= blockPosition.Y + corners[1].Y; j++) {
-			SpawnBPModActor(CoordinateInBlocks(i, j, blockPosition.Z), L"ParticleActors", L"AreaSelectionParticle-Z");
+			SpawnBPModActor(CoordinateInBlocks(i, j, blockPosition.Z), L"DiggingModActors", L"AreaSelectionParticle-Z");
 		}
 	}
+}
+
+void QuarryBlock::setDrill()
+{
+	SpawnBPModActor(blockPosition, L"DiggingModActors", L"SetCurrentTag");
+
+	int currentDepth = -currentDigBlock.Z - 1;
+
+	if (currentDepth > 0) {
+		for (int i = 1; i <= currentDepth; i++) {
+			SpawnBPModActor(blockPosition - CoordinateInBlocks(0, 0, i), L"DiggingModActors", L"DrillPipeZ");
+		}
+
+		SpawnBPModActor(blockPosition - CoordinateInBlocks(0, 0, currentDepth), L"DiggingModActors", L"DrillEnd-Z");
+	}
+}
+
+void QuarryBlock::incrementCurrentDigBlock()
+{
+	currentDigBlock.X--;
+	if (currentDigBlock.X < corners[2].X) {
+		currentDigBlock.X = corners[0].X;
+		currentDigBlock.Y--;
+		if (currentDigBlock.Y < corners[0].Y) {
+			currentDigBlock.Y = corners[1].Y;
+			currentDigBlock.Z--;
+			refreshDrill();
+			if (currentDigBlock.Z < -depth) {
+				currentDigBlock.Z = -1;
+				finishedDigging();
+			}
+		}
+	}
+}
+
+bool QuarryBlock::nextBlockIsLastOnLayer()
+{
+	return currentDigBlock.Y - 1 < corners[0].Y;
+}
+
+int QuarryBlock::getAmountOfAirBlocksInArea()
+{
+	int result = 0;
+
+	bool wasEmptyLayer;
+
+	for (int z = 1; z <= depth; z++) {
+		wasEmptyLayer = true;
+		for (int x = corners[2].X; x <= corners[1].X; x++) {
+			for (int y = corners[2].Y; y <= corners[1].Y; y++) {
+				BlockInfo blockInfo = GetBlock(blockPosition + CoordinateInBlocks(x, y, -z));
+				if (blockInfo.Type == EBlockType::Air) {
+					result++;
+				}
+				else {
+					wasEmptyLayer = false;
+				}
+			}
+		}
+
+		if (wasEmptyLayer) {
+			result -= 5;
+		}
+	}
+
+	return result;
 }

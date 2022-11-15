@@ -30,9 +30,6 @@ public:
 
 	// Updates the corner blocks to match with digDirection.
 	void updateCornerBlocks();
-	
-	// Digs/mines a single block if the Tunnel block is digging at that moment.
-	void dig();
 
 	/**
 	* Increments the length of the area that is to be dug out.
@@ -80,7 +77,7 @@ public:
 	*
 	* @return The corner of the interface.
 	*/
-	CoordinateInCentimeters getCorner();
+	CoordinateInCentimeters getCornerOfInterface();
 
 	/**
 	* Computes whether the finger is between the two points given.
@@ -114,4 +111,12 @@ public:
 	CoordinateInCentimeters getHintTextLocation();
 
 	void setAreaSelection();
+
+	void setDrill();
+
+	void incrementCurrentDigBlock();
+
+	bool nextBlockIsLastOnLayer();
+
+	int getAmountOfAirBlocksInArea();
 };

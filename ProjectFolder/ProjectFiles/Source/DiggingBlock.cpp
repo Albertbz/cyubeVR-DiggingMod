@@ -42,7 +42,7 @@ DiggingBlock::DiggingBlock(int length, int width, int depth, CoordinateInBlocks 
 
 void DiggingBlock::removeAreaSelection() 
 {
-	SpawnBPModActor(blockPosition, L"ParticleActors", L"RemoveAreaSelectionParticles");
+	SpawnBPModActor(blockPosition, L"DiggingModActors", L"RemoveAreaSelectionParticles");
 }
 
 void DiggingBlock::incrementSize() 
@@ -102,10 +102,35 @@ std::wstring DiggingBlock::getSize()
 	return std::to_wstring(length) + L"x" + std::to_wstring(width) + L"x" + std::to_wstring(depth);
 }
 
+void DiggingBlock::dig()
+{
+	if (currentMode == 3) {
+		BlockInfo blockInfo = GetBlock(blockPosition + currentDigBlock);
+
+		// For as long as the dig block is air, go to the next one
+		while (blockInfo.Type == EBlockType::Air) {
+			if (nextBlockIsLastOnLayer()) {
+				break;
+			}
+			incrementCurrentDigBlock();
+			blockInfo = GetBlock(blockPosition + currentDigBlock);
+		}
+
+		if (digSuccess()) {
+			incrementCurrentDigBlock();
+		}
+	}
+}
+
 bool DiggingBlock::digSuccess()
 {
 	BlockInfo currentBlock = GetBlock(blockPosition + currentDigBlock);
-	if (diggableBlock(currentBlock)) {
+	
+	// If the block is not valid (i.e., not loaded), return false
+	if (!currentBlock.IsValid()) {
+		return false;
+	}
+	else if (diggableBlock(currentBlock)) {
 		bool setCorrect = SetBlock(blockPosition + currentDigBlock, EBlockType::Air);
 
 		// If out of loaded chunk and the block therefore is not set (SetBlock returns false), do not continue digging.
@@ -123,9 +148,7 @@ bool DiggingBlock::digSuccess()
 			}
 		}
 	}
-	else if (!currentBlock.IsValid()) {
-		return false;
-	}
+	
 	return true;
 }
 
@@ -175,12 +198,14 @@ void DiggingBlock::destroy()
 	if (currentMode == 2) {
 		removeAreaSelection();
 	}
+	removeDrill();
 	currentMode = 0;
 }
 
 std::wstring DiggingBlock::timeToDig() 
 {
-	int totalSeconds = length * width * depth / 5;
+	int totalBlocks = length * width * depth - getAmountOfAirBlocksInArea();
+	int totalSeconds = totalBlocks / 5;
 	int seconds = totalSeconds % 60;
 	int totalMinutes = totalSeconds / 60;
 	int minutes = totalMinutes % 60;
@@ -423,4 +448,15 @@ void DiggingBlock::printHintText(CoordinateInCentimeters location, std::wstring 
 
 	DestroyHintText(currentHintTextHandle);
 	currentHintTextHandle = SpawnHintTextAdvanced(location, text, duration, sizeMul, sizeMulVer, fontMul);
+}
+
+void DiggingBlock::removeDrill()
+{
+	SpawnBPModActor(blockPosition, L"DiggingModActors", L"RemoveDrill");
+}
+
+void DiggingBlock::refreshDrill()
+{
+	removeDrill();
+	setDrill();
 }
